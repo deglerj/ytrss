@@ -1,0 +1,97 @@
+apply plugin: 'war'
+apply plugin: 'checkstyle'
+apply plugin: 'findbugs'
+
+defaultTasks 'test', 'check', 'war'
+
+def depsDir = file('build/dependencies')
+
+sourceCompatibility = 1.8 
+
+configurations {
+  standalone
+}
+
+tasks.withType(Compile) {
+    options.encoding = 'UTF-8'
+}
+
+repositories {
+	mavenCentral()
+    flatDir dirs: ['lib']
+}
+
+dependencies {
+    compile group: 'com.google.guava', name: 'guava', version: '+'
+    compile group: 'org.hsqldb', name: 'hsqldb', version: '2.+'
+    compile group: 'org.eclipse.jetty.aggregate', name: 'jetty-all', version: '9.+'
+	compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '+'
+	compile group: 'org.apache.commons', name: 'commons-io', version: '+'
+	compile group: 'org.apache.commons', name: 'commons-lang3', version: '+'
+	standalone group: 'org.slf4j', name: 'slf4j-log4j12', version: '+'
+	standalone group: 'org.eclipse.jetty.aggregate', name: 'jetty-all', version: '9.+'
+    testCompile group: 'junit', name: 'junit', version: '+'    
+}
+
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src', 'standalone']
+        }
+        resources {
+        	srcDirs = ['src']
+        }
+    }
+    test {
+    	java {
+            srcDir 'test'
+        }
+    }	
+}
+
+task extractStandaloneDependencies << {
+	for(file in configurations.standalone) {
+		ant.unzip(src: file.absolutePath,
+			dest: depsDir)
+	}
+	
+	//Remove some unnecessary files
+	ant.delete (includeEmptyDirs: 'true') {
+		fileset(dir: file(depsDir), includes: '*.css')
+	}
+	ant.delete (includeEmptyDirs: 'true') {
+		fileset(dir: file(depsDir), includes: '*.html')
+	} 
+	ant.delete (includeEmptyDirs: 'true') {
+		fileset(dir: file(depsDir), includes: '*.properties')
+	}
+	ant.delete(dir: new File(depsDir, 'META-INF'))
+	ant.delete(dir: new File(depsDir, 'about_files'))
+}
+
+
+war {
+	dependsOn 'extractStandaloneDependencies'
+
+    from fileTree(dir: 'war', exclude: '**/*.class')
+    from fileTree(dir: 'build/classes/main', include: '**/Main.class', exclude: ['**/org/**', '**/com/**'])
+    from fileTree(dir: 'build/resources/main', include: '**/log4j.xml')
+    from depsDir
+    
+    manifest {
+        attributes(
+        	"Main-Class": "Main"
+        )
+    }
+}
+
+checkstyle {
+	 configFile = file('plugin-configs/checkstyle')
+	 ignoreFailures = true
+}
+
+findbugs {
+	ignoreFailures = true
+	
+}
