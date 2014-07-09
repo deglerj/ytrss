@@ -30,6 +30,7 @@ dependencies {
 	compile('org.apache.commons:commons-io:+')
 	compile('org.apache.commons:commons-lang3:+')
     compile('it.sauronsoftware:jave:1.+')
+    compile('com.googlecode.flyway:flyway-core:+')
     testCompile('junit:junit:+')    
 }
 
@@ -37,10 +38,10 @@ dependencies {
 sourceSets {
     main {
         java {
-            srcDirs = ['src']
+            srcDirs = ['src', 'db']
         }
         resources {
-        	srcDirs = ['src', 'webapp']
+        	srcDirs = ['src', 'webapp', 'db']
         }
     }
     test {
@@ -58,4 +59,8 @@ checkstyle {
 findbugs {
 	ignoreFailures = true
 	
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '2.0'
 }

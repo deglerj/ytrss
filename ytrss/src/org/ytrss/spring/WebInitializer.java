@@ -13,7 +13,7 @@ public class WebInitializer implements WebApplicationInitializer {
 	@Override
 	public void onStartup(ServletContext servletContext) throws ServletException {
 		AnnotationConfigWebApplicationContext ctx = new AnnotationConfigWebApplicationContext();
-		ctx.register(Context.class);
+		ctx.register(YTRSSConfiguration.class);
 
 		ctx.setServletContext(servletContext);
 
