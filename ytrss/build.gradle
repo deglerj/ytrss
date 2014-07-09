@@ -18,6 +18,9 @@ tasks.withType(Compile) {
 
 repositories {
 	mavenCentral()
+	maven {
+		url 'http://xuggle.googlecode.com/svn/trunk/repo/share/java/'
+	}
     flatDir dirs: ['lib']
 }
 
@@ -25,10 +28,9 @@ dependencies {
     compile group: 'com.google.guava', name: 'guava', version: '+'
     compile group: 'org.hsqldb', name: 'hsqldb', version: '2.+'
     compile group: 'org.eclipse.jetty.aggregate', name: 'jetty-all', version: '9.+'
-	compile group: 'org.slf4j', name: 'slf4j-log4j12', version: '+'
 	compile group: 'org.apache.commons', name: 'commons-io', version: '+'
 	compile group: 'org.apache.commons', name: 'commons-lang3', version: '+'
-	standalone group: 'org.slf4j', name: 'slf4j-log4j12', version: '+'
+	compile name: 'jave-1.0.2'
 	standalone group: 'org.eclipse.jetty.aggregate', name: 'jetty-all', version: '9.+'
     testCompile group: 'junit', name: 'junit', version: '+'    
 }
@@ -81,7 +83,7 @@ war {
     
     manifest {
         attributes(
-        	"Main-Class": "Main"
+        	'Main-Class': 'Main'
         )
     }
 }
