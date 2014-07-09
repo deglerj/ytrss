@@ -19,9 +19,8 @@ tasks.withType(Compile) {
 repositories {
 	mavenCentral()
 	maven {
-		url 'http://xuggle.googlecode.com/svn/trunk/repo/share/java/'
+		url 'http://jerrymouse-repositories.googlecode.com/svn/'
 	}
-    flatDir dirs: ['lib']
 }
 
 dependencies {
@@ -30,7 +29,7 @@ dependencies {
     compile group: 'org.eclipse.jetty.aggregate', name: 'jetty-all', version: '9.+'
 	compile group: 'org.apache.commons', name: 'commons-io', version: '+'
 	compile group: 'org.apache.commons', name: 'commons-lang3', version: '+'
-	compile name: 'jave-1.0.2'
+    compile group: 'it.sauronsoftware', name: 'jave', version: '+'
 	standalone group: 'org.eclipse.jetty.aggregate', name: 'jetty-all', version: '9.+'
     testCompile group: 'junit', name: 'junit', version: '+'    
 }
