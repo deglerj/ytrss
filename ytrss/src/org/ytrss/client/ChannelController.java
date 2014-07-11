@@ -5,6 +5,8 @@ import java.util.Collections;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +27,13 @@ public class ChannelController {
 	@ModelAttribute
 	public Channel channel() {
 		return new Channel();
+	}
+
+	@RequestMapping(value = "/channel/{id}/delete", method = RequestMethod.GET)
+	public String getChannel(@PathVariable(value = "id") final long id) {
+		channelDAO.delete(id);
+
+		return "redirect:/";
 	}
 
 	@RequestMapping(value = "/channel/{id}", method = RequestMethod.GET)
@@ -48,8 +57,10 @@ public class ChannelController {
 	}
 
 	@RequestMapping(value = "/channel/{id}", method = RequestMethod.POST)
-	public String postChannel(@ModelAttribute final Channel channel, final Model model) {
-		channelDAO.persist(channel);
+	public String postChannel(@ModelAttribute @Validated final Channel channel, final BindingResult bindingResult, final Model model) {
+		if (!bindingResult.hasErrors()) {
+			channelDAO.persist(channel);
+		}
 
 		addCommonModelAttributes(channel, model);
 
@@ -57,7 +68,12 @@ public class ChannelController {
 	}
 
 	@RequestMapping(value = "/channel", method = RequestMethod.POST)
-	public String postNewChannel(@ModelAttribute final Channel channel, final Model model) {
+	public String postNewChannel(@ModelAttribute @Validated final Channel channel, final BindingResult bindingResult, final Model model) {
+		if (bindingResult.hasErrors()) {
+			addCommonModelAttributes(channel, model);
+			return "channel";
+		}
+
 		channelDAO.persist(channel);
 
 		return "redirect:/channel/" + channel.getId();

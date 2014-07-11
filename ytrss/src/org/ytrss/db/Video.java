@@ -3,20 +3,30 @@ package org.ytrss.db;
 import java.sql.Date;
 import java.sql.Timestamp;
 
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.validator.constraints.NotBlank;
+
 public class Video {
 
 	private Long		id;
 
+	@NotBlank
 	private Long		channelID;
 
+	@NotBlank
 	private String		youtubeID;
 
+	@NotNull
 	private Date		uploaded;
 
+	@NotBlank
 	private String		name;
 
+	@NotNull
 	private Timestamp	discovered;
 
+	@NotNull
 	private VideoState	state;
 
 	private String		videoFile;

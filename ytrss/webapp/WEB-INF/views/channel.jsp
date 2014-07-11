@@ -79,7 +79,7 @@
 					<h1 style="display:inline-block;">${channel.name}</h1>
 				</div>
 				<div class="col-md-4 text-right">
-					<a class="btn btn-danger" href="channel" role="button"><i class="glyphicon glyphicon-trash" style="margin-right: 7px"></i>Delete</a>
+					<a class="btn btn-danger" href="channel/${channel.id}/delete" role="button"><i class="glyphicon glyphicon-trash" style="margin-right: 7px"></i>Delete</a>
 				</div>
 			</div>
 		</c:if>
@@ -97,12 +97,18 @@
 					<div class="col-xs-7">
 						<form:input path="name" cssClass="form-control" id="inputName" placeholder="Monty Python" type="text"/>
 					</div>
+					<div class="col-xs-2">
+						<form:errors path="name" cssClass="form-error"/>
+					</div>
 				</div>
 
 				<div class="form-group">
 					<label for="inputURL" class="control-label col-xs-2">URL</label>
 					<div class="col-xs-7">
-						<form:input path="url" cssClass="form-control" id="inputURL" placeholder="youtube.com/user/MontyPython" type="url"/>
+						<form:input path="url" cssClass="form-control" id="inputURL" placeholder="http://youtube.com/user/MontyPython" type="url"/>
+					</div>
+					<div class="col-xs-2">
+						<form:errors path="url" cssClass="form-error"/>
 					</div>
 				</div>
 

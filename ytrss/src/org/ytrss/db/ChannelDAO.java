@@ -72,6 +72,13 @@ public class ChannelDAO {
 		return feed;
 	};
 
+	public void delete(final long id) {
+		jdbcTemplate.update("DELETE FROM \"VIDEO\" WHERE \"CHANNEL_FK\" = ? ", id);
+		jdbcTemplate.update("DELETE FROM \"CHANNEL\" WHERE \"ID\" = ? ", id);
+
+		// TODO delete videos' files
+	}
+
 	@Transactional(readOnly = true)
 	public List<Channel> findAll() {
 		return jdbcTemplate.query("SELECT * FROM \"CHANNEL\" ORDER BY \"NAME\"", rowMapper);
