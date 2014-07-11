@@ -1,5 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
 <c:set var="req" value="${pageContext.request}" />
 <c:set var="url">${req.requestURL}</c:set>
@@ -16,7 +17,7 @@
 
 <base href="${base}">
 
-<title>YTRSS - Downloads</title>
+<title>ytrss - Downloads</title>
 
 <link href="images/favicon.ico" rel="shortcut icon">
 <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -67,7 +68,7 @@
 
 	<div class="container">
 		<p class="text-right">
-			<a class="btn btn-lg btn-primary" href="../../components/#navbar" role="button"><i class="glyphicon glyphicon-plus" style="margin-right: 7px"></i>Add a channel</a>
+			<a class="btn btn-lg btn-primary" href="channel" role="button"><i class="glyphicon glyphicon-plus" style="margin-right: 7px"></i>Add a channel</a>
 		</p>
 		<p>
 			<table class="table">
@@ -79,7 +80,9 @@
 				</tr>
 				<c:forEach var="video" items="${videos}">
 					<tr>
-						<td>10.07.2014</td>
+						<td>
+							<fmt:formatDate value="${video.uploaded}"/>
+						</td>
 						<td>
 							<a href="channel/${video.channelID}">
 								${channels.get(video.channelID).name}
@@ -109,8 +112,6 @@
 				</c:forEach>
 			</table>
 		</p>
-		
-
 	</div>
 
 	<script src="js/jquery-1.11.1.min.js"></script>

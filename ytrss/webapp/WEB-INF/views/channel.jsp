@@ -1,5 +1,7 @@
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
-<%@taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<%@taglib prefix="c"    uri="http://java.sun.com/jsp/jstl/core"%>
+<%@taglib prefix="fn"   uri="http://java.sun.com/jsp/jstl/functions"%>
+<%@taglib prefix="fmt"  uri="http://java.sun.com/jsp/jstl/fmt"%>
+<%@taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 
 <c:set var="req" value="${pageContext.request}" />
 <c:set var="url">${req.requestURL}</c:set>
@@ -16,7 +18,12 @@
 
 <base href="${base}">
 
-<title>YTRSS - Channel Foo</title>
+<c:if test="${channel.id != null}">
+	<title>ytrss - ${channel.name}</title>
+</c:if>
+<c:if test="${channel.id == null}">
+	<title>ytrss - Add channel</title>
+</c:if>
 
 <link href="images/favicon.ico" rel="shortcut icon">
 <link href="css/bootstrap.min.css" rel="stylesheet">
@@ -66,22 +73,36 @@
 	</div>
 
 	<div class="container spread-fieldsets">
-		<h1>${channel.name}</h1>
-
+		<c:if test="${channel.id != null}">
+			<div class="row">
+				<div class="col-md-8">
+					<h1 style="display:inline-block;">${channel.name}</h1>
+				</div>
+				<div class="col-md-4 text-right">
+					<a class="btn btn-danger" href="channel" role="button"><i class="glyphicon glyphicon-trash" style="margin-right: 7px"></i>Delete</a>
+				</div>
+			</div>
+		</c:if>
+		<c:if test="${channel.id == null}">
+			<h1>Add channel</h1>
+		</c:if>
+		
 		<fieldset>
-			<legend>Data</legend>
-			<form class="form-horizontal">
+			<c:if test="${channel.id != null}">
+				<legend>Data</legend>
+			</c:if>
+			<form:form method="post" commandName="channel" cssClass="form-horizontal">
 				<div class="form-group">
 					<label for="inputName" class="control-label col-xs-2">Name</label>
 					<div class="col-xs-7">
-						<input type="text" class="form-control" id="inputName" placeholder="Monty Python">
+						<form:input path="name" cssClass="form-control" id="inputName" placeholder="Monty Python" type="text"/>
 					</div>
 				</div>
 
 				<div class="form-group">
 					<label for="inputURL" class="control-label col-xs-2">URL</label>
 					<div class="col-xs-7">
-						<input type="url" class="form-control" id="inputURL" placeholder="youtube.com/user/MontyPython">
+						<form:input path="url" cssClass="form-control" id="inputURL" placeholder="youtube.com/user/MontyPython" type="url"/>
 					</div>
 				</div>
 
@@ -90,34 +111,69 @@
 						<button type="submit" class="btn btn-primary">Save</button>
 					</div>
 				</div>
-			</form>
+			</form:form>
 		</fieldset>
 		
-		<fieldset>
-			<legend>Feeds</legend>
-			
-			<div class="form-horizontal">
-				<div class="form-group">
-					<label for="feedAtom" class="control-label col-xs-2">Atom</label>
-					<div class="col-xs-7">
-						<a id="feedAtom" href="#" class="form-control-text">http://localhost:8080/ytrss/atom/${channel.id}</a>
+		<c:if test="${channel.id != null}">
+			<fieldset>
+				<legend>Feeds</legend>
+				
+				<div class="form-horizontal">
+					<div class="form-group">
+						<label for="feedAtom" class="control-label col-xs-2">Atom</label>
+						<div class="col-xs-7">
+							<a id="feedAtom" href="#" class="form-control-text">http://localhost:8080/ytrss/atom/${channel.id}</a>
+						</div>
+					</div>
+	
+					<div class="form-group">
+						<label for="feedRSS" class="control-label col-xs-2">RSS</label>
+						<div class="col-xs-7">
+							<a id="feedRSS" href="#" class="form-control-text">http://localhost:8080/ytrss/rss/${channel.id}</a>
+						</div>
 					</div>
 				</div>
-
-				<div class="form-group">
-					<label for="feedRSS" class="control-label col-xs-2">RSS</label>
-					<div class="col-xs-7">
-						<a id="feedRSS" href="#" class="form-control-text">http://localhost:8080/ytrss/rss/${channel.id}</a>
-					</div>
-				</div>
-			</div>
-		</fieldset>
-		
-		<fieldset>
-			<legend>Downloads</legend>
+			</fieldset>
 			
-			<h4>TODO</h4>
-		</fieldset>
+			<fieldset>
+				<legend>Downloads</legend>
+				
+				<table class="table">
+					<tr>
+						<th>Uploaded</th>
+						<th>Name</th>
+						<th>Status</th>
+					</tr>
+					<c:forEach var="video" items="${videos}">
+						<tr>
+							<td>
+								<fmt:formatDate value="${video.uploaded}"/>
+							</td>
+							<td>
+								<a href="https://www.youtube.com/watch?v=${video.youtubeID}">
+									${video.name}
+								</a>
+							</td>
+							<c:if test="${video.state.ordinal() == 0}">
+								<td><span class="label label-info table-state-label"><i class="glyphicon glyphicon-info-sign"></i> New</span></td>
+							</c:if>
+							<c:if test="${video.state.ordinal() == 1}">
+								<td><span class="label label-info table-state-label"><i class="glyphicon glyphicon-info-sign"></i> Downloading</span></td>
+							</c:if>
+							<c:if test="${video.state.ordinal() == 2}">
+								<td><span class="label label-info table-state-label"><i class="glyphicon glyphicon-info-sign"></i> Transcoding</span></td>
+							</c:if>
+							<c:if test="${video.state.ordinal() == 3}">
+								<td><a href="#" class="label label-success table-state-label"><i class="glyphicon glyphicon-download-alt"></i> Ready</a></td>
+							</c:if>
+							<c:if test="${video.state.ordinal() > 3}">
+								<td><a href="#" class="label label-danger table-state-label"><i class="glyphicon glyphicon-warning-sign"></i> Error</a></td>
+							</c:if>
+						</tr>
+					</c:forEach>
+				</table>
+			</fieldset>
+		</c:if>
 	</div>
 
 	<script src="js/jquery-1.11.1.min.js"></script>

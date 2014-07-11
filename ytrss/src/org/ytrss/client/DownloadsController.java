@@ -21,7 +21,7 @@ public class DownloadsController {
 	private VideoDAO	videoDAO;
 
 	@RequestMapping("/")
-	public String showDownloads(final Model model) {
+	public String getDownloads(final Model model) {
 		model.addAttribute("channels", createChannelIDMap());
 		model.addAttribute("videos", videoDAO.findAll());
 
