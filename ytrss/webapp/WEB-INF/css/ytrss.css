@@ -1,14 +1,10 @@
 body {
-	min-height: 2000px;
+	min-height: 200px;
 	padding-top: 70px;
 }
 
 .spread-nav .glyphicon {
 	margin-right: 5px;
-}
-
-.spread-nav .badge {
-	margin-left: 5px;
 }
 
 .table-state-label {
@@ -21,4 +17,24 @@ body {
 
 .table-state-label, .table-state-label * {
 	text-decoration: none !important;
+}
+
+.spread-fieldsets fieldset {
+	margin-top: 50px;
+}
+
+.form-control-text {
+	/*background-color: #ffffff;*/
+    background-image: none;
+    /*border: 1px solid transparent;
+    border-radius: 0;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, 0.075) inset;*/
+    /*color: #2b3e50;*/
+    display: block;
+    font-size: 15px;
+    height: 39px;
+    line-height: 1.42857;
+    padding: 8px 16px;
+    transition: border-color 0.15s ease-in-out 0s, box-shadow 0.15s ease-in-out 0s;
+    width: 100%;
 }

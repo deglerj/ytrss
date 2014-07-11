@@ -21,6 +21,7 @@ repositories {
 
 dependencies {
 	compile('org.springframework:spring-webmvc:4.+')
+	compile('org.springframework:spring-jdbc:4.+')
 	compile('javax.servlet:javax.servlet-api:+')
 	compile('javax.servlet.jsp:jsp-api:+')
 	compile('javax.servlet:jstl:+')
