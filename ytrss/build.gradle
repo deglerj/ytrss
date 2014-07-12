@@ -28,7 +28,7 @@ dependencies {
 	compile('taglibs:standard:+')
     compile('com.google.guava:guava:+')
     compile('org.hsqldb:hsqldb:2.+')
-	compile('org.apache.commons:commons-io:+')
+	compile('commons-io:commons-io:+')
 	compile('org.apache.commons:commons-lang3:+')
     compile('it.sauronsoftware:jave:1.+')
     compile('com.googlecode.flyway:flyway-core:+')

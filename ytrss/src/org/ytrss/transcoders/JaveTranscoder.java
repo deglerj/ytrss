@@ -1,4 +1,4 @@
-package org.ytrss;
+package org.ytrss.transcoders;
 
 import it.sauronsoftware.jave.AudioAttributes;
 import it.sauronsoftware.jave.Encoder;
@@ -12,16 +12,16 @@ import com.google.common.base.Throwables;
 public class JaveTranscoder implements Transcoder {
 
 	@Override
-	public File transcode(File input) {
-		File target = new File("C:\\Users\\Johannes\\Desktop\\ytrss\\ " + System.currentTimeMillis() + ".mp3");
+	public File transcode(final File input) {
+		final File target = new File("C:\\Users\\Johannes\\Desktop\\ytrss\\ " + System.currentTimeMillis() + ".mp3");
 
-		AudioAttributes audio = new AudioAttributes();
+		final AudioAttributes audio = new AudioAttributes();
 		audio.setCodec("libmp3lame");
 		audio.setBitRate(new Integer(128000));
 		audio.setChannels(new Integer(2));
 		audio.setSamplingRate(new Integer(44100));
 
-		EncodingAttributes attrs = new EncodingAttributes();
+		final EncodingAttributes attrs = new EncodingAttributes();
 		attrs.setFormat("mp3");
 		attrs.setAudioAttributes(audio);
 

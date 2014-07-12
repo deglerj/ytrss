@@ -33,12 +33,18 @@ public class Video {
 
 	private String		mp3File;
 
+	private String		errorMessage;
+
 	public Long getChannelID() {
 		return channelID;
 	}
 
 	public Timestamp getDiscovered() {
 		return discovered;
+	}
+
+	public String getErrorMessage() {
+		return errorMessage;
 	}
 
 	public Long getId() {
@@ -75,6 +81,10 @@ public class Video {
 
 	public void setDiscovered(final Timestamp discovered) {
 		this.discovered = discovered;
+	}
+
+	public void setErrorMessage(final String errorMessage) {
+		this.errorMessage = errorMessage;
 	}
 
 	public void setId(final Long id) {

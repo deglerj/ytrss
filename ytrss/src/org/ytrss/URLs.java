@@ -1,7 +1,6 @@
 package org.ytrss;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -11,22 +10,25 @@ import com.google.common.base.Throwables;
 
 public class URLs {
 
-	public static String copyToString(String url) {
+	public static String copyToString(final String url) {
 		try {
 			return copyToString(new URL(url));
 		}
-		catch (MalformedURLException e) {
+		catch (final MalformedURLException e) {
 			throw Throwables.propagate(e);
 		}
 	}
 
-	public static String copyToString(URL url) {
-		try (InputStream input = url.openStream()) {
-			String string = IOUtils.toString(input);
-			return string;
+	public static String copyToString(final URL url) {
+		try {
+			return IOUtils.toString(url, "UTF-8");
 		}
-		catch (IOException e) {
+		catch (final IOException e) {
 			throw Throwables.propagate(e);
 		}
+	}
+
+	private URLs() {
+		// Static utility class, no instances allowed
 	}
 }

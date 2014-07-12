@@ -1,21 +1,21 @@
-package org.ytrss;
+package org.ytrss.pages;
 
 import java.util.Comparator;
 import java.util.List;
 
 public class StreamMapEntryScorer {
 
-	public StreamMapEntry findBestEntry(List<StreamMapEntry> entries) {
+	public StreamMapEntry findBestEntry(final List<StreamMapEntry> entries) {
 		entries.sort(Comparator.comparingInt(value -> getScore((StreamMapEntry) value)).reversed());
 
 		return entries.get(0);
 	}
 
-	private int getScore(StreamMapEntry entry) {
+	private int getScore(final StreamMapEntry entry) {
 		return getTypeScore(entry.getType()) + getQualityScore(entry.getQuality());
 	}
 
-	private int getQualityScore(String quality) {
+	private int getQualityScore(final String quality) {
 		switch (quality) {
 			case "medium":
 				return 10;
@@ -31,7 +31,7 @@ public class StreamMapEntryScorer {
 		}
 	}
 
-	private int getTypeScore(String type) {
+	private int getTypeScore(final String type) {
 		switch (type) {
 			case "video/mp4":
 				return 10;

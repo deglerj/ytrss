@@ -10,6 +10,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.config.annotation.DefaultServletHandlerConfigurer;
@@ -18,11 +19,14 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.ytrss.db.DatabaseInitializer;
+import org.ytrss.transcoders.JaveTranscoder;
+import org.ytrss.transcoders.Transcoder;
 
 @Configuration
 @ComponentScan("org.ytrss")
 @EnableWebMvc
 @EnableTransactionManagement
+@EnableScheduling
 public class YTRSSConfiguration extends WebMvcConfigurerAdapter {
 
 	@Override
@@ -56,6 +60,11 @@ public class YTRSSConfiguration extends WebMvcConfigurerAdapter {
 		resolver.setPrefix("/WEB-INF/views/");
 		resolver.setSuffix(".jsp");
 		return resolver;
+	}
+
+	@Bean
+	public Transcoder getTranscoder() {
+		return new JaveTranscoder();
 	}
 
 	@Bean

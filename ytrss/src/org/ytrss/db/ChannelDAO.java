@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -31,9 +32,26 @@ public class ChannelDAO {
 
 		@Override
 		public PreparedStatement createPreparedStatement(final Connection con) throws SQLException {
-			final PreparedStatement stmt = con.prepareStatement("INSERT INTO \"CHANNEL\" (\"NAME\", \"URL\") VALUES (?, ?)", Statement.RETURN_GENERATED_KEYS);
+			final PreparedStatement stmt = con.prepareStatement(
+					"INSERT INTO \"CHANNEL\" (\"NAME\", \"URL\", \"EXCLUDE_REGEX\", \"INCLUDE_REGEX\") VALUES (?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+
 			stmt.setString(1, channel.getName());
 			stmt.setString(2, channel.getUrl());
+
+			if (channel.getExcludeRegex() == null) {
+				stmt.setNull(3, Types.LONGVARCHAR);
+			}
+			else {
+				stmt.setString(3, channel.getExcludeRegex());
+			}
+
+			if (channel.getIncludeRegex() == null) {
+				stmt.setNull(4, Types.LONGVARCHAR);
+			}
+			else {
+				stmt.setString(4, channel.getIncludeRegex());
+			}
+
 			return stmt;
 		}
 
@@ -49,10 +67,28 @@ public class ChannelDAO {
 
 		@Override
 		public PreparedStatement createPreparedStatement(final Connection con) throws SQLException {
-			final PreparedStatement stmt = con.prepareStatement("UPDATE \"CHANNEL\" SET \"NAME\" = ?, \"URL\" = ? WHERE \"ID\" = ?");
+			final PreparedStatement stmt = con
+					.prepareStatement("UPDATE \"CHANNEL\" SET \"NAME\" = ?, \"URL\" = ?, \"EXCLUDE_REGEX\" = ?, \"INCLUDE_REGEX\" = ? WHERE \"ID\" = ?");
+
 			stmt.setString(1, channel.getName());
 			stmt.setString(2, channel.getUrl());
-			stmt.setLong(3, channel.getId());
+
+			if (channel.getExcludeRegex() == null) {
+				stmt.setNull(3, Types.LONGVARCHAR);
+			}
+			else {
+				stmt.setString(3, channel.getExcludeRegex());
+			}
+
+			if (channel.getIncludeRegex() == null) {
+				stmt.setNull(4, Types.LONGVARCHAR);
+			}
+			else {
+				stmt.setString(4, channel.getIncludeRegex());
+			}
+
+			stmt.setLong(5, channel.getId());
+
 			return stmt;
 		}
 
@@ -65,12 +101,14 @@ public class ChannelDAO {
 	private JdbcTemplate				jdbcTemplate;
 
 	private final RowMapper<Channel>	rowMapper	= (rs, rowNum) -> {
-		final Channel feed = new Channel();
-		feed.setId(rs.getLong("id"));
-		feed.setName(rs.getString("name"));
-		feed.setUrl(rs.getString("url"));
-		return feed;
-	};
+														final Channel channel = new Channel();
+														channel.setId(rs.getLong("id"));
+														channel.setName(rs.getString("name"));
+														channel.setUrl(rs.getString("url"));
+														channel.setExcludeRegex(rs.getString("exclude_regex"));
+														channel.setIncludeRegex(rs.getString("include_regex"));
+														return channel;
+													};
 
 	public void delete(final long id) {
 		jdbcTemplate.update("DELETE FROM \"VIDEO\" WHERE \"CHANNEL_FK\" = ? ", id);

@@ -1,14 +1,14 @@
-package org.ytrss;
+package org.ytrss.pages;
 
 public class StreamMapEntry {
 
-	private String	url;
+	private final String	url;
 
-	private String	type;
+	private final String	type;
 
-	private String	quality;
+	private final String	quality;
 
-	public StreamMapEntry(String url, String type, String quality) {
+	public StreamMapEntry(final String url, final String type, final String quality) {
 		this.url = url;
 		this.type = type;
 		this.quality = quality;

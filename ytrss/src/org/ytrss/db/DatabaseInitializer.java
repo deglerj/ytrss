@@ -14,24 +14,24 @@ public class DatabaseInitializer {
 
 	private static Log	log	= LogFactory.getLog(DatabaseInitializer.class);
 
-	public void initialize(DataSource dataSource) {
-		log.info("Preparing DB initialization");
+	public void initialize(final DataSource dataSource) {
+		DatabaseInitializer.log.info("Preparing DB initialization");
 		final Flyway flyway = new Flyway();
 		flyway.setDataSource(dataSource);
 		flyway.setLocations("org.ytrss");
 
 		final MigrationInfo current = flyway.info().current();
 		if (current == null) {
-			log.info("No existing DB found");
+			DatabaseInitializer.log.info("No existing DB found");
 		}
 		else {
-			log.info("Current DB version is " + current.getVersion());
+			DatabaseInitializer.log.info("Current DB version is " + current.getVersion());
 		}
 
-		log.info("Starting DB initialization");
+		DatabaseInitializer.log.info("Starting DB initialization");
 		flyway.migrate();
 
-		log.info("Completed DB initialization. DB version is now " + flyway.info().current().getVersion());
+		DatabaseInitializer.log.info("Completed DB initialization. DB version is now " + flyway.info().current().getVersion());
 	}
 
 }

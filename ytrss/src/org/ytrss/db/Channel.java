@@ -14,8 +14,20 @@ public class Channel {
 	@URL
 	private String	url;
 
+	private String	includeRegex;
+
+	private String	excludeRegex;
+
+	public String getExcludeRegex() {
+		return excludeRegex;
+	}
+
 	public Long getId() {
 		return id;
+	}
+
+	public String getIncludeRegex() {
+		return includeRegex;
 	}
 
 	public String getName() {
@@ -26,8 +38,16 @@ public class Channel {
 		return url;
 	}
 
+	public void setExcludeRegex(final String excludeRegex) {
+		this.excludeRegex = excludeRegex;
+	}
+
 	public void setId(final Long id) {
 		this.id = id;
+	}
+
+	public void setIncludeRegex(final String includeRegex) {
+		this.includeRegex = includeRegex;
 	}
 
 	public void setName(final String name) {

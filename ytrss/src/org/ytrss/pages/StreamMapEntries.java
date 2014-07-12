@@ -1,8 +1,8 @@
-package org.ytrss;
+package org.ytrss.pages;
 
 public class StreamMapEntries {
 
-	public static String getExtension(StreamMapEntry entry) {
+	public static String getExtension(final StreamMapEntry entry) {
 		switch (entry.getType()) {
 			case "video/mp4":
 				return "mp4";
@@ -16,5 +16,9 @@ public class StreamMapEntries {
 				System.out.println("Unknown video type \"" + entry.getType() + "\"");
 				return "avi";
 		}
+	}
+
+	private StreamMapEntries() {
+		// Static utility class, no instances allowed
 	}
 }
