@@ -7,22 +7,21 @@ import java.util.regex.Pattern;
 
 public class ChannelPage {
 
-	private final String			source;
+	private final String			contentGrid;
 
-	private static final Pattern	CONTENT_GRID_PATTERN	= Pattern.compile("video-page-content(.+)yt-uix-load-more", Pattern.MULTILINE | Pattern.DOTALL);
+	private static final Pattern	CONTENT_GRID_PATTERN	= Pattern.compile("video-page-content(.+)<div id=\"ad_creative_1\"", Pattern.MULTILINE
+																	| Pattern.DOTALL);
 
 	// Value of title attribute is matched in group 1, href in group 2
 	private static final Pattern	GRID_ENTRY_PATTERN		= Pattern.compile("<a[^<]*title=\"([^\"]+)\"[^<]*href=\"([^\"]+)\"[^<]*>", Pattern.MULTILINE);
 
 	public ChannelPage(final String source) {
-		this.source = source;
+		final Matcher gridMatcher = CONTENT_GRID_PATTERN.matcher(source);
+		gridMatcher.find();
+		contentGrid = gridMatcher.group(1);
 	}
 
 	public List<ContentGridEntry> getContentGridEntries() {
-		final Matcher gridMatcher = CONTENT_GRID_PATTERN.matcher(source);
-		gridMatcher.find();
-		final String contentGrid = gridMatcher.group(1);
-
 		final List<ContentGridEntry> entries = new ArrayList<>();
 
 		final Matcher entriesMatcher = GRID_ENTRY_PATTERN.matcher(contentGrid);
