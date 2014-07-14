@@ -141,7 +141,7 @@ public class Ripper {
 		updateVideoState(video, VideoState.TRANSCONDING_FAILED, errors);
 
 		// Retry
-		transcoder.transcode(videoFile, mp3File -> {
+		transcoder.transcode(videoFile, video, mp3File -> {
 			onTranscodeComplete(mp3File, video);
 		}, t -> {
 			onTranscodeFailed(videoFile, video, t);
@@ -177,7 +177,7 @@ public class Ripper {
 
 		updateVideoState(video, VideoState.TRANSCODING);
 
-		transcoder.transcode(videoFile, mp3File -> {
+		transcoder.transcode(videoFile, video, mp3File -> {
 			onTranscodeComplete(mp3File, video);
 		}, t -> {
 			onTranscodeFailed(videoFile, video, t);

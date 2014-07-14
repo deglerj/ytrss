@@ -103,7 +103,7 @@
 							<td><span class="label label-info table-state-label"><i class="glyphicon glyphicon-info-sign"></i> Transcoding</span></td>
 						</c:if>
 						<c:if test="${video.state.ordinal() == 3}">
-							<td><a href="#" class="label label-success table-state-label"><i class="glyphicon glyphicon-download-alt"></i> Ready</a></td>
+							<td><a href="download/${video.id}" class="label label-success table-state-label"><i class="glyphicon glyphicon-download-alt"></i> Ready</a></td>
 						</c:if>
 						<c:if test="${video.state.ordinal() > 3}">
 							<td><a href="#" class="label label-danger table-state-label"><i class="glyphicon glyphicon-warning-sign"></i> Error</a></td>

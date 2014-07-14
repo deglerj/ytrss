@@ -9,6 +9,7 @@ import org.apache.commons.io.FileUtils;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.ytrss.db.Video;
+import org.ytrss.db.Videos;
 import org.ytrss.pages.StreamMapEntries;
 import org.ytrss.pages.StreamMapEntry;
 
@@ -17,9 +18,10 @@ public class StreamDownloader {
 
 	@Async("streamDownloader")
 	public void download(final Video video, final StreamMapEntry entry, final Consumer<File> downloaded, final Consumer<Throwable> failed) {
-		System.out.println("DOWNLOADING " + video.getName());
+		final String userHome = System.getProperty("user.home");
+		final String fileName = userHome + "/.ytrss/videos/" + Videos.getFileName(video) + "." + StreamMapEntries.getExtension(entry);
 
-		final File file = new File("C:\\Users\\Johannes\\Desktop\\ytrss\\" + System.currentTimeMillis() + "." + StreamMapEntries.getExtension(entry));
+		final File file = new File(fileName);
 		try {
 			FileUtils.copyURLToFile(new URL(entry.getUrl()), file);
 		}

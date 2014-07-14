@@ -9,15 +9,20 @@ import java.io.File;
 import java.util.function.Consumer;
 
 import org.springframework.scheduling.annotation.Async;
+import org.ytrss.db.Video;
+import org.ytrss.db.Videos;
 
 public class JaveTranscoder implements Transcoder {
 
 	@Override
 	@Async("transcoder")
-	public void transcode(final File videoFile, final Consumer<File> transcoded, final Consumer<Throwable> failed) {
+	public void transcode(final File videoFile, final Video video, final Consumer<File> transcoded, final Consumer<Throwable> failed) {
 		System.out.println("TRANSCODING " + videoFile.getName());
 
-		final File mp3File = new File("C:\\Users\\Johannes\\Desktop\\ytrss\\ " + System.currentTimeMillis() + ".mp3");
+		final String userHome = System.getProperty("user.home");
+		final String fileName = userHome + "/.ytrss/mp3s/" + Videos.getFileName(video) + ".mp3";
+
+		final File mp3File = new File(fileName);
 
 		final AudioAttributes audio = new AudioAttributes();
 		audio.setCodec("libmp3lame");

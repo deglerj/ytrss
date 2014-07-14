@@ -23,6 +23,7 @@ import org.ytrss.db.Channel;
 import org.ytrss.db.ChannelDAO;
 import org.ytrss.db.Video;
 import org.ytrss.db.VideoDAO;
+import org.ytrss.db.Videos;
 
 import com.google.common.base.Throwables;
 
@@ -44,7 +45,7 @@ public class DownloadsController {
 
 		response.setContentType("audio/mpeg");
 		response.setContentLength(new Long(file.length()).intValue());
-		response.setHeader("Content-Disposition", "attachment; filename=Test.xls");
+		response.setHeader("Content-Disposition", "attachment; filename=" + Videos.getFileName(video) + ".mp3");
 
 		try (final InputStream in = new FileInputStream(file); OutputStream out = response.getOutputStream()) {
 			IOUtils.copy(in, out);
