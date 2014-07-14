@@ -1,15 +1,21 @@
 package org.ytrss.spring;
 
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 import javax.sql.DataSource;
 
 import org.hsqldb.jdbc.JDBCDataSource;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.DataSourceTransactionManager;
+import org.springframework.scheduling.annotation.AsyncConfigurer;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
@@ -27,7 +33,8 @@ import org.ytrss.transcoders.Transcoder;
 @EnableWebMvc
 @EnableTransactionManagement
 @EnableScheduling
-public class YTRSSConfiguration extends WebMvcConfigurerAdapter {
+@EnableAsync
+public class YTRSSConfiguration extends WebMvcConfigurerAdapter implements AsyncConfigurer {
 
 	@Override
 	public void addResourceHandlers(final ResourceHandlerRegistry registry) {
@@ -40,6 +47,11 @@ public class YTRSSConfiguration extends WebMvcConfigurerAdapter {
 	@Override
 	public void configureDefaultServletHandling(final DefaultServletHandlerConfigurer configurer) {
 		configurer.enable();
+	}
+
+	@Override
+	public Executor getAsyncExecutor() {
+		return new SimpleAsyncTaskExecutor();
 	}
 
 	@Bean
@@ -63,8 +75,20 @@ public class YTRSSConfiguration extends WebMvcConfigurerAdapter {
 	}
 
 	@Bean
+	@Qualifier("streamDownloader")
+	public Executor getStreamDownloaderExecutor() {
+		return Executors.newFixedThreadPool(3);
+	}
+
+	@Bean
 	public Transcoder getTranscoder() {
 		return new JaveTranscoder();
+	}
+
+	@Bean
+	@Qualifier("transcoder")
+	public Executor getTranscoderExecutor() {
+		return Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 	}
 
 	@Bean

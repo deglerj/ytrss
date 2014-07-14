@@ -6,14 +6,18 @@ import it.sauronsoftware.jave.EncoderException;
 import it.sauronsoftware.jave.EncodingAttributes;
 
 import java.io.File;
+import java.util.function.Consumer;
 
-import com.google.common.base.Throwables;
+import org.springframework.scheduling.annotation.Async;
 
 public class JaveTranscoder implements Transcoder {
 
 	@Override
-	public File transcode(final File input) {
-		final File target = new File("C:\\Users\\Johannes\\Desktop\\ytrss\\ " + System.currentTimeMillis() + ".mp3");
+	@Async("transcoder")
+	public void transcode(final File videoFile, final Consumer<File> transcoded, final Consumer<Throwable> failed) {
+		System.out.println("TRANSCODING " + videoFile.getName());
+
+		final File mp3File = new File("C:\\Users\\Johannes\\Desktop\\ytrss\\ " + System.currentTimeMillis() + ".mp3");
 
 		final AudioAttributes audio = new AudioAttributes();
 		audio.setCodec("libmp3lame");
@@ -26,13 +30,13 @@ public class JaveTranscoder implements Transcoder {
 		attrs.setAudioAttributes(audio);
 
 		try {
-			new Encoder().encode(input, target, attrs);
+			new Encoder().encode(videoFile, mp3File, attrs);
 		}
 		catch (IllegalArgumentException | EncoderException e) {
-			throw Throwables.propagate(e);
+			failed.accept(e);
 		}
 
-		return target;
+		transcoded.accept(mp3File);
 	}
 
 }

@@ -19,8 +19,6 @@ import org.ytrss.pages.StreamMapEntryScorer;
 import org.ytrss.pages.VideoPage;
 import org.ytrss.transcoders.Transcoder;
 
-import com.google.common.base.Throwables;
-
 @Component
 public class Ripper {
 
@@ -38,6 +36,9 @@ public class Ripper {
 
 	@Autowired
 	private Transcoder			transcoder;
+
+	@Autowired
+	private StreamDownloader	downloader;
 
 	public long getCountdown() {
 		if (active || lastExecuted == null) {
@@ -90,19 +91,61 @@ public class Ripper {
 		}
 	}
 
-	private File download(final VideoPage videoPage, final Video video, final StreamMapEntry bestEntry) {
-		try {
-			updateVideoState(video, VideoState.DOWNLOADING);
-			return new Downloader().download(bestEntry);
-		}
-		catch (final Exception e) {
-			updateVideoState(video, VideoState.DOWNLOADING_FAILED, e);
-			throw Throwables.propagate(e);
-		}
+	private void download(final Channel channel, final VideoPage videoPage) {
+		final Video video = createVideo(channel, videoPage);
+
+		final StreamMapEntry bestEntry = new StreamMapEntryScorer().findBestEntry(videoPage.getStreamMapEntries());
+
+		System.out.println("REQUESTING DOWNLOAD FOR " + video.getName());
+
+		updateVideoState(video, VideoState.DOWNLOADING);
+
+		downloader.download(video, bestEntry, videoFile -> {
+			onDownloadComplete(video, videoFile);
+		}, t -> {
+			onDownloadFailed(video, t, bestEntry);
+		});
+
 	}
 
 	private boolean hasBeenRipped(final VideoPage videoPage) {
 		return videoDAO.findByYoutubeID(videoPage.getVideoID()) != null;
+	}
+
+	private void onDownloadComplete(final Video video, final File videoFile) {
+		video.setVideoFile(videoFile.getAbsolutePath());
+
+		transcode(videoFile, video);
+	}
+
+	private void onDownloadFailed(final Video video, final Throwable error, final StreamMapEntry bestEntry) {
+		// Mark as failed
+		updateVideoState(video, VideoState.DOWNLOADING_FAILED, error);
+
+		// Retry
+		downloader.download(video, bestEntry, videoFile -> {
+			onDownloadComplete(video, videoFile);
+		}, t -> {
+			onDownloadFailed(video, t, bestEntry);
+		});
+	}
+
+	private void onTranscodeComplete(final File mp3File, final Video video) {
+		video.setMp3File(mp3File.getAbsolutePath());
+
+		updateVideoState(video, VideoState.READY);
+	}
+
+	private void onTranscodeFailed(final File videoFile, final Video video, final Throwable errors) {
+		// Mark as failed
+		updateVideoState(video, VideoState.TRANSCONDING_FAILED, errors);
+
+		// Retry
+		transcoder.transcode(videoFile, mp3File -> {
+			onTranscodeComplete(mp3File, video);
+		}, t -> {
+			onTranscodeFailed(videoFile, video, t);
+		});
 	}
 
 	private ChannelPage openChannelPage(final Channel channel) {
@@ -124,27 +167,21 @@ public class Ripper {
 		for (final ContentGridEntry contentEntry : channelPage.getContentGridEntries()) {
 			final VideoPage videoPage = openVideoPage(contentEntry);
 			if (!hasBeenRipped(videoPage)) {
-				rip(channel, videoPage);
+				download(channel, videoPage);
 			}
 		}
 	}
 
-	private void rip(final Channel channel, final VideoPage videoPage) {
-		final Video video = createVideo(channel, videoPage);
+	private void transcode(final File videoFile, final Video video) {
+		System.out.println("REQUESTING TRANSCODING FOR " + video.getName());
 
-		final StreamMapEntry bestEntry = new StreamMapEntryScorer().findBestEntry(videoPage.getStreamMapEntries());
+		updateVideoState(video, VideoState.TRANSCODING);
 
-		final File videoFile = download(videoPage, video, bestEntry);
-
-		try {
-			updateVideoState(video, VideoState.TRANSCODING);
-			transcoder.transcode(videoFile);
-			updateVideoState(video, VideoState.READY);
-		}
-		catch (final Exception e) {
-			updateVideoState(video, VideoState.TRANSCONDING_FAILED, e);
-			throw Throwables.propagate(e);
-		}
+		transcoder.transcode(videoFile, mp3File -> {
+			onTranscodeComplete(mp3File, video);
+		}, t -> {
+			onTranscodeFailed(videoFile, video, t);
+		});
 	}
 
 	private void updateVideoState(final Video video, final VideoState state) {
@@ -153,9 +190,9 @@ public class Ripper {
 		videoDAO.persist(video);
 	}
 
-	private void updateVideoState(final Video video, final VideoState state, final Exception e) {
+	private void updateVideoState(final Video video, final VideoState state, final Throwable t) {
 		video.setState(state);
-		video.setErrorMessage(e.getMessage());
+		video.setErrorMessage(t.getMessage());
 		videoDAO.persist(video);
 	}
 }

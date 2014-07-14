@@ -1,9 +1,15 @@
 package org.ytrss.pages;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import org.ytrss.Patterns;
+
+import com.google.common.base.Strings;
 
 public class ChannelPage {
 
@@ -16,9 +22,8 @@ public class ChannelPage {
 	private static final Pattern	GRID_ENTRY_PATTERN		= Pattern.compile("<a[^<]*title=\"([^\"]+)\"[^<]*href=\"([^\"]+)\"[^<]*>", Pattern.MULTILINE);
 
 	public ChannelPage(final String source) {
-		final Matcher gridMatcher = CONTENT_GRID_PATTERN.matcher(source);
-		gridMatcher.find();
-		contentGrid = gridMatcher.group(1);
+		checkArgument(!Strings.isNullOrEmpty(source), "Source must not be emtpy");
+		contentGrid = Patterns.getMatchGroup(CONTENT_GRID_PATTERN, 1, source);
 	}
 
 	public List<ContentGridEntry> getContentGridEntries() {

@@ -1,5 +1,7 @@
 package org.ytrss.pages;
 
+import static com.google.common.base.Preconditions.checkArgument;
+
 import java.io.IOException;
 import java.net.URLDecoder;
 import java.sql.Date;
@@ -12,8 +14,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.ytrss.Patterns;
 
 import com.google.common.base.Splitter;
+import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 
@@ -34,6 +38,7 @@ public class VideoPage {
 	private static final Pattern	UPLOADED_PATTERN	= Pattern.compile("<strong>.+on\\s+([^<]+)");
 
 	public VideoPage(final String source) {
+		checkArgument(!Strings.isNullOrEmpty(source), "Source must not be emtpy");
 		this.source = source;
 	}
 
@@ -42,10 +47,7 @@ public class VideoPage {
 	}
 
 	public List<StreamMapEntry> getStreamMapEntries() {
-		final Matcher mapMatcher = VideoPage.STREAM_MAP_PATTERN.matcher(source);
-		mapMatcher.find();
-
-		final String encodedStreamMap = mapMatcher.group(1);
+		final String encodedStreamMap = Patterns.getMatchGroup(STREAM_MAP_PATTERN, 1, source);
 
 		try {
 			final String decodedStreamMap = decode(encodedStreamMap);
@@ -97,9 +99,7 @@ public class VideoPage {
 	}
 
 	public Date getUploaded() {
-		final Matcher matcher = UPLOADED_PATTERN.matcher(source);
-		matcher.find();
-		final String text = matcher.group(1);
+		final String text = Patterns.getMatchGroup(UPLOADED_PATTERN, 1, source);
 
 		final DateFormat format = new SimpleDateFormat("MMM dd, yyyy", Locale.UK);
 		try {
@@ -144,9 +144,7 @@ public class VideoPage {
 	}
 
 	private String getFromPattern(final Pattern pattern) {
-		final Matcher matcher = pattern.matcher(source);
-		matcher.find();
-		final String match = matcher.group(1);
+		final String match = Patterns.getMatchGroup(pattern, 1, source);
 		if (match == null) {
 			return null;
 		}
