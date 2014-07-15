@@ -2,6 +2,7 @@ package org.ytrss.spring;
 
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import javax.sql.DataSource;
@@ -72,6 +73,11 @@ public class YTRSSConfiguration extends WebMvcConfigurerAdapter implements Async
 		resolver.setPrefix("/WEB-INF/views/");
 		resolver.setSuffix(".jsp");
 		return resolver;
+	}
+
+	@Bean
+	public ScheduledExecutorService getScheduledExecutorService() {
+		return Executors.newScheduledThreadPool(1);
 	}
 
 	@Bean

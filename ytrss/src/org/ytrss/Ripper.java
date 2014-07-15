@@ -2,6 +2,7 @@ package org.ytrss;
 
 import java.io.File;
 import java.sql.Timestamp;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,23 +23,26 @@ import org.ytrss.transcoders.Transcoder;
 @Component
 public class Ripper {
 
-	private static final long	DELAY	= TimeUnit.MINUTES.toMillis(30);
+	private static final long			DELAY	= TimeUnit.MINUTES.toMillis(30);
 
-	private Long				lastExecuted;
+	private Long						lastExecuted;
 
-	private volatile boolean	active;
-
-	@Autowired
-	private ChannelDAO			channelDAO;
+	private volatile boolean			active;
 
 	@Autowired
-	private VideoDAO			videoDAO;
+	private ChannelDAO					channelDAO;
 
 	@Autowired
-	private Transcoder			transcoder;
+	private VideoDAO					videoDAO;
 
 	@Autowired
-	private StreamDownloader	downloader;
+	private Transcoder					transcoder;
+
+	@Autowired
+	private StreamDownloader			downloader;
+
+	@Autowired
+	private ScheduledExecutorService	scheduledExecutor;
 
 	public long getCountdown() {
 		if (active || lastExecuted == null) {
@@ -118,9 +122,10 @@ public class Ripper {
 		// Mark as failed
 		updateVideoState(video, VideoState.DOWNLOADING_FAILED, error);
 
-		// TODO delay retrying download by x minutes
-
-		download(video, entry);
+		// Retry in 5 minutes
+		scheduledExecutor.schedule(() -> {
+			download(video, entry);
+		}, 5, TimeUnit.MINUTES);
 	}
 
 	private void onTranscodeComplete(final File mp3File, final Video video) {
@@ -133,9 +138,10 @@ public class Ripper {
 		// Mark as failed
 		updateVideoState(video, VideoState.TRANSCODING_FAILED, errors);
 
-		// TODO delay retrying transcoding by x minutes
-
-		transcode(videoFile, video);
+		// Retry in 5 minutes
+		scheduledExecutor.schedule(() -> {
+			transcode(videoFile, video);
+		}, 5, TimeUnit.MINUTES);
 	}
 
 	private ChannelPage openChannelPage(final Channel channel) {
