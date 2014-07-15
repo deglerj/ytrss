@@ -6,11 +6,11 @@ You can access ytrss through a simple web-interface, that allows you to manage c
 
 Early alpha
 ----
-ytrss is still in a very early alpha stage. Many settings are still hardcoded and bugs are to be expected.
+ytrss is still in a very early alpha stage. Many settings are hardcoded and bugs are to be expected.
 Future versions will add:
 - Embedded server (currently ytrss has to be deployed on Tomcat or a similar server)
 - Better feeds with ID3 tags, pictures, ...
-- AJAXified user interface
+- AJAXified admin interface
 - Password-secured admin interface
 - Including and excluding videos using regular expressions
 - ...
@@ -27,3 +27,4 @@ ytrss uses
 - Flyway
 - Hibernate Validation
 - ROME
+- Gradle
