@@ -4,7 +4,9 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 import java.io.IOException;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -135,7 +137,7 @@ public class ChannelController {
 	}
 
 	private void addCommonModelAttributes(final Channel channel, final Model model) {
-		model.addAttribute("channels", channelDAO.findAll());
+		model.addAttribute("channels", createChannelIDMap());
 
 		if (channel.getId() == null) {
 			model.addAttribute("videos", Collections.emptyList());
@@ -143,6 +145,14 @@ public class ChannelController {
 		else {
 			model.addAttribute("videos", videoDAO.findByChannelID(channel.getId()));
 		}
+	}
+
+	private Map<Long, Channel> createChannelIDMap() {
+		final Map<Long, Channel> map = new HashMap<>();
+		for (final Channel channel : channelDAO.findAll()) {
+			map.put(channel.getId(), channel);
+		}
+		return map;
 	}
 
 	private SyndFeed createFeed(final Channel channel, final String type, final String requestURL, final List<SyndEntry> entries) {
