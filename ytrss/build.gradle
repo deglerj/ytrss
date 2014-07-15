@@ -1,16 +1,8 @@
 apply plugin: 'java'
-apply plugin: 'checkstyle'
-apply plugin: 'findbugs'
 
 defaultTasks 'build'
 
-def depsDir = file('build/dependencies')
-
 sourceCompatibility = 1.8 
-
-tasks.withType(Compile) {
-    options.encoding = 'UTF-8'
-}
 
 repositories {
 	mavenCentral()
@@ -20,32 +12,36 @@ repositories {
 }
 
 dependencies {
-	compile('org.springframework:spring-webmvc:4.+')
-	compile('org.springframework:spring-jdbc:4.+')
-	compile('javax.servlet:javax.servlet-api:+')
-	compile('javax.servlet.jsp:jsp-api:+')
-	compile('javax.servlet:jstl:+')
-	compile('taglibs:standard:+')
-    compile('com.google.guava:guava:+')
-    compile('org.hsqldb:hsqldb:2.+')
-	compile('commons-io:commons-io:+')
-	compile('org.apache.commons:commons-lang3:+')
-    compile('it.sauronsoftware:jave:1.+')
-    compile('com.googlecode.flyway:flyway-core:+')
+	compile 'org.springframework:spring-web:4.+'
+	compile 'org.springframework:spring-webmvc:4.+'
+	compile 'org.springframework:spring-jdbc:4.+'
+	compile 'javax.servlet:javax.servlet-api:+'
+	compile 'javax.servlet.jsp:jsp-api:+'
+	compile 'javax.servlet:jstl:+'
+	compile 'taglibs:standard:+'
+    compile 'com.google.guava:guava:+'
+    compile 'org.hsqldb:hsqldb:2.+'
+	compile 'commons-io:commons-io:+'
+	compile 'org.apache.commons:commons-lang3:+'
+    compile 'it.sauronsoftware:jave:1.+'
+    compile 'com.googlecode.flyway:flyway-core:+'
     compile 'javax.validation:validation-api:+'
 	compile 'org.hibernate:hibernate-validator:5.+'
-    compile('rome:rome:+')
-    testCompile('junit:junit:+')    
+    compile 'rome:rome:+'
+	compile 'org.eclipse.jetty:jetty-webapp:9.+'
+	compile 'org.eclipse.jetty:jetty-jsp:9.+'
+	
+    testCompile 'junit:junit:+'    
 }
 
 
 sourceSets {
     main {
         java {
-            srcDirs = ['src', 'db']
+            srcDirs = ['src']
         }
         resources {
-        	srcDirs = ['src', 'webapp', 'db']
+        	srcDirs = ['resources']
         }
     }
     test {
@@ -55,14 +51,18 @@ sourceSets {
     }	
 }
 
-checkstyle {
-	 configFile = file('plugin-configs/checkstyle')
-	 ignoreFailures = true
-}
+jar {
+	from(configurations.compile.collect { it.isDirectory() ? it : zipTree(it) }) {
+		exclude 'META-INF/*.SF'
+		exclude 'META-INF/*.DSA'
+		exclude 'META-INF/*.RSA'
+	}
 
-findbugs {
-	ignoreFailures = true
-	
+	manifest {
+		attributes(
+			'Main-Class': 'org.ytrss.Main'
+		)
+	}
 }
 
 task wrapper(type: Wrapper) {

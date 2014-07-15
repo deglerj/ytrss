@@ -8,11 +8,9 @@ Early alpha
 ----
 ytrss is still in a very early alpha stage. Many settings are hardcoded and bugs are to be expected.
 Future versions will add:
-- Embedded server (currently ytrss has to be deployed on Tomcat or a similar server)
 - Better feeds with ID3 tags, pictures, ...
 - AJAXified admin interface
 - Password-secured admin interface
-- Including and excluding videos using regular expressions
 - ...
 
 
@@ -20,7 +18,7 @@ Future versions will add:
 ----
 ytrss uses
 - Spring
-- Apache Tomcat
+- Jetty
 - Google Guava
 - HSQLDB
 - Jave - Java Audio Video Encoder

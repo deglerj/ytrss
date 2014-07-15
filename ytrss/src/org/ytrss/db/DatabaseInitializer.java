@@ -18,7 +18,7 @@ public class DatabaseInitializer {
 		DatabaseInitializer.log.info("Preparing DB initialization");
 		final Flyway flyway = new Flyway();
 		flyway.setDataSource(dataSource);
-		flyway.setLocations("org.ytrss");
+		flyway.setLocations("org.ytrss.db.migrate");
 
 		final MigrationInfo current = flyway.info().current();
 		if (current == null) {

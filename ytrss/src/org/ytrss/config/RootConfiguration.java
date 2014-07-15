@@ -1,0 +1,39 @@
+package org.ytrss.config;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
+import org.springframework.stereotype.Controller;
+import org.ytrss.transcoders.JaveTranscoder;
+import org.ytrss.transcoders.Transcoder;
+
+/**
+ * The root application context.
+ * <p/>
+ * Scanning is enabled but will skip @Configuration and @Controller classes.
+ *
+ * @Configuration classes are skipped to prevent picking theses ones up again as these files are in the scan path. @Controller classes will be picked up by
+ *                MvcConfiguration.
+ */
+@Configuration
+@Import({ JettyConfiguration.class, AsyncConfiguration.class, DatabaseConfiguration.class })
+@ComponentScan(basePackages = { "org.ytrss" }, excludeFilters = { @ComponentScan.Filter(Controller.class), @ComponentScan.Filter(Configuration.class) })
+// Based on: https://github.com/jasonish/jetty-springmvc-jsp-template
+public class RootConfiguration {
+
+	/**
+	 * Allows access to properties. eg @Value("${jetty.port}").
+	 */
+	@Bean
+	public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
+		return new PropertySourcesPlaceholderConfigurer();
+	}
+
+	@Bean
+	public Transcoder getTranscoder() {
+		return new JaveTranscoder();
+	}
+
+}
