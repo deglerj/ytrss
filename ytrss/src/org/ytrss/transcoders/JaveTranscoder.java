@@ -8,11 +8,16 @@ import it.sauronsoftware.jave.EncodingAttributes;
 import java.io.File;
 import java.util.function.Consumer;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.ytrss.db.Video;
 import org.ytrss.db.Videos;
+import org.ytrss.pages.StreamMapEntryScorer;
 
 public class JaveTranscoder implements Transcoder {
+
+	private static Logger	log	= LoggerFactory.getLogger(StreamMapEntryScorer.class);
 
 	@Override
 	@Async("transcoder")
@@ -20,7 +25,7 @@ public class JaveTranscoder implements Transcoder {
 			final Consumer<Throwable> failed) {
 		started.accept(null);
 
-		System.out.println("TRANSCODING " + videoFile.getName());
+		log.info("Transcoding " + videoFile.getName());
 
 		final String userHome = System.getProperty("user.home");
 		final String fileName = userHome + "/.ytrss/mp3s/" + Videos.getFileName(video) + ".mp3";

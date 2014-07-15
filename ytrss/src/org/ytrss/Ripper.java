@@ -8,6 +8,8 @@ import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -52,6 +54,8 @@ public class Ripper {
 
 	@Autowired
 	private StreamMapEntryScorer		streamMapEntryScorer;
+
+	private static Logger				log		= LoggerFactory.getLogger(Ripper.class);
 
 	public long getCountdown() {
 		if (active || lastExecuted == null) {
@@ -99,13 +103,18 @@ public class Ripper {
 	}
 
 	private void download(final Video video, final StreamMapEntry entry) {
-		System.out.println("REQUESTING DOWNLOAD FOR " + video.getName());
+		log.info("Requesting download for " + video.getName());
 
 		updateVideoState(video, VideoState.DOWNLOADING_ENQUEUED);
 
-		downloader.download(video, entry, nil -> updateVideoState(video, VideoState.DOWNLOADING), videoFile -> {
+		downloader.download(video, entry, nil -> {
+			log.info("Started download of " + video.getName());
+			updateVideoState(video, VideoState.DOWNLOADING);
+		}, videoFile -> {
+			log.info("Completed download of " + video.getName());
 			onDownloadComplete(video, videoFile);
 		}, t -> {
+			log.error("Download failed for " + video.getName(), t);
 			onDownloadFailed(video, t, entry);
 		});
 
@@ -193,7 +202,7 @@ public class Ripper {
 		for (final Video video : videoDAO.findAll()) {
 			if (video.getState() == VideoState.DOWNLOADING || video.getState() == VideoState.DOWNLOADING_ENQUEUED
 					|| video.getState() == VideoState.DOWNLOADING_FAILED) {
-				System.out.println("RESUME DOWNLOADING FOR " + video.getName());
+				log.info("Resuming download of " + video.getName());
 				final VideoPage videoPage = openVideoPage(video);
 				final StreamMapEntry bestEntry = streamMapEntryScorer.findBestEntry(videoPage.getStreamMapEntries());
 				download(video, bestEntry);
@@ -205,7 +214,7 @@ public class Ripper {
 		for (final Video video : videoDAO.findAll()) {
 			if (video.getState() == VideoState.TRANSCODING || video.getState() == VideoState.TRANSCODING_ENQUEUED
 					|| video.getState() == VideoState.TRANSCODING_FAILED) {
-				System.out.println("RESUME TRANSCODING FOR " + video.getName());
+				log.info("Resuming transcoding of " + video.getName());
 				final File videoFile = new File(video.getVideoFile());
 				transcode(videoFile, video);
 			}
@@ -237,13 +246,18 @@ public class Ripper {
 	}
 
 	private void transcode(final File videoFile, final Video video) {
-		System.out.println("REQUESTING TRANSCODING FOR " + video.getName());
+		log.info("Requesting transcoding for " + video.getName());
 
 		updateVideoState(video, VideoState.TRANSCODING_ENQUEUED);
 
-		transcoder.transcode(videoFile, video, nil -> updateVideoState(video, VideoState.TRANSCODING), mp3File -> {
+		transcoder.transcode(videoFile, video, nil -> {
+			log.info("Started transcoding of " + video.getName());
+			updateVideoState(video, VideoState.TRANSCODING);
+		}, mp3File -> {
+			log.info("Completed transcoding " + video.getName());
 			onTranscodeComplete(mp3File, video);
 		}, t -> {
+			log.warn("Transcoding failed for " + video.getName(), t);
 			onTranscodeFailed(videoFile, video, t);
 		});
 	}

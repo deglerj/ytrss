@@ -1,5 +1,8 @@
 package org.ytrss.pages;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class StreamMapEntries {
 
 	public static String getExtension(final StreamMapEntry entry) {
@@ -13,10 +16,12 @@ public class StreamMapEntries {
 			case "video/3gpp":
 				return "3gp";
 			default:
-				System.out.println("Unknown video type \"" + entry.getType() + "\"");
+				log.warn("Unknown video type \"" + entry.getType() + "\"");
 				return "avi";
 		}
 	}
+
+	private static Logger	log	= LoggerFactory.getLogger(StreamMapEntries.class);
 
 	private StreamMapEntries() {
 		// Static utility class, no instances allowed

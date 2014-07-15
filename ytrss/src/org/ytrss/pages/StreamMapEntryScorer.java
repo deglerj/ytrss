@@ -3,10 +3,14 @@ package org.ytrss.pages;
 import java.util.Comparator;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 @Component
 public class StreamMapEntryScorer {
+
+	private static Logger	log	= LoggerFactory.getLogger(StreamMapEntryScorer.class);
 
 	public StreamMapEntry findBestEntry(final List<StreamMapEntry> entries) {
 		entries.sort(Comparator.comparingInt(value -> getScore((StreamMapEntry) value)).reversed());
@@ -25,7 +29,7 @@ public class StreamMapEntryScorer {
 			case "small":
 				return 1;
 			default:
-				System.out.println("Unknown quality type \"" + quality + "\"");
+				log.warn("Unknown quality type \"" + quality + "\"");
 				return 0;
 		}
 	}
@@ -45,7 +49,7 @@ public class StreamMapEntryScorer {
 			case "video/3gpp":
 				return 2;
 			default:
-				System.out.println("Unknown video type \"" + type + "\"");
+				log.warn("Unknown video type \"" + type + "\"");
 				return 0;
 		}
 	}

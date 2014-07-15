@@ -30,6 +30,8 @@ dependencies {
     compile 'rome:rome:+'
 	compile 'org.eclipse.jetty:jetty-webapp:9.+'
 	compile 'org.eclipse.jetty:jetty-jsp:9.+'
+	compile 'org.slf4j:slf4j-jdk14:+'
+	compile 'org.slf4j:log4j-over-slf4j:+'
 	
     testCompile 'junit:junit:+'    
 }

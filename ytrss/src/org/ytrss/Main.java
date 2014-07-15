@@ -1,14 +1,18 @@
 package org.ytrss;
 
 import org.apache.commons.lang3.mutable.MutableBoolean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.web.context.support.GenericWebApplicationContext;
 import org.ytrss.config.RootConfiguration;
+import org.ytrss.pages.StreamMapEntryScorer;
 
 //Based on: https://github.com/jasonish/jetty-springmvc-jsp-template
 public class Main {
+
 	public static void main(final String[] args) throws Exception {
 
 		try {
@@ -32,16 +36,17 @@ public class Main {
 			applicationContext.refresh();
 
 			if (webApplicationContextInitialized.isFalse()) {
-				System.err.println("Failed to initialize web application.  Exiting.");
+				log.error("Failed to initialize web application. Exiting...");
 				System.exit(1);
 			}
 
-			System.out.println("Running.");
+			log.info("Running");
 		}
 		catch (final Exception e) {
-			System.err.println("Error starting application");
-			e.printStackTrace();
+			log.error("Error starting application", e);
 			System.exit(1);
 		}
 	}
+
+	private static Logger	log	= LoggerFactory.getLogger(StreamMapEntryScorer.class);
 }
