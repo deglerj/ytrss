@@ -92,21 +92,30 @@
 							<a href="https://www.youtube.com/watch?v=${video.youtubeID}">
 								${video.name}
 							</a>
-						</td>
+						</td>						
 						<c:if test="${video.state.ordinal() == 0}">
 							<td><span class="label label-info table-state-label"><i class="glyphicon glyphicon-info-sign"></i> New</span></td>
 						</c:if>
 						<c:if test="${video.state.ordinal() == 1}">
-							<td><span class="label label-info table-state-label"><i class="glyphicon glyphicon-info-sign"></i> Downloading</span></td>
+							<td><span class="label label-default table-state-label"><i class="glyphicon glyphicon-time"></i> DL enqueued</span></td>
 						</c:if>
 						<c:if test="${video.state.ordinal() == 2}">
-							<td><span class="label label-info table-state-label"><i class="glyphicon glyphicon-info-sign"></i> Transcoding</span></td>
+							<td><span class="label label-info table-state-label"><i class="glyphicon glyphicon-download"></i>Downloading</span></td>
 						</c:if>
 						<c:if test="${video.state.ordinal() == 3}">
-							<td><a href="download/${video.id}" class="label label-success table-state-label"><i class="glyphicon glyphicon-download-alt"></i> Ready</a></td>
+							<td><span class="label label-danger table-state-label"><i class="glyphicon glyphicon-warning-sign"></i>DL failed</span></td>
 						</c:if>
-						<c:if test="${video.state.ordinal() > 3}">
-							<td><a href="#" class="label label-danger table-state-label"><i class="glyphicon glyphicon-warning-sign"></i> Error</a></td>
+						<c:if test="${video.state.ordinal() == 4}">
+							<td><span class="label label-default table-state-label"><i class="glyphicon glyphicon-time"></i> TRC enqueued</span></td>
+						</c:if>
+						<c:if test="${video.state.ordinal() == 5}">
+							<td><span class="label label-danger table-state-label"><i class="glyphicon glyphicon-record"></i> Transconding</span></td>
+						</c:if>
+						<c:if test="${video.state.ordinal() == 6}">
+							<td><span class="label label-danger table-state-label"><i class="glyphicon glyphicon-warning-sign"></i>TRC failed</span></td>
+						</c:if>
+						<c:if test="${video.state.ordinal() == 7}">
+							<td><a href="download/${video.id}" class="label label-success table-state-label"><i class="glyphicon glyphicon-download-alt"></i> Ready</a></td>
 						</c:if>
 					</tr>
 				</c:forEach>

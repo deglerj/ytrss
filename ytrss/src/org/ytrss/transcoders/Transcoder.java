@@ -7,6 +7,6 @@ import org.ytrss.db.Video;
 
 public interface Transcoder {
 
-	void transcode(File videoFile, Video video, Consumer<File> transcoded, Consumer<Throwable> failed);
+	void transcode(File videoFile, Video video, Consumer<Void> started, Consumer<File> transcoded, Consumer<Throwable> failed);
 
 }

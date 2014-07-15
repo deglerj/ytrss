@@ -17,7 +17,10 @@ import org.ytrss.pages.StreamMapEntry;
 public class StreamDownloader {
 
 	@Async("streamDownloader")
-	public void download(final Video video, final StreamMapEntry entry, final Consumer<File> downloaded, final Consumer<Throwable> failed) {
+	public void download(final Video video, final StreamMapEntry entry, final Consumer<Void> started, final Consumer<File> downloaded,
+			final Consumer<Throwable> failed) {
+		started.accept(null);
+
 		final String userHome = System.getProperty("user.home");
 		final String fileName = userHome + "/.ytrss/videos/" + Videos.getFileName(video) + "." + StreamMapEntries.getExtension(entry);
 

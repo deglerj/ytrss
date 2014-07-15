@@ -91,19 +91,15 @@ public class Ripper {
 		}
 	}
 
-	private void download(final Channel channel, final VideoPage videoPage) {
-		final Video video = createVideo(channel, videoPage);
-
-		final StreamMapEntry bestEntry = new StreamMapEntryScorer().findBestEntry(videoPage.getStreamMapEntries());
-
+	private void download(final Video video, final StreamMapEntry entry) {
 		System.out.println("REQUESTING DOWNLOAD FOR " + video.getName());
 
-		updateVideoState(video, VideoState.DOWNLOADING);
+		updateVideoState(video, VideoState.DOWNLOADING_ENQUEUED);
 
-		downloader.download(video, bestEntry, videoFile -> {
+		downloader.download(video, entry, nil -> updateVideoState(video, VideoState.DOWNLOADING), videoFile -> {
 			onDownloadComplete(video, videoFile);
 		}, t -> {
-			onDownloadFailed(video, t, bestEntry);
+			onDownloadFailed(video, t, entry);
 		});
 
 	}
@@ -118,16 +114,13 @@ public class Ripper {
 		transcode(videoFile, video);
 	}
 
-	private void onDownloadFailed(final Video video, final Throwable error, final StreamMapEntry bestEntry) {
+	private void onDownloadFailed(final Video video, final Throwable error, final StreamMapEntry entry) {
 		// Mark as failed
 		updateVideoState(video, VideoState.DOWNLOADING_FAILED, error);
 
-		// Retry
-		downloader.download(video, bestEntry, videoFile -> {
-			onDownloadComplete(video, videoFile);
-		}, t -> {
-			onDownloadFailed(video, t, bestEntry);
-		});
+		// TODO delay retrying download by x minutes
+
+		download(video, entry);
 	}
 
 	private void onTranscodeComplete(final File mp3File, final Video video) {
@@ -138,14 +131,11 @@ public class Ripper {
 
 	private void onTranscodeFailed(final File videoFile, final Video video, final Throwable errors) {
 		// Mark as failed
-		updateVideoState(video, VideoState.TRANSCONDING_FAILED, errors);
+		updateVideoState(video, VideoState.TRANSCODING_FAILED, errors);
 
-		// Retry
-		transcoder.transcode(videoFile, video, mp3File -> {
-			onTranscodeComplete(mp3File, video);
-		}, t -> {
-			onTranscodeFailed(videoFile, video, t);
-		});
+		// TODO delay retrying transcoding by x minutes
+
+		transcode(videoFile, video);
 	}
 
 	private ChannelPage openChannelPage(final Channel channel) {
@@ -167,7 +157,10 @@ public class Ripper {
 		for (final ContentGridEntry contentEntry : channelPage.getContentGridEntries()) {
 			final VideoPage videoPage = openVideoPage(contentEntry);
 			if (!hasBeenRipped(videoPage)) {
-				download(channel, videoPage);
+				final Video video = createVideo(channel, videoPage);
+
+				final StreamMapEntry bestEntry = new StreamMapEntryScorer().findBestEntry(videoPage.getStreamMapEntries());
+				download(video, bestEntry);
 			}
 		}
 	}
@@ -175,9 +168,9 @@ public class Ripper {
 	private void transcode(final File videoFile, final Video video) {
 		System.out.println("REQUESTING TRANSCODING FOR " + video.getName());
 
-		updateVideoState(video, VideoState.TRANSCODING);
+		updateVideoState(video, VideoState.TRANSCODING_ENQUEUED);
 
-		transcoder.transcode(videoFile, video, mp3File -> {
+		transcoder.transcode(videoFile, video, nil -> updateVideoState(video, VideoState.TRANSCODING), mp3File -> {
 			onTranscodeComplete(mp3File, video);
 		}, t -> {
 			onTranscodeFailed(videoFile, video, t);
@@ -185,12 +178,16 @@ public class Ripper {
 	}
 
 	private void updateVideoState(final Video video, final VideoState state) {
+		System.out.println("STATE " + state + " FOR " + video.getName());
+
 		video.setState(state);
 		video.setErrorMessage(null);
 		videoDAO.persist(video);
 	}
 
 	private void updateVideoState(final Video video, final VideoState state, final Throwable t) {
+		System.out.println("STATE " + state + " FOR " + video.getName());
+
 		video.setState(state);
 		video.setErrorMessage(t.getMessage());
 		videoDAO.persist(video);

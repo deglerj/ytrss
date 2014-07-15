@@ -16,7 +16,10 @@ public class JaveTranscoder implements Transcoder {
 
 	@Override
 	@Async("transcoder")
-	public void transcode(final File videoFile, final Video video, final Consumer<File> transcoded, final Consumer<Throwable> failed) {
+	public void transcode(final File videoFile, final Video video, final Consumer<Void> started, final Consumer<File> transcoded,
+			final Consumer<Throwable> failed) {
+		started.accept(null);
+
 		System.out.println("TRANSCODING " + videoFile.getName());
 
 		final String userHome = System.getProperty("user.home");

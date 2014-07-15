@@ -77,7 +77,7 @@ public class YTRSSConfiguration extends WebMvcConfigurerAdapter implements Async
 	@Bean
 	@Qualifier("streamDownloader")
 	public Executor getStreamDownloaderExecutor() {
-		return Executors.newFixedThreadPool(3);
+		return Executors.newFixedThreadPool(2);
 	}
 
 	@Bean
