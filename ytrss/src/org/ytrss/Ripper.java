@@ -60,6 +60,7 @@ public class Ripper {
 
 	@PostConstruct
 	public void resumeAfterRestart() {
+		// TODO Spawn new thread, doing this synchronously slows down the server startup
 		resumeTranscoding();
 		resumeDownloads();
 	}

@@ -1,5 +1,6 @@
 package org.ytrss.client;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkState;
 
 import java.io.File;
@@ -19,6 +20,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.ytrss.db.Channel;
 import org.ytrss.db.ChannelDAO;
 import org.ytrss.db.Video;
@@ -37,8 +39,10 @@ public class DownloadsController {
 	private VideoDAO	videoDAO;
 
 	@RequestMapping(value = "/download/{id}", method = RequestMethod.GET)
-	public void getDownload(@PathVariable(value = "id") final long id, final HttpServletResponse response) {
+	public void getDownload(@PathVariable("id") final long id, @RequestParam("token") final String token, final HttpServletResponse response) {
 		final Video video = videoDAO.findById(id);
+
+		checkArgument(Videos.createToken(video).equals(token), "Token mismatch");
 
 		final File file = new File(video.getMp3File());
 		checkState(file.exists(), "MP3 file for video #" + video.getId() + " does not exist");
