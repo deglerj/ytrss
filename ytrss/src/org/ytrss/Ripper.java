@@ -4,6 +4,7 @@ import java.io.File;
 import java.sql.Timestamp;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Pattern;
 
 import javax.annotation.PostConstruct;
 
@@ -22,6 +23,8 @@ import org.ytrss.pages.StreamMapEntry;
 import org.ytrss.pages.StreamMapEntryScorer;
 import org.ytrss.pages.VideoPage;
 import org.ytrss.transcoders.Transcoder;
+
+import com.google.common.base.Strings;
 
 @Component
 public class Ripper {
@@ -112,6 +115,20 @@ public class Ripper {
 		return videoDAO.findByYoutubeID(videoPage.getVideoID()) != null;
 	}
 
+	private boolean matchesPatterns(final ContentGridEntry contentEntry, final Channel channel) {
+		boolean included = true;
+		if (!Strings.isNullOrEmpty(channel.getIncludeRegex())) {
+			included = Pattern.compile(channel.getIncludeRegex(), Pattern.CASE_INSENSITIVE).matcher(contentEntry.getTitle()).matches();
+		}
+
+		boolean excluded = false;
+		if (!Strings.isNullOrEmpty(channel.getExcludeRegex())) {
+			excluded = Pattern.compile(channel.getExcludeRegex(), Pattern.CASE_INSENSITIVE).matcher(contentEntry.getTitle()).matches();
+		}
+
+		return included && !excluded;
+	}
+
 	private void onDownloadComplete(final Video video, final File videoFile) {
 		video.setVideoFile(videoFile.getAbsolutePath());
 
@@ -198,6 +215,10 @@ public class Ripper {
 	private void rip(final Channel channel) {
 		final ChannelPage channelPage = openChannelPage(channel);
 		for (final ContentGridEntry contentEntry : channelPage.getContentGridEntries()) {
+			if (!matchesPatterns(contentEntry, channel)) {
+				continue;
+			}
+
 			final VideoPage videoPage = openVideoPage(contentEntry);
 			if (!hasBeenRipped(videoPage)) {
 				final Video video = createVideo(channel, videoPage);

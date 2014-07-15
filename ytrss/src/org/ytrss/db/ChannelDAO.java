@@ -77,7 +77,7 @@ public class ChannelDAO {
 		@Override
 		public PreparedStatement createPreparedStatement(final Connection con) throws SQLException {
 			final PreparedStatement stmt = con
-					.prepareStatement("UPDATE \"CHANNEL\" SET \"NAME\" = ?, \"URL\" = ?, \"EXCLUDE_REGEX\" = ?, \"INCLUDE_REGEX\" = ?, \"SECURITY_TOKEN\" = ? WHERE \"ID\" = ?");
+					.prepareStatement("UPDATE \"CHANNEL\" SET \"NAME\" = ?, \"URL\" = ?, \"EXCLUDE_REGEX\" = ?, \"INCLUDE_REGEX\" = ? WHERE \"ID\" = ?");
 
 			stmt.setString(1, channel.getName());
 			stmt.setString(2, channel.getUrl());
@@ -96,14 +96,7 @@ public class ChannelDAO {
 				stmt.setString(4, channel.getIncludeRegex());
 			}
 
-			if (channel.getSecurityToken() == null) {
-				stmt.setNull(5, Types.LONGVARCHAR);
-			}
-			else {
-				stmt.setString(5, channel.getSecurityToken());
-			}
-
-			stmt.setLong(6, channel.getId());
+			stmt.setLong(5, channel.getId());
 
 			return stmt;
 		}

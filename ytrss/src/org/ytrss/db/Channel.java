@@ -16,8 +16,10 @@ public class Channel {
 
 	private String	securityToken;
 
+	@RegularExpression
 	private String	includeRegex;
 
+	@RegularExpression
 	private String	excludeRegex;
 
 	public String getExcludeRegex() {
