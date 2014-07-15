@@ -14,6 +14,8 @@ public class Channel {
 	@URL
 	private String	url;
 
+	private String	securityToken;
+
 	private String	includeRegex;
 
 	private String	excludeRegex;
@@ -34,6 +36,10 @@ public class Channel {
 		return name;
 	}
 
+	public String getSecurityToken() {
+		return securityToken;
+	}
+
 	public String getUrl() {
 		return url;
 	}
@@ -52,6 +58,10 @@ public class Channel {
 
 	public void setName(final String name) {
 		this.name = name;
+	}
+
+	public void setSecurityToken(final String securityToken) {
+		this.securityToken = securityToken;
 	}
 
 	public void setUrl(final String url) {

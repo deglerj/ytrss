@@ -34,6 +34,7 @@ dependencies {
     compile('com.googlecode.flyway:flyway-core:+')
     compile 'javax.validation:validation-api:+'
 	compile 'org.hibernate:hibernate-validator:5.+'
+    compile('rome:rome:+')
     testCompile('junit:junit:+')    
 }
 

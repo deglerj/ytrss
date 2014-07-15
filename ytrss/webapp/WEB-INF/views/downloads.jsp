@@ -116,8 +116,7 @@
 							<td><span class="label label-danger table-state-label"><i class="glyphicon glyphicon-warning-sign"></i>TRC failed</span></td>
 						</c:if>
 						<c:if test="${video.state.ordinal() == 7}">
-							<s:eval expression="T(org.ytrss.db.Videos).createToken(video)" var="token" />
-							<td><a href="download/${video.id}?token=${token}" class="label label-success table-state-label"><i class="glyphicon glyphicon-download-alt"></i> Ready</a></td>
+							<td><a href="download?id=${video.id}&token=${video.securityToken}" class="label label-success table-state-label"><i class="glyphicon glyphicon-download-alt"></i> Ready</a></td>
 						</c:if>
 					</tr>
 				</c:forEach>

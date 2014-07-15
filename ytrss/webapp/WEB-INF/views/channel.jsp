@@ -128,15 +128,15 @@
 				<div class="form-horizontal">
 					<div class="form-group">
 						<label for="feedAtom" class="control-label col-xs-2">Atom</label>
-						<div class="col-xs-7">
-							<a id="feedAtom" href="#" class="form-control-text">http://localhost:8080/ytrss/atom/${channel.id}</a>
+						<div class="col-xs-10">
+							<a id="feedAtom" href="channel/${channel.id}/feed?type=atom&token=${channel.securityToken}" class="form-control-text">http://localhost:8080/ytrss/channel/${channel.id}/feed?type=atom&token=${channel.securityToken}</a>
 						</div>
 					</div>
 	
 					<div class="form-group">
 						<label for="feedRSS" class="control-label col-xs-2">RSS</label>
-						<div class="col-xs-7">
-							<a id="feedRSS" href="#" class="form-control-text">http://localhost:8080/ytrss/rss/${channel.id}</a>
+						<div class="col-xs-10">
+							<a id="feedRSS" href="channel/${channel.id}/feed?type=rss&token=${channel.securityToken}" class="form-control-text">http://localhost:8080/ytrss/channel/${channel.id}/feed?type=rss&token=${channel.securityToken}</a>
 						</div>
 					</div>
 				</div>
@@ -183,7 +183,7 @@
 								<td><span class="label label-danger table-state-label"><i class="glyphicon glyphicon-warning-sign"></i>TRC failed</span></td>
 							</c:if>
 							<c:if test="${video.state.ordinal() == 7}">
-								<td><a href="download/${video.id}" class="label label-success table-state-label"><i class="glyphicon glyphicon-download-alt"></i> Ready</a></td>
+								<td><a href="download?id=${video.id}&token=${video.securityToken}" class="label label-success table-state-label"><i class="glyphicon glyphicon-download-alt"></i> Ready</a></td>
 							</c:if>
 						</tr>
 					</c:forEach>

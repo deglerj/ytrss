@@ -29,6 +29,8 @@ public class Video {
 	@NotNull
 	private VideoState	state;
 
+	private String		securityToken;
+
 	private String		videoFile;
 
 	private String		mp3File;
@@ -57,6 +59,10 @@ public class Video {
 
 	public String getName() {
 		return name;
+	}
+
+	public String getSecurityToken() {
+		return securityToken;
 	}
 
 	public VideoState getState() {
@@ -97,6 +103,10 @@ public class Video {
 
 	public void setName(final String name) {
 		this.name = name;
+	}
+
+	public void setSecurityToken(final String securityToken) {
+		this.securityToken = securityToken;
 	}
 
 	public void setState(final VideoState state) {

@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.List;
+import java.util.UUID;
 
 import javax.sql.DataSource;
 
@@ -36,7 +37,7 @@ public class VideoDAO {
 		public PreparedStatement createPreparedStatement(final Connection con) throws SQLException {
 			final PreparedStatement stmt = con
 					.prepareStatement(
-							"INSERT INTO \"VIDEO\" (\"CHANNEL_FK\", \"YOUT_ID\", \"NAME\", \"UPLOADED\", \"DISCOVERED\", \"STATE\", \"VIDEO_FILE\", \"MP3_FILE\", \"ERROR_MESSAGE\") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+							"INSERT INTO \"VIDEO\" (\"CHANNEL_FK\", \"YOUT_ID\", \"NAME\", \"UPLOADED\", \"DISCOVERED\", \"STATE\", \"VIDEO_FILE\", \"MP3_FILE\", \"ERROR_MESSAGE\", \"SECURITY_TOKEN\") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
 							Statement.RETURN_GENERATED_KEYS);
 
 			stmt.setLong(1, video.getChannelID());
@@ -67,6 +68,13 @@ public class VideoDAO {
 				stmt.setString(9, video.getErrorMessage());
 			}
 
+			if (video.getSecurityToken() == null) {
+				stmt.setNull(10, Types.LONGVARCHAR);
+			}
+			else {
+				stmt.setString(10, video.getSecurityToken());
+			}
+
 			return stmt;
 		}
 
@@ -83,7 +91,7 @@ public class VideoDAO {
 		@Override
 		public PreparedStatement createPreparedStatement(final Connection con) throws SQLException {
 			final PreparedStatement stmt = con
-					.prepareStatement("UPDATE \"VIDEO\" SET \"CHANNEL_FK\" = ?, \"YOUT_ID\" = ?, \"NAME\" = ?, \"UPLOADED\" = ?, \"DISCOVERED\" = ?, \"STATE\" = ?, \"VIDEO_FILE\" = ?, \"MP3_FILE\" = ?, \"ERROR_MESSAGE\" = ? WHERE \"ID\" = ?");
+					.prepareStatement("UPDATE \"VIDEO\" SET \"CHANNEL_FK\" = ?, \"YOUT_ID\" = ?, \"NAME\" = ?, \"UPLOADED\" = ?, \"DISCOVERED\" = ?, \"STATE\" = ?, \"VIDEO_FILE\" = ?, \"MP3_FILE\" = ?, \"ERROR_MESSAGE\" = ?, \"SECURITY_TOKEN\" = ? WHERE \"ID\" = ?");
 
 			stmt.setLong(1, video.getChannelID());
 			stmt.setString(2, video.getYoutubeID());
@@ -113,7 +121,14 @@ public class VideoDAO {
 				stmt.setString(9, video.getErrorMessage());
 			}
 
-			stmt.setLong(10, video.getId());
+			if (video.getSecurityToken() == null) {
+				stmt.setNull(10, Types.LONGVARCHAR);
+			}
+			else {
+				stmt.setString(10, video.getSecurityToken());
+			}
+
+			stmt.setLong(11, video.getId());
 
 			return stmt;
 		}
@@ -138,6 +153,7 @@ public class VideoDAO {
 		video.setVideoFile(rs.getString("video_file"));
 		video.setMp3File(rs.getString("mp3_file"));
 		video.setErrorMessage(rs.getString("error_message"));
+		video.setSecurityToken(rs.getString("security_token"));
 		return video;
 	};
 
@@ -163,6 +179,10 @@ public class VideoDAO {
 	}
 
 	public void persist(final Video video) {
+		if (video.getId() == null && video.getSecurityToken() == null) {
+			video.setSecurityToken(createSecurityToken());
+		}
+
 		final KeyHolder keyHolder = new GeneratedKeyHolder();
 
 		jdbcTemplate.update(video.getId() == null ? new InsertStatementCreator(video) : new UpdateStatementCreator(video), keyHolder);
@@ -171,4 +191,11 @@ public class VideoDAO {
 			video.setId(keyHolder.getKey().longValue());
 		}
 	}
+
+	private String createSecurityToken() {
+		final String uuid = UUID.randomUUID().toString();
+		// Only keep characters and digits
+		return uuid.replaceAll("[^\\w\\d]", "");
+	}
+
 }

@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
 import java.util.List;
+import java.util.UUID;
 
 import javax.sql.DataSource;
 
@@ -33,7 +34,8 @@ public class ChannelDAO {
 		@Override
 		public PreparedStatement createPreparedStatement(final Connection con) throws SQLException {
 			final PreparedStatement stmt = con.prepareStatement(
-					"INSERT INTO \"CHANNEL\" (\"NAME\", \"URL\", \"EXCLUDE_REGEX\", \"INCLUDE_REGEX\") VALUES (?, ?, ?, ?)", Statement.RETURN_GENERATED_KEYS);
+					"INSERT INTO \"CHANNEL\" (\"NAME\", \"URL\", \"EXCLUDE_REGEX\", \"INCLUDE_REGEX\", \"SECURITY_TOKEN\") VALUES (?, ?, ?, ?, ?)",
+					Statement.RETURN_GENERATED_KEYS);
 
 			stmt.setString(1, channel.getName());
 			stmt.setString(2, channel.getUrl());
@@ -50,6 +52,13 @@ public class ChannelDAO {
 			}
 			else {
 				stmt.setString(4, channel.getIncludeRegex());
+			}
+
+			if (channel.getSecurityToken() == null) {
+				stmt.setNull(5, Types.LONGVARCHAR);
+			}
+			else {
+				stmt.setString(5, channel.getSecurityToken());
 			}
 
 			return stmt;
@@ -68,7 +77,7 @@ public class ChannelDAO {
 		@Override
 		public PreparedStatement createPreparedStatement(final Connection con) throws SQLException {
 			final PreparedStatement stmt = con
-					.prepareStatement("UPDATE \"CHANNEL\" SET \"NAME\" = ?, \"URL\" = ?, \"EXCLUDE_REGEX\" = ?, \"INCLUDE_REGEX\" = ? WHERE \"ID\" = ?");
+					.prepareStatement("UPDATE \"CHANNEL\" SET \"NAME\" = ?, \"URL\" = ?, \"EXCLUDE_REGEX\" = ?, \"INCLUDE_REGEX\" = ?, \"SECURITY_TOKEN\" = ? WHERE \"ID\" = ?");
 
 			stmt.setString(1, channel.getName());
 			stmt.setString(2, channel.getUrl());
@@ -87,7 +96,14 @@ public class ChannelDAO {
 				stmt.setString(4, channel.getIncludeRegex());
 			}
 
-			stmt.setLong(5, channel.getId());
+			if (channel.getSecurityToken() == null) {
+				stmt.setNull(5, Types.LONGVARCHAR);
+			}
+			else {
+				stmt.setString(5, channel.getSecurityToken());
+			}
+
+			stmt.setLong(6, channel.getId());
 
 			return stmt;
 		}
@@ -107,6 +123,7 @@ public class ChannelDAO {
 														channel.setUrl(rs.getString("url"));
 														channel.setExcludeRegex(rs.getString("exclude_regex"));
 														channel.setIncludeRegex(rs.getString("include_regex"));
+														channel.setSecurityToken(rs.getString("security_token"));
 														return channel;
 													};
 
@@ -128,6 +145,10 @@ public class ChannelDAO {
 	}
 
 	public void persist(final Channel channel) {
+		if (channel.getId() == null && channel.getSecurityToken() == null) {
+			channel.setSecurityToken(createSecurityToken());
+		}
+
 		final KeyHolder keyHolder = new GeneratedKeyHolder();
 
 		jdbcTemplate.update(channel.getId() == null ? new InsertStatementCreator(channel) : new UpdateStatementCreator(channel), keyHolder);
@@ -135,5 +156,11 @@ public class ChannelDAO {
 		if (channel.getId() == null) {
 			channel.setId(keyHolder.getKey().longValue());
 		}
+	}
+
+	private String createSecurityToken() {
+		final String uuid = UUID.randomUUID().toString();
+		// Only keep characters and digits
+		return uuid.replaceAll("[^\\w\\d]", "");
 	}
 }

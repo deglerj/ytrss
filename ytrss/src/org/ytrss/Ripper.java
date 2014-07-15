@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.ytrss.db.Channel;
@@ -58,20 +59,7 @@ public class Ripper {
 		}
 	}
 
-	@PostConstruct
-	public void resumeAfterRestart() {
-		// TODO Spawn new thread, doing this synchronously slows down the server startup
-		resumeTranscoding();
-		resumeDownloads();
-	}
-
-	@Scheduled(fixedDelay = 1000)
-	public void schedule() {
-		if (!active && delayExpired()) {
-			start();
-		}
-	}
-
+	@Async
 	public synchronized void start() {
 		active = true;
 
@@ -178,6 +166,12 @@ public class Ripper {
 		return new VideoPage(URLs.copyToString(url));
 	}
 
+	@PostConstruct
+	private void resumeAfterRestart() {
+		resumeTranscoding();
+		resumeDownloads();
+	}
+
 	private void resumeDownloads() {
 		for (final Video video : videoDAO.findAll()) {
 			if (video.getState() == VideoState.DOWNLOADING || video.getState() == VideoState.DOWNLOADING_ENQUEUED
@@ -214,6 +208,13 @@ public class Ripper {
 		}
 	}
 
+	@Scheduled(fixedDelay = 1000)
+	private void schedule() {
+		if (!active && delayExpired()) {
+			start();
+		}
+	}
+
 	private void transcode(final File videoFile, final Video video) {
 		System.out.println("REQUESTING TRANSCODING FOR " + video.getName());
 
@@ -227,16 +228,12 @@ public class Ripper {
 	}
 
 	private void updateVideoState(final Video video, final VideoState state) {
-		System.out.println("STATE " + state + " FOR " + video.getName());
-
 		video.setState(state);
 		video.setErrorMessage(null);
 		videoDAO.persist(video);
 	}
 
 	private void updateVideoState(final Video video, final VideoState state, final Throwable t) {
-		System.out.println("STATE " + state + " FOR " + video.getName());
-
 		video.setState(state);
 		video.setErrorMessage(t.getMessage());
 		videoDAO.persist(video);

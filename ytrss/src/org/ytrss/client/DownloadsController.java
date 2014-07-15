@@ -17,7 +17,6 @@ import org.apache.commons.io.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -38,11 +37,11 @@ public class DownloadsController {
 	@Autowired
 	private VideoDAO	videoDAO;
 
-	@RequestMapping(value = "/download/{id}", method = RequestMethod.GET)
-	public void getDownload(@PathVariable("id") final long id, @RequestParam("token") final String token, final HttpServletResponse response) {
+	@RequestMapping(value = "/download", method = RequestMethod.GET)
+	public void getDownload(@RequestParam("id") final long id, @RequestParam("token") final String token, final HttpServletResponse response) {
 		final Video video = videoDAO.findById(id);
 
-		checkArgument(Videos.createToken(video).equals(token), "Token mismatch");
+		checkArgument(token.equals(video.getSecurityToken()), "Token mismatch");
 
 		final File file = new File(video.getMp3File());
 		checkState(file.exists(), "MP3 file for video #" + video.getId() + " does not exist");
