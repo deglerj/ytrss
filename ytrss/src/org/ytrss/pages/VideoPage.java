@@ -14,7 +14,10 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.ytrss.Patterns;
+import org.ytrss.client.ChannelController;
 
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
@@ -36,6 +39,8 @@ public class VideoPage {
 	private static final Pattern	KEY_VALUE_PATTERN	= Pattern.compile("^([^=]+)=(.+)$");
 
 	private static final Pattern	UPLOADED_PATTERN	= Pattern.compile("<strong>.+on\\s+([^<]+)");
+
+	private static Logger			log					= LoggerFactory.getLogger(ChannelController.class);
 
 	public VideoPage(final String source) {
 		checkArgument(!Strings.isNullOrEmpty(source), "Source must not be emtpy");
@@ -90,6 +95,7 @@ public class VideoPage {
 			return entries;
 		}
 		catch (final IOException e) {
+			log.error("Error parsing stream map entries", e);
 			throw Throwables.propagate(e);
 		}
 	}
@@ -107,6 +113,7 @@ public class VideoPage {
 			return new Date(parsed.getTime());
 		}
 		catch (final ParseException e) {
+			log.error("Error parsing upload date", e);
 			throw Throwables.propagate(e);
 		}
 

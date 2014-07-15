@@ -5,6 +5,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.ytrss.client.ChannelController;
 
 import com.google.common.base.Throwables;
 
@@ -24,9 +27,12 @@ public class URLs {
 			return IOUtils.toString(url, "UTF-8");
 		}
 		catch (final IOException e) {
+			log.error("Error downloading page", e);
 			throw Throwables.propagate(e);
 		}
 	}
+
+	private static Logger	log	= LoggerFactory.getLogger(ChannelController.class);
 
 	private URLs() {
 		// Static utility class, no instances allowed

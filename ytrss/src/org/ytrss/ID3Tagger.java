@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.ytrss.db.Channel;
@@ -29,6 +31,8 @@ public class ID3Tagger {
 
 	private final DateFormat	yearFormat	= new SimpleDateFormat("yyyy");
 
+	private static Logger		log			= LoggerFactory.getLogger(ID3Tagger.class);
+
 	public void tag(final File file, final Video video) {
 		final Channel channel = channelDAO.findById(video.getChannelID());
 
@@ -52,6 +56,7 @@ public class ID3Tagger {
 			Files.move(taggedFile, file);
 		}
 		catch (UnsupportedTagException | InvalidDataException | IOException | NotSupportedException e) {
+			log.error("Error creating ID3 tagged mp3 file", e);
 			throw Throwables.propagate(e);
 		}
 	}

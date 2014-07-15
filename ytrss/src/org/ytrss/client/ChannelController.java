@@ -11,6 +11,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -43,13 +45,15 @@ import com.sun.syndication.io.SyndFeedOutput;
 public class ChannelController {
 
 	@Autowired
-	private ChannelDAO	channelDAO;
+	private ChannelDAO		channelDAO;
 
 	@Autowired
-	private VideoDAO	videoDAO;
+	private VideoDAO		videoDAO;
 
 	@Autowired
-	private Ripper		ripper;
+	private Ripper			ripper;
+
+	private static Logger	log	= LoggerFactory.getLogger(ChannelController.class);
 
 	@ModelAttribute
 	public Channel channel() {
@@ -97,6 +101,7 @@ public class ChannelController {
 			feedOutput.output(feed, response.getWriter());
 		}
 		catch (IOException | FeedException e) {
+			log.error("Error writing feed to HTTP response", e);
 			throw Throwables.propagate(e);
 		}
 	}

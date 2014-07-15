@@ -14,6 +14,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.io.IOUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -32,10 +34,12 @@ import com.google.common.base.Throwables;
 public class DownloadsController {
 
 	@Autowired
-	private ChannelDAO	channelDAO;
+	private ChannelDAO		channelDAO;
 
 	@Autowired
-	private VideoDAO	videoDAO;
+	private VideoDAO		videoDAO;
+
+	private static Logger	log	= LoggerFactory.getLogger(ChannelController.class);
 
 	@RequestMapping(value = "/download", method = RequestMethod.GET)
 	public void getDownload(@RequestParam("id") final long id, @RequestParam("token") final String token, final HttpServletResponse response) {
@@ -54,6 +58,7 @@ public class DownloadsController {
 			IOUtils.copy(in, out);
 		}
 		catch (final IOException e) {
+			log.error("Error writing mp3 file content to HTTP response", e);
 			throw Throwables.propagate(e);
 		}
 	}
