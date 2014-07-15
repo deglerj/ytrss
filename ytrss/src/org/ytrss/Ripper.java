@@ -5,6 +5,8 @@ import java.sql.Timestamp;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -44,6 +46,9 @@ public class Ripper {
 	@Autowired
 	private ScheduledExecutorService	scheduledExecutor;
 
+	@Autowired
+	private StreamMapEntryScorer		streamMapEntryScorer;
+
 	public long getCountdown() {
 		if (active || lastExecuted == null) {
 			return 0;
@@ -51,6 +56,12 @@ public class Ripper {
 		else {
 			return (lastExecuted + DELAY) - System.currentTimeMillis();
 		}
+	}
+
+	@PostConstruct
+	public void resumeAfterRestart() {
+		resumeTranscoding();
+		resumeDownloads();
 	}
 
 	@Scheduled(fixedDelay = 1000)
@@ -130,8 +141,11 @@ public class Ripper {
 
 	private void onTranscodeComplete(final File mp3File, final Video video) {
 		video.setMp3File(mp3File.getAbsolutePath());
-
 		updateVideoState(video, VideoState.READY);
+
+		// Delete video file
+		final File videoFile = new File(video.getVideoFile());
+		videoFile.delete();
 	}
 
 	private void onTranscodeFailed(final File videoFile, final Video video, final Throwable errors) {
@@ -158,6 +172,34 @@ public class Ripper {
 		return new VideoPage(URLs.copyToString(url));
 	}
 
+	private VideoPage openVideoPage(final Video video) {
+		final String url = "http://youtube.com/watch?v=" + video.getYoutubeID() + "&gl=gb&hl=en"; // Force locale to make date parsing easier
+		return new VideoPage(URLs.copyToString(url));
+	}
+
+	private void resumeDownloads() {
+		for (final Video video : videoDAO.findAll()) {
+			if (video.getState() == VideoState.DOWNLOADING || video.getState() == VideoState.DOWNLOADING_ENQUEUED
+					|| video.getState() == VideoState.DOWNLOADING_FAILED) {
+				System.out.println("RESUME DOWNLOADING FOR " + video.getName());
+				final VideoPage videoPage = openVideoPage(video);
+				final StreamMapEntry bestEntry = streamMapEntryScorer.findBestEntry(videoPage.getStreamMapEntries());
+				download(video, bestEntry);
+			}
+		}
+	}
+
+	private void resumeTranscoding() {
+		for (final Video video : videoDAO.findAll()) {
+			if (video.getState() == VideoState.TRANSCODING || video.getState() == VideoState.TRANSCODING_ENQUEUED
+					|| video.getState() == VideoState.TRANSCODING_FAILED) {
+				System.out.println("RESUME TRANSCODING FOR " + video.getName());
+				final File videoFile = new File(video.getVideoFile());
+				transcode(videoFile, video);
+			}
+		}
+	}
+
 	private void rip(final Channel channel) {
 		final ChannelPage channelPage = openChannelPage(channel);
 		for (final ContentGridEntry contentEntry : channelPage.getContentGridEntries()) {
@@ -165,7 +207,7 @@ public class Ripper {
 			if (!hasBeenRipped(videoPage)) {
 				final Video video = createVideo(channel, videoPage);
 
-				final StreamMapEntry bestEntry = new StreamMapEntryScorer().findBestEntry(videoPage.getStreamMapEntries());
+				final StreamMapEntry bestEntry = streamMapEntryScorer.findBestEntry(videoPage.getStreamMapEntries());
 				download(video, bestEntry);
 			}
 		}

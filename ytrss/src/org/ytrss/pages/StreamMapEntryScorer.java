@@ -3,16 +3,15 @@ package org.ytrss.pages;
 import java.util.Comparator;
 import java.util.List;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class StreamMapEntryScorer {
 
 	public StreamMapEntry findBestEntry(final List<StreamMapEntry> entries) {
 		entries.sort(Comparator.comparingInt(value -> getScore((StreamMapEntry) value)).reversed());
 
 		return entries.get(0);
-	}
-
-	private int getScore(final StreamMapEntry entry) {
-		return getTypeScore(entry.getType()) + getQualityScore(entry.getQuality());
 	}
 
 	private int getQualityScore(final String quality) {
@@ -29,6 +28,10 @@ public class StreamMapEntryScorer {
 				System.out.println("Unknown quality type \"" + quality + "\"");
 				return 0;
 		}
+	}
+
+	private int getScore(final StreamMapEntry entry) {
+		return getTypeScore(entry.getType()) + getQualityScore(entry.getQuality());
 	}
 
 	private int getTypeScore(final String type) {

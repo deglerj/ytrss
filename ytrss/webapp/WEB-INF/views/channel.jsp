@@ -176,7 +176,7 @@
 								<td><span class="label label-default table-state-label"><i class="glyphicon glyphicon-time"></i> TRC enqueued</span></td>
 							</c:if>
 							<c:if test="${video.state.ordinal() == 5}">
-								<td><span class="label label-danger table-state-label"><i class="glyphicon glyphicon-record"></i> Transconding</span></td>
+								<td><span class="label label-info table-state-label"><i class="glyphicon glyphicon-record"></i> Transconding</span></td>
 							</c:if>
 							<c:if test="${video.state.ordinal() == 6}">
 								<td><span class="label label-danger table-state-label"><i class="glyphicon glyphicon-warning-sign"></i>TRC failed</span></td>
