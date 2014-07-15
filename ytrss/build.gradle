@@ -32,6 +32,7 @@ dependencies {
 	compile 'org.eclipse.jetty:jetty-jsp:9.+'
 	compile 'org.slf4j:slf4j-jdk14:+'
 	compile 'org.slf4j:log4j-over-slf4j:+'
+	compile 'com.mpatric:mp3agic:+'
 	
     testCompile 'junit:junit:+'    
 }

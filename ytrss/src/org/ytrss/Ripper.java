@@ -57,6 +57,9 @@ public class Ripper {
 
 	private static Logger				log		= LoggerFactory.getLogger(Ripper.class);
 
+	@Autowired
+	private ID3Tagger					id3Tagger;
+
 	public long getCountdown() {
 		if (active || lastExecuted == null) {
 			return 0;
@@ -155,6 +158,8 @@ public class Ripper {
 	}
 
 	private void onTranscodeComplete(final File mp3File, final Video video) {
+		id3Tagger.tag(mp3File, video);
+
 		video.setMp3File(mp3File.getAbsolutePath());
 		updateVideoState(video, VideoState.READY);
 
