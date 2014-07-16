@@ -10,6 +10,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletResponse;
 
@@ -22,6 +23,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.ytrss.Dates;
+import org.ytrss.Ripper;
 import org.ytrss.db.Channel;
 import org.ytrss.db.ChannelDAO;
 import org.ytrss.db.Video;
@@ -38,6 +41,9 @@ public class DownloadsController {
 
 	@Autowired
 	private VideoDAO		videoDAO;
+
+	@Autowired
+	private Ripper			ripper;
 
 	private static Logger	log	= LoggerFactory.getLogger(ChannelController.class);
 
@@ -67,6 +73,7 @@ public class DownloadsController {
 	public String getDownloads(final Model model) {
 		model.addAttribute("channels", createChannelIDMap());
 		model.addAttribute("videos", videoDAO.findAll());
+		model.addAttribute("updateCountdown", Dates.formatAsPrettyString(ripper.getCountdown(), TimeUnit.MINUTES, TimeUnit.SECONDS));
 
 		return "downloads";
 	}

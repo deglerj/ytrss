@@ -54,3 +54,6 @@
 		</tr>
 	</c:forEach>
 </table>
+<div class="text-right text-info" style="font-size: 13px">
+	Next update in: ${updateCountdown}
+</div>

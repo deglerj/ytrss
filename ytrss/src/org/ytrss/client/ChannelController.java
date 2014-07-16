@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.ytrss.Dates;
 import org.ytrss.Ripper;
 import org.ytrss.db.Channel;
 import org.ytrss.db.ChannelDAO;
@@ -143,6 +145,7 @@ public class ChannelController {
 
 	private void addCommonModelAttributes(final Channel channel, final Model model) {
 		model.addAttribute("channels", createChannelIDMap());
+		model.addAttribute("updateCountdown", Dates.formatAsPrettyString(ripper.getCountdown(), TimeUnit.MINUTES, TimeUnit.SECONDS));
 
 		if (channel.getId() == null) {
 			model.addAttribute("videos", Collections.emptyList());
