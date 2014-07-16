@@ -8,7 +8,6 @@ Early alpha
 ----
 ytrss is still in a very early alpha stage. Many settings are hardcoded and bugs are to be expected.
 Future versions will add:
-- Better feeds with ID3 tags, pictures, ...
 - AJAXified admin interface
 - Password-secured admin interface
 - ...
@@ -26,3 +25,7 @@ ytrss uses
 - Hibernate Validation
 - ROME
 - Gradle
+- slf4j
+- mp3agic
+- jQuery
+- Bootstrap
