@@ -6,6 +6,7 @@ import org.slf4j.LoggerFactory;
 public class StreamMapEntries {
 
 	public static String getExtension(final StreamMapEntry entry) {
+		// Don't forget to add new extensions to the regex in Cleaner#cleanUpOrphanedVideoFiles
 		switch (entry.getType()) {
 			case "video/mp4":
 				return "mp4";

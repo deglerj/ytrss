@@ -110,21 +110,19 @@ public class ChannelDAO {
 	private JdbcTemplate				jdbcTemplate;
 
 	private final RowMapper<Channel>	rowMapper	= (rs, rowNum) -> {
-														final Channel channel = new Channel();
-														channel.setId(rs.getLong("id"));
-														channel.setName(rs.getString("name"));
-														channel.setUrl(rs.getString("url"));
-														channel.setExcludeRegex(rs.getString("exclude_regex"));
-														channel.setIncludeRegex(rs.getString("include_regex"));
-														channel.setSecurityToken(rs.getString("security_token"));
-														return channel;
-													};
+		final Channel channel = new Channel();
+		channel.setId(rs.getLong("id"));
+		channel.setName(rs.getString("name"));
+		channel.setUrl(rs.getString("url"));
+		channel.setExcludeRegex(rs.getString("exclude_regex"));
+		channel.setIncludeRegex(rs.getString("include_regex"));
+		channel.setSecurityToken(rs.getString("security_token"));
+		return channel;
+	};
 
 	public void delete(final long id) {
 		jdbcTemplate.update("DELETE FROM \"VIDEO\" WHERE \"CHANNEL_FK\" = ? ", id);
 		jdbcTemplate.update("DELETE FROM \"CHANNEL\" WHERE \"ID\" = ? ", id);
-
-		// TODO delete videos' files
 	}
 
 	@Transactional(readOnly = true)
