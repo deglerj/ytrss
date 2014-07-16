@@ -5,7 +5,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -25,21 +24,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.ytrss.Dates;
+import org.ytrss.FeedGenerator;
 import org.ytrss.Ripper;
 import org.ytrss.db.Channel;
 import org.ytrss.db.ChannelDAO;
-import org.ytrss.db.Video;
 import org.ytrss.db.VideoDAO;
-import org.ytrss.db.VideoState;
 
 import com.google.common.base.Throwables;
-import com.google.common.collect.Lists;
-import com.sun.syndication.feed.synd.SyndEnclosure;
-import com.sun.syndication.feed.synd.SyndEnclosureImpl;
-import com.sun.syndication.feed.synd.SyndEntry;
-import com.sun.syndication.feed.synd.SyndEntryImpl;
 import com.sun.syndication.feed.synd.SyndFeed;
-import com.sun.syndication.feed.synd.SyndFeedImpl;
 import com.sun.syndication.io.FeedException;
 import com.sun.syndication.io.SyndFeedOutput;
 
@@ -54,6 +46,9 @@ public class ChannelController {
 
 	@Autowired
 	private Ripper			ripper;
+
+	@Autowired
+	private FeedGenerator	generator;
 
 	private static Logger	log	= LoggerFactory.getLogger(ChannelController.class);
 
@@ -90,12 +85,7 @@ public class ChannelController {
 
 		final String requestURL = request.getRequestURL().toString();
 
-		final List<Video> videos = videoDAO.findByChannelID(channel.getId());
-		videos.removeIf(v -> v.getState() != VideoState.READY);
-		final List<SyndEntry> entries = Lists.transform(videos, v -> createSyndEntry(v, requestURL));
-
-		final SyndFeed feed = createFeed(channel, type, requestURL, entries);
-
+		final SyndFeed feed = generator.generateFeed(channel, requestURL, type);
 		setFeedHeaders(channel, type, response);
 
 		try {
@@ -161,44 +151,6 @@ public class ChannelController {
 			map.put(channel.getId(), channel);
 		}
 		return map;
-	}
-
-	private SyndFeed createFeed(final Channel channel, final String type, final String requestURL, final List<SyndEntry> entries) {
-		final SyndFeed feed = new SyndFeedImpl();
-
-		feed.setAuthor("ytrss");
-		feed.setDescription("ytrss feed for Youtube channel \"" + channel.getName() + "\"");
-
-		feed.setLink(requestURL + "?type=" + type + "&token=" + channel.getSecurityToken());
-		feed.setTitle(channel.getName());
-
-		feed.setEntries(entries);
-
-		if ("rss".equals(type)) {
-			feed.setFeedType("rss_2.0");
-		}
-		else {
-			feed.setFeedType("atom_1.0");
-		}
-
-		return feed;
-	}
-
-	private SyndEntry createSyndEntry(final Video video, final String requestURL) {
-		final String baseURL = requestURL.replaceAll("channel/\\d+/feed.*", "");
-		final String downloadURL = baseURL + "download?id=" + video.getId() + "&token=" + video.getSecurityToken();
-
-		final SyndEntry entry = new SyndEntryImpl();
-		entry.setLink(downloadURL);
-		entry.setTitle(video.getName());
-		entry.setPublishedDate(video.getUploaded());
-
-		final SyndEnclosure enclosure = new SyndEnclosureImpl();
-		enclosure.setUrl(downloadURL);
-		enclosure.setType("audio/mpeg");
-		entry.setEnclosures(Lists.newArrayList(enclosure));
-
-		return entry;
 	}
 
 	private void setFeedHeaders(final Channel channel, final String type, final HttpServletResponse response) {

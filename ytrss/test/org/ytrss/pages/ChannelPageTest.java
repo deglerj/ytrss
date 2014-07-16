@@ -28,6 +28,8 @@ public class ChannelPageTest {
 		// Should have 30 entries (maximum for a page)
 		assertEquals(30, normalPage.getContentGridEntries().size());
 
+		assertNotNull(normalPage.getProfileImage());
+
 		// All content grid entries should point to a valid video page
 		for (final ContentGridEntry contentEntry : normalPage.getContentGridEntries()) {
 			final String url = "http://youtube.com" + contentEntry.getHref() + "&gl=gb&hl=en"; // Force locale to make date parsing easier
@@ -40,6 +42,8 @@ public class ChannelPageTest {
 	public void testOneEntryPage() {
 		// Should have 30 entries (maximum for a page)
 		assertEquals(1, oneEntryPage.getContentGridEntries().size());
+
+		assertNotNull(oneEntryPage.getProfileImage());
 
 		// Content grid entry should point to a valid video page
 		final ContentGridEntry contentEntry = oneEntryPage.getContentGridEntries().get(0);

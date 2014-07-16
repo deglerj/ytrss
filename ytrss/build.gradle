@@ -27,7 +27,7 @@ dependencies {
     compile 'com.googlecode.flyway:flyway-core:+'
     compile 'javax.validation:validation-api:+'
 	compile 'org.hibernate:hibernate-validator:5.+'
-    compile 'rome:rome:+'
+    compile 'org.rometools:rome-modules:+'
 	compile 'org.eclipse.jetty:jetty-webapp:9.+'
 	compile 'org.eclipse.jetty:jetty-jsp:9.+'
 	compile 'org.slf4j:slf4j-jdk14:+'
