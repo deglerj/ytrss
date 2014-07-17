@@ -11,15 +11,15 @@ ytrss is still in an early development stage. Expect bugs and some missing featu
 
 Getting started
 ----
-1) Make sure you have Java 8 or higher installed
-2) Download ytrss-<version>.jar
-3) Run from command line using "java -jar ytrss-<version>.jar"
-4) Wait a few seconds for the console output to say "Running"
-5) Open the web-interface at http://localhost:8080
-6) Log in using the password "ytrss" and any user name. (You can change the password under "Settings")
-7) Add a Youtube channel
-8) Wait a few minutes for the first videos to finish downloading and transcoding
-9) Open the channel page and subscribe to the RSS or Atom feed
+1. Make sure you have Java 8 or higher installed
+2. Download ytrss-<version>.jar
+3. Run from command line using "java -jar ytrss-<version>.jar"
+4. Wait a few seconds for the console output to say "Running"
+5. Open the web-interface at http://localhost:8080
+6. Log in using the password "ytrss" and any user name. (You can change the password under "Settings")
+7. Add a Youtube channel
+8. Wait a few minutes for the first videos to finish downloading and transcoding
+9. Open the channel page and subscribe to the RSS or Atom feed
 
 
 
