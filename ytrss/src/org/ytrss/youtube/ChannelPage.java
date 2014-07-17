@@ -1,4 +1,4 @@
-package org.ytrss.pages;
+package org.ytrss.youtube;
 
 import static com.google.common.base.Preconditions.checkArgument;
 

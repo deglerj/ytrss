@@ -1,4 +1,4 @@
-package org.ytrss.pages;
+package org.ytrss.youtube;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -17,7 +17,7 @@ import org.apache.commons.lang3.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.ytrss.Patterns;
-import org.ytrss.client.ChannelController;
+import org.ytrss.controllers.ChannelController;
 
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;

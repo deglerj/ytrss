@@ -8,8 +8,6 @@ import java.sql.Types;
 import java.util.List;
 import java.util.UUID;
 
-import javax.sql.DataSource;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -104,21 +102,18 @@ public class ChannelDAO {
 	}
 
 	@Autowired
-	private DataSource					dataSource;
-
-	@Autowired
 	private JdbcTemplate				jdbcTemplate;
 
 	private final RowMapper<Channel>	rowMapper	= (rs, rowNum) -> {
-		final Channel channel = new Channel();
-		channel.setId(rs.getLong("id"));
-		channel.setName(rs.getString("name"));
-		channel.setUrl(rs.getString("url"));
-		channel.setExcludeRegex(rs.getString("exclude_regex"));
-		channel.setIncludeRegex(rs.getString("include_regex"));
-		channel.setSecurityToken(rs.getString("security_token"));
-		return channel;
-	};
+														final Channel channel = new Channel();
+														channel.setId(rs.getLong("id"));
+														channel.setName(rs.getString("name"));
+														channel.setUrl(rs.getString("url"));
+														channel.setExcludeRegex(rs.getString("exclude_regex"));
+														channel.setIncludeRegex(rs.getString("include_regex"));
+														channel.setSecurityToken(rs.getString("security_token"));
+														return channel;
+													};
 
 	public void delete(final long id) {
 		jdbcTemplate.update("DELETE FROM \"VIDEO\" WHERE \"CHANNEL_FK\" = ? ", id);

@@ -59,9 +59,10 @@
 							<li><a href="channel"><i class="glyphicon glyphicon-plus"></i>Add</a></li>
 						</ul>
 					</li>
+					<li class="${param.active == 3 ? 'active' : ''}"><a href="settings"><i class="glyphicon glyphicon-cog"></i> Settings</a></li>
 				</ul>
 				<ul class="nav navbar-nav navbar-right">
-					<li><a href="https://github.com/deglerj/ytrss"><i class="glyphicon glyphicon-globe"></i> ytrss 0.0.5</a></li>
+					<li><a href="https://github.com/deglerj/ytrss"><i class="glyphicon glyphicon-globe"></i> ytrss 0.0.6</a></li>
 				</ul>
 			</div>
 		</div>

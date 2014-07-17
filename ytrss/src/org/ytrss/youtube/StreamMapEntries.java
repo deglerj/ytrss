@@ -1,4 +1,4 @@
-package org.ytrss.pages;
+package org.ytrss.youtube;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

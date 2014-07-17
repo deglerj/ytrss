@@ -1,4 +1,4 @@
-package org.ytrss.pages;
+package org.ytrss.youtube;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -15,6 +15,8 @@ import java.util.Locale;
 import org.junit.Before;
 import org.junit.Test;
 import org.ytrss.URLs;
+import org.ytrss.youtube.StreamMapEntry;
+import org.ytrss.youtube.VideoPage;
 
 public class VideoPageTest {
 

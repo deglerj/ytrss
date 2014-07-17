@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.ytrss.db.Video;
 import org.ytrss.db.Videos;
-import org.ytrss.pages.StreamMapEntryScorer;
+import org.ytrss.youtube.StreamMapEntryScorer;
 
 public class JaveTranscoder implements Transcoder {
 

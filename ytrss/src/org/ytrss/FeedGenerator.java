@@ -14,7 +14,7 @@ import org.ytrss.db.Channel;
 import org.ytrss.db.Video;
 import org.ytrss.db.VideoDAO;
 import org.ytrss.db.VideoState;
-import org.ytrss.pages.ChannelPage;
+import org.ytrss.youtube.ChannelPage;
 
 import com.google.common.collect.Lists;
 import com.sun.syndication.feed.module.itunes.FeedInformation;

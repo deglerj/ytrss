@@ -19,12 +19,12 @@ import org.ytrss.db.ChannelDAO;
 import org.ytrss.db.Video;
 import org.ytrss.db.VideoDAO;
 import org.ytrss.db.VideoState;
-import org.ytrss.pages.ChannelPage;
-import org.ytrss.pages.ContentGridEntry;
-import org.ytrss.pages.StreamMapEntry;
-import org.ytrss.pages.StreamMapEntryScorer;
-import org.ytrss.pages.VideoPage;
 import org.ytrss.transcoders.Transcoder;
+import org.ytrss.youtube.ChannelPage;
+import org.ytrss.youtube.ContentGridEntry;
+import org.ytrss.youtube.StreamMapEntry;
+import org.ytrss.youtube.StreamMapEntryScorer;
+import org.ytrss.youtube.VideoPage;
 
 import com.google.common.base.Strings;
 

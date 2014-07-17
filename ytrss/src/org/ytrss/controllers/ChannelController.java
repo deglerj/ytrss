@@ -1,4 +1,4 @@
-package org.ytrss.client;
+package org.ytrss.controllers;
 
 import static com.google.common.base.Preconditions.checkArgument;
 

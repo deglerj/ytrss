@@ -10,8 +10,8 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.ytrss.db.Video;
 import org.ytrss.db.Videos;
-import org.ytrss.pages.StreamMapEntries;
-import org.ytrss.pages.StreamMapEntry;
+import org.ytrss.youtube.StreamMapEntries;
+import org.ytrss.youtube.StreamMapEntry;
 
 @Component
 public class StreamDownloader {

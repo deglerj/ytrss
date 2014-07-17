@@ -1,9 +1,11 @@
 package org.ytrss.config;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 import javax.servlet.ServletException;
 
+import org.springframework.web.filter.DelegatingFilterProxy;
 import org.springframework.web.servlet.support.AbstractAnnotationConfigDispatcherServletInitializer;
 
 //Based on: https://github.com/jasonish/jetty-springmvc-jsp-template
@@ -22,6 +24,13 @@ public class WebAppInitializer extends AbstractAnnotationConfigDispatcherServlet
 			logger.error("Failed to initialize web application", e);
 			System.exit(0);
 		}
+	}
+
+	@Override
+	public void onStartup(final ServletContext servletContext) throws ServletException {
+		super.onStartup(servletContext);
+
+		servletContext.addFilter("springSecurityFilterChain", new DelegatingFilterProxy()).addMappingForUrlPatterns(null, false, "/*");
 	}
 
 	/**

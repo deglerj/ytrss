@@ -8,8 +8,6 @@ import java.sql.Types;
 import java.util.List;
 import java.util.UUID;
 
-import javax.sql.DataSource;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
@@ -129,26 +127,23 @@ public class VideoDAO {
 	}
 
 	@Autowired
-	private DataSource				dataSource;
-
-	@Autowired
 	private JdbcTemplate			jdbcTemplate;
 
 	private final RowMapper<Video>	rowMapper	= (rs, rowNum) -> {
-		final Video video = new Video();
-		video.setId(rs.getLong("id"));
-		video.setChannelID(rs.getLong("channel_fk"));
-		video.setYoutubeID(rs.getString("yout_id"));
-		video.setName(rs.getString("name"));
-		video.setUploaded(rs.getDate("uploaded"));
-		video.setDiscovered(rs.getTimestamp("discovered"));
-		video.setState(VideoState.values()[rs.getInt("state")]);
-		video.setVideoFile(rs.getString("video_file"));
-		video.setMp3File(rs.getString("mp3_file"));
-		video.setErrorMessage(rs.getString("error_message"));
-		video.setSecurityToken(rs.getString("security_token"));
-		return video;
-	};
+													final Video video = new Video();
+													video.setId(rs.getLong("id"));
+													video.setChannelID(rs.getLong("channel_fk"));
+													video.setYoutubeID(rs.getString("yout_id"));
+													video.setName(rs.getString("name"));
+													video.setUploaded(rs.getDate("uploaded"));
+													video.setDiscovered(rs.getTimestamp("discovered"));
+													video.setState(VideoState.values()[rs.getInt("state")]);
+													video.setVideoFile(rs.getString("video_file"));
+													video.setMp3File(rs.getString("mp3_file"));
+													video.setErrorMessage(rs.getString("error_message"));
+													video.setSecurityToken(rs.getString("security_token"));
+													return video;
+												};
 
 	public void delete(final long id) {
 		jdbcTemplate.update("DELETE FROM \"VIDEO\" WHERE \"ID\" = ? ", id);

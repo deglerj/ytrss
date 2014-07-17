@@ -1,4 +1,4 @@
-package org.ytrss.pages;
+package org.ytrss.youtube;
 
 import java.util.Comparator;
 import java.util.List;

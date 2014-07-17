@@ -8,7 +8,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.web.context.support.GenericWebApplicationContext;
 import org.ytrss.config.RootConfiguration;
-import org.ytrss.pages.StreamMapEntryScorer;
+import org.ytrss.youtube.StreamMapEntryScorer;
 
 //Based on: https://github.com/jasonish/jetty-springmvc-jsp-template
 public class Main {

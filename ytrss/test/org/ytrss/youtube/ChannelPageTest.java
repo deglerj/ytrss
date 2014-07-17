@@ -1,4 +1,4 @@
-package org.ytrss.pages;
+package org.ytrss.youtube;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -10,6 +10,9 @@ import java.net.URL;
 import org.junit.Before;
 import org.junit.Test;
 import org.ytrss.URLs;
+import org.ytrss.youtube.ChannelPage;
+import org.ytrss.youtube.ContentGridEntry;
+import org.ytrss.youtube.VideoPage;
 
 public class ChannelPageTest {
 
