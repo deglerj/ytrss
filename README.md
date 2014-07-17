@@ -29,7 +29,7 @@ Getting started
 - Jetty (http://eclipse.org/jetty/)
 - Guava  (http://code.google.com/p/guava-libraries/)
 - HSQLDB (http://hsqldb.org/)
-- Jave - Java Audio Video Encoder (http://sauronsoftware.it/projects/jave/)
+- Tarsos Transcoder (http://0110.be/tags/TarsosTranscoder)
 - Flyway (http://flywaydb.org/)
 - Hibernate Validator (http://hibernate.org/validator/)
 - ROME (http://rometools.github.io/rome/)

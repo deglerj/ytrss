@@ -1,7 +1,6 @@
 package org.ytrss;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.util.function.Consumer;
 
@@ -28,8 +27,8 @@ public class StreamDownloader {
 		try {
 			FileUtils.copyURLToFile(new URL(entry.getUrl()), file);
 		}
-		catch (final IOException e) {
-			failed.accept(e);
+		catch (final Throwable t) {
+			failed.accept(t);
 		}
 
 		downloaded.accept(file);

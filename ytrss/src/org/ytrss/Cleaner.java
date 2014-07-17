@@ -71,6 +71,7 @@ public class Cleaner {
 				final String fileName = path.toString();
 				if (!filesToKeep.contains(fileName) && fileName.endsWith(".mp3")) {
 					try {
+						log.info("Cleaning up mp3 file " + fileName);
 						Files.delete(path);
 					}
 					catch (final IOException e) {
@@ -99,6 +100,7 @@ public class Cleaner {
 				final String fileName = path.toString();
 				if (!filesToKeep.contains(fileName) && fileName.matches(".+\\.(?:mp4|webm|flv|3gp|avi)")) {
 					try {
+						log.info("Cleaning up video file " + fileName);
 						Files.delete(path);
 					}
 					catch (final IOException e) {
