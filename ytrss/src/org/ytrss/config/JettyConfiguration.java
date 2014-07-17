@@ -1,5 +1,6 @@
 package org.ytrss.config;
 
+import java.io.File;
 import java.io.IOException;
 
 import org.eclipse.jetty.server.Server;
@@ -13,6 +14,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.GenericWebApplicationContext;
+
+import com.google.common.io.Files;
 
 /**
  * Configure the embedded Jetty server and the SpringMVC dispatcher servlet.
@@ -34,6 +37,8 @@ public class JettyConfiguration {
 	 */
 	@Bean(initMethod = "start", destroyMethod = "stop")
 	public Server jettyServer() throws IOException {
+
+		System.setProperty("org.apache.jasper.compiler.disablejsr199", "true");
 
 		/* Create the server. */
 		final Server server = new Server();
@@ -57,6 +62,10 @@ public class JettyConfiguration {
 
 		/* Disable directory listings if no index.html is found. */
 		ctx.setInitParameter("org.eclipse.jetty.servlet.Default.dirAllowed", "false");
+
+		final File tempDir = Files.createTempDir();
+
+		ctx.setAttribute("javax.servlet.context.tempdir", tempDir.getAbsolutePath());
 
 		/*
 		 * Create the root web application context and set it as a servlet attribute so the dispatcher servlet can find it.

@@ -24,7 +24,7 @@ public class YtrssUserDetailsService implements UserDetailsService {
 	}
 
 	private String getPassword() {
-		return settingsService.getSetting("password", BCrypt.hashpw("password", BCrypt.gensalt()), String.class);
+		return settingsService.getSetting("password", BCrypt.hashpw("ytrss", BCrypt.gensalt()), String.class);
 	}
 
 }
