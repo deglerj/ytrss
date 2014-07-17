@@ -6,26 +6,36 @@ You can access ytrss through a simple web-interface, that allows you to manage c
 
 Early alpha
 ----
-ytrss is still in a very early alpha stage. Many settings are hardcoded and bugs are to be expected.
-Future versions will add:
-- AJAXified admin interface
-- Password-secured admin interface
-- ...
+ytrss is still in an early development stage. Expect bugs and some missing features.
+
+
+Getting started
+----
+1) Make sure you have Java 8 or higher installed
+2) Download ytrss-<version>.jar
+3) Run from command line using "java -jar ytrss-<version>.jar"
+4) Wait a few seconds for the console output to say "Running"
+5) Open the web-interface at http://localhost:8080
+6) Log in using the password "ytrss" and any user name. (You can change the password under "Settings")
+7) Add a Youtube channel
+8) Wait a few minutes for the first videos to finish downloading and transcoding
+9) Open the channel page and subscribe to the RSS or Atom feed
+
 
 
 3rd party libraries
 ----
-ytrss uses
-- Spring
-- Jetty
-- Google Guava
-- HSQLDB
-- Jave - Java Audio Video Encoder
-- Flyway
-- Hibernate Validation
-- ROME
-- Gradle
-- slf4j
-- mp3agic
-- jQuery
-- Bootstrap
+- Spring (http://spring.io/)
+- Jetty (http://eclipse.org/jetty/)
+- Guava  (http://code.google.com/p/guava-libraries/)
+- HSQLDB (http://hsqldb.org/)
+- Jave - Java Audio Video Encoder (http://sauronsoftware.it/projects/jave/)
+- Flyway (http://flywaydb.org/)
+- Hibernate Validator (http://hibernate.org/validator/)
+- ROME (http://rometools.github.io/rome/)
+- Gradle (http://gradle.org/)
+- slf4j (http://slf4j.org/)
+- mp3agic (http://github.com/mpatric/mp3agic)
+- jQuery (http://jquery.com/)
+- Bootstrap (http://getbootstrap.com/)
+- JDT (http://eclipse.org/jdt/)
