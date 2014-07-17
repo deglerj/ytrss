@@ -5,7 +5,11 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +28,8 @@ import com.google.common.collect.Lists;
 public class Cleaner {
 
 	private static final long	MAX_VIDEOS_PER_CHANNEL	= 30;
+
+	private static final long	MIN_FILE_AGE			= TimeUnit.DAYS.toMillis(1);
 
 	@Autowired
 	private VideoDAO			videoDAO;
@@ -58,6 +64,10 @@ public class Cleaner {
 
 		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Paths.get(directory))) {
 			for (final Path path : directoryStream) {
+				if (!isOldFile(path)) {
+					continue;
+				}
+
 				final String fileName = path.toString();
 				if (!filesToKeep.contains(fileName) && fileName.endsWith(".mp3")) {
 					try {
@@ -82,6 +92,10 @@ public class Cleaner {
 
 		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Paths.get(directory))) {
 			for (final Path path : directoryStream) {
+				if (!isOldFile(path)) {
+					continue;
+				}
+
 				final String fileName = path.toString();
 				if (!filesToKeep.contains(fileName) && fileName.matches(".+\\.(?:mp4|webm|flv|3gp|avi)")) {
 					try {
@@ -96,6 +110,13 @@ public class Cleaner {
 		catch (final IOException e) {
 			log.warn("Could not list content of video directory", e);
 		}
+	}
+
+	private boolean isOldFile(final Path path) throws IOException {
+		final BasicFileAttributes attributes = Files.readAttributes(path, BasicFileAttributes.class);
+		final Instant lastModified = attributes.lastModifiedTime() == null ? attributes.creationTime().toInstant() : attributes.lastModifiedTime().toInstant();
+		final long age = lastModified.until(Instant.now(), ChronoUnit.MILLIS);
+		return age > MIN_FILE_AGE;
 	}
 
 }
