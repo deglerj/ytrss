@@ -29,6 +29,7 @@ public class StreamDownloader {
 		}
 		catch (final Throwable t) {
 			failed.accept(t);
+			return;
 		}
 
 		downloaded.accept(file);

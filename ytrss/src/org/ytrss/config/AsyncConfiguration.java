@@ -30,13 +30,13 @@ public class AsyncConfiguration implements AsyncConfigurer {
 	@Bean
 	@Qualifier("streamDownloader")
 	public Executor getStreamDownloaderExecutor() {
-		return Executors.newFixedThreadPool(2);
+		return Executors.newSingleThreadExecutor();
 	}
 
 	@Bean
 	@Qualifier("transcoder")
 	public Executor getTranscoderExecutor() {
-		return Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+		return Executors.newSingleThreadExecutor();
 	}
 
 }

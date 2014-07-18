@@ -12,14 +12,15 @@ ytrss is still in an early development stage. Expect bugs and some missing featu
 Getting started
 ----
 1. Make sure you have Java 8 or higher installed
-2. Download ytrss-<version>.jar
-3. Run from command line using "java -jar ytrss-<version>.jar"
-4. Wait a few seconds for the console output to say "Running"
-5. Open the web-interface at http://localhost:8080
-6. Log in using the password "ytrss" and any user name. (You can change the password under "Settings")
-7. Add a Youtube channel
-8. Wait a few minutes for the first videos to finish downloading and transcoding
-9. Open the channel page and subscribe to the RSS or Atom feed
+2. Make sure "ffmpeg" is available on the command line (Linux users should install ffmpeg through their package manager, Windows users can download it from here: http://ffmpeg.zeranoe.com/builds/)
+3. Download ytrss-<version>.jar
+4. Run from command line using "java -jar ytrss-<version>.jar"
+5. Wait a few seconds for the console output to say "Running"
+6. Open the web-interface at http://localhost:8080
+7. Log in using the password "ytrss" and any user name. (You can change the password under "Settings")
+8. Add a Youtube channel
+9. Wait a few minutes for the first videos to finish downloading and transcoding
+10. Open the channel page and subscribe to the RSS or Atom feed
 
 
 
@@ -29,7 +30,6 @@ Getting started
 - Jetty (http://eclipse.org/jetty/)
 - Guava  (http://code.google.com/p/guava-libraries/)
 - HSQLDB (http://hsqldb.org/)
-- Tarsos Transcoder (http://0110.be/tags/TarsosTranscoder)
 - Flyway (http://flywaydb.org/)
 - Hibernate Validator (http://hibernate.org/validator/)
 - ROME (http://rometools.github.io/rome/)

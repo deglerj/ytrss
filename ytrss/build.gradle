@@ -28,6 +28,7 @@ dependencies {
     compile 'org.hsqldb:hsqldb:2.+'
 	compile 'commons-io:commons-io:+'
 	compile 'org.apache.commons:commons-lang3:+'
+	compile 'org.apache.commons:commons-exec:+'
     compile 'com.googlecode.flyway:flyway-core:+'
     compile 'javax.validation:validation-api:+'
 	compile 'org.hibernate:hibernate-validator:5.+'
@@ -38,8 +39,6 @@ dependencies {
 	compile 'org.slf4j:slf4j-jdk14:+'
 	compile 'org.slf4j:log4j-over-slf4j:+'
 	compile 'com.mpatric:mp3agic:+'
-	
-	compile name: 'Tarsos-1.0'
 	
     testCompile 'junit:junit:+'    
 }

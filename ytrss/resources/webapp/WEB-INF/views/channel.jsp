@@ -93,16 +93,16 @@
 			<c:set var="base" value="${fn:substring(url, 0, fn:length(url) - fn:length(uri))}${req.contextPath}/" />
 			<div class="form-horizontal">
 				<div class="form-group">
-					<label for="feedAtom" class="control-label col-xs-2">Atom</label>
-					<div class="col-xs-10">
-						<a id="feedAtom" href="channel/${channel.id}/feed?type=atom&token=${channel.securityToken}" class="form-control-text">${base}channel/${channel.id}/feed?type=atom&token=${channel.securityToken}</a>
-					</div>
-				</div>
-
-				<div class="form-group">
 					<label for="feedRSS" class="control-label col-xs-2">RSS</label>
 					<div class="col-xs-10">
 						<a id="feedRSS" href="channel/${channel.id}/feed?type=rss&token=${channel.securityToken}" class="form-control-text">${base}channel/${channel.id}/feed?type=rss&token=${channel.securityToken}</a>
+					</div>
+				</div>
+				
+				<div class="form-group">
+					<label for="feedAtom" class="control-label col-xs-2">Atom</label>
+					<div class="col-xs-10">
+						<a id="feedAtom" href="channel/${channel.id}/feed?type=atom&token=${channel.securityToken}" class="form-control-text">${base}channel/${channel.id}/feed?type=atom&token=${channel.securityToken}</a>
 					</div>
 				</div>
 			</div>

@@ -8,7 +8,7 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.core.convert.support.DefaultConversionService;
 import org.springframework.stereotype.Controller;
-import org.ytrss.transcoders.TarsosTranscoder;
+import org.ytrss.transcoders.FFMPEGCommandTranscoder;
 import org.ytrss.transcoders.Transcoder;
 
 /**
@@ -40,7 +40,7 @@ public class RootConfiguration {
 
 	@Bean
 	public Transcoder getTranscoder() {
-		return new TarsosTranscoder();
+		return new FFMPEGCommandTranscoder();
 	}
 
 }
