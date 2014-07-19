@@ -27,6 +27,7 @@ import org.ytrss.youtube.StreamMapEntryScorer;
 import org.ytrss.youtube.VideoPage;
 
 import com.google.common.base.Strings;
+import com.google.common.base.Throwables;
 
 @Component
 public class Ripper {
@@ -188,13 +189,47 @@ public class Ripper {
 	}
 
 	private VideoPage openVideoPage(final ContentGridEntry contentEntry) {
-		final String url = "http://youtube.com" + contentEntry.getHref() + "&gl=gb&hl=en"; // Force locale to make date parsing easier
-		return new VideoPage(URLs.copyToString(url));
+		// Try multiple times, sometimes opening a page fails due to temporary Youtube problems
+		for (int i = 0; i < 10; i++) {
+			try {
+				final String url = "http://youtube.com" + contentEntry.getHref() + "&gl=gb&hl=en"; // Force locale to make date parsing easier
+				return new VideoPage(URLs.copyToString(url));
+			}
+			catch (final Exception e) {
+				if (i < 9) {
+					log.warn("Could not open video page \"" + contentEntry.getHref() + "\". Retrying...");
+				}
+				else {
+					log.warn("Could not open video page \"" + contentEntry.getHref() + "\". Giving up...");
+					throw Throwables.propagate(e);
+				}
+			}
+		}
+
+		// This code should never be reached
+		throw new RuntimeException();
 	}
 
 	private VideoPage openVideoPage(final Video video) {
-		final String url = "http://youtube.com/watch?v=" + video.getYoutubeID() + "&gl=gb&hl=en"; // Force locale to make date parsing easier
-		return new VideoPage(URLs.copyToString(url));
+		// Try multiple times, sometimes opening a page fails due to temporary Youtube problems
+		for (int i = 0; i < 10; i++) {
+			try {
+				final String url = "http://youtube.com/watch?v=" + video.getYoutubeID() + "&gl=gb&hl=en"; // Force locale to make date parsing easier
+				return new VideoPage(URLs.copyToString(url));
+			}
+			catch (final Exception e) {
+				if (i < 9) {
+					log.warn("Could not open video page \"" + video.getYoutubeID() + "\". Retrying...");
+				}
+				else {
+					log.warn("Could not open video page \"" + video.getYoutubeID() + "\". Giving up...");
+					throw Throwables.propagate(e);
+				}
+			}
+		}
+
+		// This code should never be reached
+		throw new RuntimeException();
 	}
 
 	@PostConstruct

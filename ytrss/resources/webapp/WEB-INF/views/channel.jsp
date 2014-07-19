@@ -16,7 +16,7 @@
 				<h1 style="display:inline-block;">${channel.name}</h1>
 			</div>
 			<div class="col-md-4 text-right">
-				<a class="btn btn-danger" href="channel/${channel.id}/delete" role="button"><i class="glyphicon glyphicon-trash" style="margin-right: 7px"></i>Delete</a>
+				<a class="btn btn-danger" href="channel/${channel.id}/delete" role="button" onclick="return confirm('Are you sure you want to delete channel \'${channel.name}\'?')"><i class="glyphicon glyphicon-trash" style="margin-right: 7px"></i>Delete</a>
 			</div>
 		</div>
 	</c:if>

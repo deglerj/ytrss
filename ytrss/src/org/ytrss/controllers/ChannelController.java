@@ -3,10 +3,8 @@ package org.ytrss.controllers;
 import static com.google.common.base.Preconditions.checkArgument;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -23,7 +21,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.ytrss.Dates;
 import org.ytrss.FeedGenerator;
 import org.ytrss.Ripper;
 import org.ytrss.db.Channel;
@@ -45,10 +42,10 @@ public class ChannelController {
 	private VideoDAO		videoDAO;
 
 	@Autowired
-	private Ripper			ripper;
+	private FeedGenerator	generator;
 
 	@Autowired
-	private FeedGenerator	generator;
+	private Ripper			ripper;
 
 	private static Logger	log	= LoggerFactory.getLogger(ChannelController.class);
 
@@ -135,14 +132,6 @@ public class ChannelController {
 
 	private void addCommonModelAttributes(final Channel channel, final Model model) {
 		model.addAttribute("channels", createChannelIDMap());
-		model.addAttribute("updateCountdown", Dates.formatAsPrettyString(ripper.getCountdown(), TimeUnit.MINUTES, TimeUnit.SECONDS));
-
-		if (channel.getId() == null) {
-			model.addAttribute("videos", Collections.emptyList());
-		}
-		else {
-			model.addAttribute("videos", videoDAO.findByChannelID(channel.getId()));
-		}
 	}
 
 	private Map<Long, Channel> createChannelIDMap() {

@@ -4,7 +4,7 @@ defaultTasks 'build'
 
 sourceCompatibility = 1.8 
 
-version = '0.0.7'
+version = '0.0.8'
 
 repositories {
 	mavenCentral()
@@ -39,6 +39,7 @@ dependencies {
 	compile 'org.slf4j:slf4j-jdk14:+'
 	compile 'org.slf4j:log4j-over-slf4j:+'
 	compile 'com.mpatric:mp3agic:+'
+	compile 'net.sourceforge.argo:argo:+'
 	
     testCompile 'junit:junit:+'    
 }
