@@ -4,9 +4,9 @@ ytrss is a small, server-based application that automatically downloads videos f
 You can access ytrss through a simple web-interface, that allows you to manage channel subscriptions, get feed URLs and download single files.
 
 
-Early alpha
+Warning
 ----
-ytrss is still in an early development stage. Expect bugs and some missing features.
+ytrss is still in an early development stage (aka "it's working for me"). Please report any bugs you find.
 
 
 Getting started
@@ -16,13 +16,13 @@ Getting started
   - If you're using Linux simply install ffmpeg through your package manager (e.g. apt-get install ffmpeg)
   - If you're using Windows download the latest version here: http://ffmpeg.zeranoe.com/builds/, extract it anywhere and add the "bin" directory to Windows' PATH variable
 3. Download ytrss-&lt;version&gt;.jar
-4. Run from command line using "java -jar ytrss-&lt;version&gt;.jar"
+4. Run from command line using "java -jar ytrss-&lt;version&gt;.jar". RasPi (and other low-end device) users might want to add "-Xmx32m" as a parameter, to reduce memory usage.
 5. Wait a few seconds for the console output to say "Running"
 6. Open the web-interface at http://localhost:8080
-7. Log in using the password "ytrss" and any user name. (You can change the password under "Settings")
+7. Log in using the password "ytrss" and any user name. You can change the password later in the settings.
 8. Add a Youtube channel
-9. Wait a few minutes for the first videos to finish downloading and transcoding
-10. Open the channel page and subscribe to the RSS or Atom feed
+9. Wait a few minutes for the first videos to finish downloading and transcoding. Files are stored in the current user's home in ".ytrss".
+10. Open the channel page and subscribe to the RSS (recommended) or Atom feed
 
 
 

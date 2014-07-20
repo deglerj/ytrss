@@ -1,3 +1,5 @@
+var lastVideosUpdate = -1;
+
 function startVideoTableUpdates(tableId, channelId) {
 	var table = $("#" + tableId);
 	
@@ -11,14 +13,19 @@ function startVideoTableUpdates(tableId, channelId) {
 }
 
 function updateTable(table, channelId) {
-	var url = "/videos";
+	var reqData = '{"lastUpdate":' + lastVideosUpdate;
 	if(channelId != null) {
-		url += "?channel=" + channelId;
+		reqData += ',"channel":' + channelId;
 	}
+	reqData += '}';
 	
-	$.getJSON(url, function(data){
-		updateTableRowCount(table, data.videos.length);
-		updateTableContent(table, data.videos);
+	
+	$.getJSON("/videos", reqData, function(data){
+		if(data.videos){
+			lastVideosUpdate = data.lastUpdate;
+			updateTableRowCount(table, data.videos.length);
+			updateTableContent(table, data.videos);
+		}
 		updateCountdown(data.countdown);
 	});	
 }

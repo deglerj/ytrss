@@ -9,6 +9,8 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -26,10 +28,12 @@ import org.ytrss.db.VideoState;
 
 import argo.format.CompactJsonFormatter;
 import argo.format.JsonFormatter;
+import argo.jdom.JdomParser;
 import argo.jdom.JsonField;
 import argo.jdom.JsonNode;
 import argo.jdom.JsonNodeFactories;
 import argo.jdom.JsonRootNode;
+import argo.saj.InvalidSyntaxException;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
@@ -48,17 +52,38 @@ public class VideosController {
 
 	private final JsonFormatter	jsonFormatter	= new CompactJsonFormatter();
 
+	private final JdomParser	jsonParser		= new JdomParser();
+
 	@RequestMapping(value = "/videos", method = RequestMethod.GET)
-	public @ResponseBody String getVideos(@RequestParam(value = "channel", required = false) final Long channelID) {
-		final List<Video> videos = channelID == null ? videoDAO.findAll() : videoDAO.findByChannelID(channelID);
+	public @ResponseBody String getVideos(final HttpServletRequest request) throws InvalidSyntaxException {
+		final String jsonRequestString = request.getParameterMap().keySet().iterator().next();
+		final JsonRootNode jsonRequest = jsonParser.parse(jsonRequestString);
+		final long lastUpdate = Long.parseLong(jsonRequest.getNumberValue("lastUpdate"));
+
+		final List<JsonField> responseFields = Lists.newArrayList();
+
+		if (isVideosUpdateRequired(lastUpdate)) {
+			List<Video> videos;
+			if (jsonRequest.isNumberValue("channel")) {
+				videos = videoDAO.findByChannelID(Long.parseLong(jsonRequest.getNumberValue("channel")));
+			}
+			else {
+				videos = videoDAO.findAll();
+			}
+
+			final JsonField videosField = field("videos", array(Lists.transform(videos, this::createVideoNode)));
+			responseFields.add(videosField);
+
+			final JsonField lastUpdateField = field("lastUpdate", number(videoDAO.getLastUpdate()));
+			responseFields.add(lastUpdateField);
+		}
 
 		final String countdown = Dates.formatAsPrettyString(ripper.getCountdown(), TimeUnit.MINUTES, TimeUnit.SECONDS);
-
-		final JsonField videosField = field("videos", array(Lists.transform(videos, this::createVideoNode)));
 		final JsonField countdownField = field("countdown", string(countdown, true));
-		final JsonRootNode json = object(videosField, countdownField);
+		responseFields.add(countdownField);
 
-		return jsonFormatter.format(json);
+		final JsonRootNode jsonResponse = object(responseFields);
+		return jsonFormatter.format(jsonResponse);
 
 	}
 
@@ -94,6 +119,10 @@ public class VideosController {
 				field("securityToken", string(video.getSecurityToken(), false))
 				);
 		//@formatter:on
+	}
+
+	private boolean isVideosUpdateRequired(final long lastUpdate) {
+		return lastUpdate != videoDAO.getLastUpdate();
 	}
 
 	private JsonNode string(final String string, final boolean escapeHtml) {

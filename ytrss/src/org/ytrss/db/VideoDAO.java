@@ -127,27 +127,31 @@ public class VideoDAO {
 
 	}
 
+	private long					lastUpdate	= System.currentTimeMillis();
+
 	@Autowired
 	private JdbcTemplate			jdbcTemplate;
 
 	private final RowMapper<Video>	rowMapper	= (rs, rowNum) -> {
-		final Video video = new Video();
-		video.setId(rs.getLong("id"));
-		video.setChannelID(rs.getLong("channel_fk"));
-		video.setYoutubeID(rs.getString("yout_id"));
-		video.setName(rs.getString("name"));
-		video.setUploaded(rs.getDate("uploaded"));
-		video.setDiscovered(rs.getTimestamp("discovered"));
-		video.setState(VideoState.values()[rs.getInt("state")]);
-		video.setVideoFile(rs.getString("video_file"));
-		video.setMp3File(rs.getString("mp3_file"));
-		video.setErrorMessage(rs.getString("error_message"));
-		video.setSecurityToken(rs.getString("security_token"));
-		return video;
-	};
+													final Video video = new Video();
+													video.setId(rs.getLong("id"));
+													video.setChannelID(rs.getLong("channel_fk"));
+													video.setYoutubeID(rs.getString("yout_id"));
+													video.setName(rs.getString("name"));
+													video.setUploaded(rs.getDate("uploaded"));
+													video.setDiscovered(rs.getTimestamp("discovered"));
+													video.setState(VideoState.values()[rs.getInt("state")]);
+													video.setVideoFile(rs.getString("video_file"));
+													video.setMp3File(rs.getString("mp3_file"));
+													video.setErrorMessage(rs.getString("error_message"));
+													video.setSecurityToken(rs.getString("security_token"));
+													return video;
+												};
 
 	public void delete(final long id) {
 		jdbcTemplate.update("DELETE FROM \"VIDEO\" WHERE \"ID\" = ? ", id);
+
+		lastUpdate = System.currentTimeMillis();
 	}
 
 	@Transactional(readOnly = true)
@@ -171,6 +175,10 @@ public class VideoDAO {
 		return Iterables.getOnlyElement(result, null);
 	}
 
+	public long getLastUpdate() {
+		return lastUpdate;
+	}
+
 	public void persist(final Video video) {
 		if (video.getId() == null && Strings.isNullOrEmpty(video.getSecurityToken())) {
 			video.setSecurityToken(createSecurityToken());
@@ -183,6 +191,8 @@ public class VideoDAO {
 		if (video.getId() == null) {
 			video.setId(keyHolder.getKey().longValue());
 		}
+
+		lastUpdate = System.currentTimeMillis();
 	}
 
 	private String createSecurityToken() {
