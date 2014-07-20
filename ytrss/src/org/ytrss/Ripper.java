@@ -61,6 +61,12 @@ public class Ripper {
 	@Autowired
 	private ID3Tagger					id3Tagger;
 
+	public void download(final Video video) {
+		final VideoPage videoPage = openVideoPage(video);
+		final StreamMapEntry bestEntry = streamMapEntryScorer.findBestEntry(videoPage.getStreamMapEntries());
+		download(video, bestEntry);
+	}
+
 	public long getCountdown() {
 		if (active || lastExecuted == null) {
 			return 0;

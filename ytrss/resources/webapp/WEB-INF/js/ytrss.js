@@ -7,7 +7,7 @@ function startVideoTableUpdates(tableId, channelId) {
 	$(table).find("tr").last().remove();
 	
 	updateTable(table, channelId);
-	window.setInterval(function(){updateTable(table, channelId)}, 10000);	
+	window.setInterval(function(){updateTable(table, channelId)}, 5000);	
 }
 
 function updateTable(table, channelId) {
@@ -30,7 +30,7 @@ function updateTableRowCount(table, rows) {
 		//Append additional rows
 		for(var i = currentRows; i < rows; i++){
 			var tr = document.createElement("tr");
-			for(var j = 0; j < 4; j++){
+			for(var j = 0; j < 5; j++){
 				var td = document.createElement("td");
 				tr.appendChild(td);
 			}
@@ -121,7 +121,13 @@ function updateTableContent(table, videos) {
 			state += '</a>';
 		}
 		$(tds[showChannels ? 3 : 2]).html(state);
+		
+		$(tds[showChannels ? 4 : 3]).html('<div class="dropdown"> <span class="dropdown-toggle glyphicon glyphicon-th" style="cursor:pointer" id="videoOptionMenu1" data-toggle="dropdown"></span> <ul class="dropdown-menu" role="menu" aria-labelledby="videoOptionMenu1"> <li role="presentation"><a role="menuitem" tabindex="-1" style="text-decoration: none" href="#" onclick="resetVideo(' + video.id + ')"><span class="glyphicon glyphicon-repeat"></span> Reset</a></li> </ul> </div>');
 	});
+}
+
+function resetVideo(id) {
+	$.get('/videos/reset?id=' + id);
 }
 
 function updateCountdown(countdown) {

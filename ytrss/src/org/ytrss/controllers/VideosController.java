@@ -22,6 +22,7 @@ import org.ytrss.db.Channel;
 import org.ytrss.db.ChannelDAO;
 import org.ytrss.db.Video;
 import org.ytrss.db.VideoDAO;
+import org.ytrss.db.VideoState;
 
 import argo.format.CompactJsonFormatter;
 import argo.format.JsonFormatter;
@@ -59,6 +60,21 @@ public class VideosController {
 
 		return jsonFormatter.format(json);
 
+	}
+
+	@RequestMapping(value = "/videos/reset", method = RequestMethod.GET)
+	public @ResponseBody String resetVideo(@RequestParam("id") final long videoID) {
+		final Video video = videoDAO.findById(videoID);
+
+		video.setState(VideoState.NEW);
+		video.setErrorMessage(null);
+		video.setMp3File(null);
+		video.setVideoFile(null);
+		videoDAO.persist(video);
+
+		ripper.download(video);
+
+		return "reset";
 	}
 
 	private JsonNode createVideoNode(final Video video) {

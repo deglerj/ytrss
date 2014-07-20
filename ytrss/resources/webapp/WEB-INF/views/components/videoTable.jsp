@@ -10,11 +10,12 @@
 			<c:if test="${param.channelID == null}"><th>Channel</th></c:if>
 			<th>Name</th>
 			<th>Status</th>
+			<th>Options</th>
 		</tr>
 	</thead>
 	<tbody>
 		<tr>
-			<td colspan="4">
+			<td colspan="5">
 				<div class="progress progress-striped active">
 	                <div style="width: 100%" class="progress-bar">Loading...</div>
 	            </div>
@@ -37,3 +38,4 @@
 		}, false);
 	</script>
 </c:if>
+
