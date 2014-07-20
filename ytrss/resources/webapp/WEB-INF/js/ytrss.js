@@ -4,6 +4,7 @@ function startVideoTableUpdates(tableId, channelId) {
 	var table = $("#" + tableId);
 	
 	$('<div class="text-right text-info" style="font-size: 13px" id="countdown"></div>').insertAfter(table);
+	$('<div class="text-muted" style="padding-left: 10px; margin-bottom: 20px; display: none;" id="tableEmpty">No videos available</div>').insertAfter(table);
 	
 	//Hide loading indicator
 	$(table).find("tr").last().remove();
@@ -25,9 +26,19 @@ function updateTable(table, channelId) {
 			lastVideosUpdate = data.lastUpdate;
 			updateTableRowCount(table, data.videos.length);
 			updateTableContent(table, data.videos);
+			updateTableEmpty(data.videos.length == 0);
 		}
 		updateCountdown(data.countdown);
 	});	
+}
+
+function updateTableEmpty(empty) {
+	if(empty){
+		$("#tableEmpty").show();
+	}
+	else {
+		$("#tableEmpty").hide();
+	}
 }
 
 function updateTableRowCount(table, rows) {
@@ -138,5 +149,10 @@ function resetVideo(id) {
 }
 
 function updateCountdown(countdown) {
-	$("#countdown").text("Next update in: " + countdown);
+	if(countdown == 'now') {
+		$("#countdown").text("Updating...");
+	}
+	else {
+		$("#countdown").text("Next update in: " + countdown);
+	}
 }
