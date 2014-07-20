@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+
+	<filter>
+		<filter-name>GzipFilter</filter-name>
+		<filter-class>org.eclipse.jetty.servlets.GzipFilter</filter-class>
+		<init-param>
+			<param-name>mimeTypes</param-name>
+			<param-value>text/html,application/json,text/css,application/javascript,font/woff</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>GzipFilter</filter-name>
+		<url-pattern>/*</url-pattern>
+	</filter-mapping>
 
 </web-app>

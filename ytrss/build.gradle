@@ -35,6 +35,7 @@ dependencies {
     compile 'org.rometools:rome-modules:+'
 	compile 'org.eclipse.jetty:jetty-webapp:9.+'
 	compile 'org.eclipse.jetty:jetty-jsp:9.+'
+	compile 'org.eclipse.jetty:jetty-servlets:9.+'
 	compile 'org.eclipse.jetty.toolchain:jetty-jsp-jdt:+'
 	compile 'org.slf4j:slf4j-jdk14:+'
 	compile 'org.slf4j:log4j-over-slf4j:+'
