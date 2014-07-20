@@ -9,9 +9,11 @@
 </jsp:include>
 
 <div class="container">
-	<p class="text-right">
-		<a class="btn btn-lg btn-primary" href="channel" role="button"><i class="glyphicon glyphicon-plus" style="margin-right: 7px"></i>Add a channel</a>
-	</p>
+	<c:if test="${channels.isEmpty()}">
+		<p class="text-right">
+			<a class="btn btn-lg btn-primary" href="channel" role="button"><i class="glyphicon glyphicon-plus" style="margin-right: 7px"></i>Add a channel</a>
+		</p>
+	</c:if>
 	<p>
 		<jsp:include page="components/videoTable.jsp"></jsp:include>
 	</p>
