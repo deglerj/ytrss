@@ -13,9 +13,7 @@
 		<a class="btn btn-lg btn-primary" href="channel" role="button"><i class="glyphicon glyphicon-plus" style="margin-right: 7px"></i>Add a channel</a>
 	</p>
 	<p>
-		<jsp:include page="components/videoTable.jsp">
-			<jsp:param value="true" name="showChannels"/>
-		</jsp:include>
+		<jsp:include page="components/videoTable.jsp"></jsp:include>
 	</p>
 </div>
 

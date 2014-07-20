@@ -1,6 +1,4 @@
-startVideoTableUpdates("videoTable");
-
-function startVideoTableUpdates(tableId) {
+function startVideoTableUpdates(tableId, channelId) {
 	var table = $("#" + tableId);
 	
 	$('<div class="text-right text-info" style="font-size: 13px" id="countdown"></div>').insertAfter(table);
@@ -8,12 +6,17 @@ function startVideoTableUpdates(tableId) {
 	//Hide loading indicator
 	$(table).find("tr").last().remove();
 	
-	updateTable(table);
-	window.setInterval(function(){updateTable(table)}, 10000);	
+	updateTable(table, channelId);
+	window.setInterval(function(){updateTable(table, channelId)}, 10000);	
 }
 
-function updateTable(table) {
-	$.getJSON("/videos", function(data){
+function updateTable(table, channelId) {
+	var url = "/videos";
+	if(channelId != null) {
+		url += "?channel=" + channelId;
+	}
+	
+	$.getJSON(url, function(data){
 		updateTableRowCount(table, data.videos.length);
 		updateTableContent(table, data.videos);
 		updateCountdown(data.countdown);

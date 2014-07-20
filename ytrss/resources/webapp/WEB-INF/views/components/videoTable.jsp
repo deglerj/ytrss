@@ -7,7 +7,7 @@
 	<thead>
 		<tr>
 			<th>Uploaded</th>
-			<c:if test="${param.showChannels}"><th>Channel</th></c:if>
+			<c:if test="${param.channelID == null}"><th>Channel</th></c:if>
 			<th>Name</th>
 			<th>Status</th>
 		</tr>
@@ -23,8 +23,17 @@
 	</tbody>
 </table>
 
-<c:if test="${!param.showChannels}">
+<c:if test="${param.channelID == null}">
 	<script type="text/javascript">
-		window.showChannels = false;
+		window.addEventListener("load", function(){
+			startVideoTableUpdates("videoTable", null);	
+		}, false);
+	</script>
+</c:if>
+<c:if test="${param.channelID != null}">
+	<script type="text/javascript">
+		window.addEventListener("load", function(){
+			startVideoTableUpdates("videoTable", ${param.channelID});	
+		}, false);
 	</script>
 </c:if>

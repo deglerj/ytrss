@@ -112,7 +112,7 @@
 			<legend>Downloads</legend>
 			
 			<jsp:include page="components/videoTable.jsp">
-				<jsp:param value="false" name="showChannels"/>
+				<jsp:param value="${channel.id}" name="channelID"/>
 			</jsp:include>
 		</fieldset>
 	</c:if>
