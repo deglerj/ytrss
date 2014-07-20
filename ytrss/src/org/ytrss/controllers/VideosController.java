@@ -7,7 +7,6 @@ import static argo.jdom.JsonNodeFactories.object;
 
 import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -18,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-import org.ytrss.Dates;
 import org.ytrss.Ripper;
 import org.ytrss.db.Channel;
 import org.ytrss.db.ChannelDAO;
@@ -78,8 +76,7 @@ public class VideosController {
 			responseFields.add(lastUpdateField);
 		}
 
-		final String countdown = Dates.formatAsPrettyString(ripper.getCountdown(), TimeUnit.MINUTES, TimeUnit.SECONDS);
-		final JsonField countdownField = field("countdown", string(countdown, true));
+		final JsonField countdownField = field("countdown", number(ripper.getCountdown()));
 		responseFields.add(countdownField);
 
 		final JsonRootNode jsonResponse = object(responseFields);

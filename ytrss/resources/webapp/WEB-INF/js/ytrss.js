@@ -149,10 +149,30 @@ function resetVideo(id) {
 }
 
 function updateCountdown(countdown) {
-	if(countdown == 'now') {
+	var seconds = countdown / 1000;
+	
+	if(countdown == 0) {
 		$("#countdown").text("Updating...");
 	}
 	else {
-		$("#countdown").text("Next update in: " + countdown);
+		 var minutes = Math.floor(seconds / 60);
+		 var remSeconds = Math.floor(seconds % 60);
+		 
+		 var text = "Next update in: " + minutes;
+		 if(minutes == 1) {
+			 text +=" minute";
+		 }
+		 else{
+			 text +=" minutes";
+		 }
+		 text += " and " + remSeconds;
+		 if(remSeconds == 1) {
+			 text += " second";
+		 }
+		 else{
+			 text += " seconds";
+		 }
+		 
+		 $("#countdown").text(text);
 	}
 }
