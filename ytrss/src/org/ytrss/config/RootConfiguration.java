@@ -1,5 +1,11 @@
 package org.ytrss.config;
 
+import java.util.Arrays;
+
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
+import org.springframework.cache.concurrent.ConcurrentMapCache;
+import org.springframework.cache.support.SimpleCacheManager;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -22,6 +28,7 @@ import org.ytrss.transcoders.Transcoder;
 @Configuration
 @Import({ JettyConfiguration.class, AsyncConfiguration.class, DatabaseConfiguration.class, SecurityConfiguration.class })
 @ComponentScan(basePackages = { "org.ytrss" }, excludeFilters = { @ComponentScan.Filter(Controller.class), @ComponentScan.Filter(Configuration.class) })
+@EnableCaching
 // Based on: https://github.com/jasonish/jetty-springmvc-jsp-template
 public class RootConfiguration {
 
@@ -31,6 +38,14 @@ public class RootConfiguration {
 	@Bean
 	public static PropertySourcesPlaceholderConfigurer propertySourcesPlaceholderConfigurer() {
 		return new PropertySourcesPlaceholderConfigurer();
+	}
+
+	@Bean
+	public CacheManager cacheManager() {
+		// configure and return an implementation of Spring's CacheManager SPI
+		final SimpleCacheManager cacheManager = new SimpleCacheManager();
+		cacheManager.setCaches(Arrays.asList(new ConcurrentMapCache("videos"), new ConcurrentMapCache("channels")));
+		return cacheManager;
 	}
 
 	@Bean

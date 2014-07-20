@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
@@ -107,31 +109,35 @@ public class ChannelDAO {
 	private JdbcTemplate				jdbcTemplate;
 
 	private final RowMapper<Channel>	rowMapper	= (rs, rowNum) -> {
-		final Channel channel = new Channel();
-		channel.setId(rs.getLong("id"));
-		channel.setName(rs.getString("name"));
-		channel.setUrl(rs.getString("url"));
-		channel.setExcludeRegex(rs.getString("exclude_regex"));
-		channel.setIncludeRegex(rs.getString("include_regex"));
-		channel.setSecurityToken(rs.getString("security_token"));
-		return channel;
-	};
+														final Channel channel = new Channel();
+														channel.setId(rs.getLong("id"));
+														channel.setName(rs.getString("name"));
+														channel.setUrl(rs.getString("url"));
+														channel.setExcludeRegex(rs.getString("exclude_regex"));
+														channel.setIncludeRegex(rs.getString("include_regex"));
+														channel.setSecurityToken(rs.getString("security_token"));
+														return channel;
+													};
 
+	@CacheEvict(value = "channels", allEntries = true)
 	public void delete(final long id) {
 		jdbcTemplate.update("DELETE FROM \"VIDEO\" WHERE \"CHANNEL_FK\" = ? ", id);
 		jdbcTemplate.update("DELETE FROM \"CHANNEL\" WHERE \"ID\" = ? ", id);
 	}
 
+	@Cacheable("channels")
 	@Transactional(readOnly = true)
 	public List<Channel> findAll() {
 		return jdbcTemplate.query("SELECT * FROM \"CHANNEL\" ORDER BY \"NAME\"", rowMapper);
 	}
 
+	@Cacheable("channels")
 	@Transactional(readOnly = true)
 	public Channel findById(final long id) {
 		return jdbcTemplate.queryForObject("SELECT * FROM \"CHANNEL\" WHERE \"ID\" = ?", rowMapper, id);
 	}
 
+	@CacheEvict(value = "channels", allEntries = true)
 	public void persist(final Channel channel) {
 		if (channel.getId() == null && Strings.isNullOrEmpty(channel.getSecurityToken())) {
 			channel.setSecurityToken(createSecurityToken());

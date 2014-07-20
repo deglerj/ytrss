@@ -36,6 +36,8 @@ public class Ripper {
 
 	private static final long			DELAY	= TimeUnit.MINUTES.toMillis(30);
 
+	private static Logger				log		= LoggerFactory.getLogger(Ripper.class);
+
 	private Long						lastExecuted;
 
 	private volatile boolean			active;
@@ -57,8 +59,6 @@ public class Ripper {
 
 	@Autowired
 	private StreamMapEntryScorer		streamMapEntryScorer;
-
-	private static Logger				log		= LoggerFactory.getLogger(Ripper.class);
 
 	@Autowired
 	private ID3Tagger					id3Tagger;
