@@ -9,8 +9,11 @@ import org.apache.commons.exec.LogOutputStream;
 import org.apache.commons.exec.PumpStreamHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.scheduling.annotation.Async;
 import org.ytrss.db.Video;
+import org.ytrss.db.VideoDAO;
 import org.ytrss.db.Videos;
 
 public class FFMPEGCommandTranscoder implements Transcoder {
@@ -33,12 +36,21 @@ public class FFMPEGCommandTranscoder implements Transcoder {
 		}
 	}
 
+	@Autowired
+	private VideoDAO		videoDAO;
+
 	private static Logger	log	= LoggerFactory.getLogger(FFMPEGCommandTranscoder.class);
 
 	@Override
 	@Async("transcoder")
 	public void transcode(final File videoFile, final Video video, final Consumer<Void> started, final Consumer<File> transcoded,
 			final Consumer<Throwable> failed) {
+		// Make sure the video has not been deleted while being enqueued for transcoding
+		if (isVideoDeleted(video)) {
+			log.info("Skipped transcoding video \"" + video.getName() + "\" because it was already deleted");
+			return;
+		}
+
 		started.accept(null);
 
 		log.info("Transcoding " + videoFile.getName());
@@ -67,6 +79,16 @@ public class FFMPEGCommandTranscoder implements Transcoder {
 		}
 
 		transcoded.accept(mp3File);
+	}
+
+	private boolean isVideoDeleted(final Video video) {
+		try {
+			videoDAO.findById(video.getId());
+			return false;
+		}
+		catch (final EmptyResultDataAccessException e) {
+			return true;
+		}
 	}
 
 }
