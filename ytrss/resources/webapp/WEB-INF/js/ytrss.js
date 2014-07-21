@@ -10,7 +10,7 @@ function startVideoTableUpdates(tableId, channelId) {
 	$(table).find("tr").last().remove();
 	
 	updateTable(table, channelId);
-	window.setInterval(function(){updateTable(table, channelId)}, 5000);	
+	window.setInterval(function(){updateTable(table, channelId)}, 1000);	
 }
 
 function updateTable(table, channelId) {
@@ -144,7 +144,19 @@ function updateTableContent(table, videos) {
 		}
 		$(tds[showChannels ? 3 : 2]).html(state);
 		
-		$(tds[showChannels ? 4 : 3]).html('<div class="dropdown"> <span class="dropdown-toggle glyphicon glyphicon-th" style="cursor:pointer" id="videoOptionMenu1" data-toggle="dropdown"></span> <ul class="dropdown-menu" role="menu" aria-labelledby="videoOptionMenu1"> <li role="presentation"><a role="menuitem" tabindex="-1" style="text-decoration: none" href="javascript:void()" onclick="resetVideo(' + video.id + ')"><span class="glyphicon glyphicon-repeat"></span> Reset</a></li> <li role="presentation"><a role="menuitem" tabindex="-1" style="text-decoration: none" href="javascript:void()" onclick="deleteVideo(' + video.id + ')"><span class="glyphicon glyphicon-trash"></span> Delete</a></li> </ul> </div>');
+		var showOptions = false;
+		var options = '<div class="dropdown"><span class="dropdown-toggle glyphicon glyphicon-th" style="cursor:pointer" id="videoOptionMenu1" data-toggle="dropdown"></span><ul class="dropdown-menu" role="menu" aria-labelledby="videoOptionMenu1">';		
+		if(video.state == 4 || video.state == 6 || video.state == 7 || video.state == 8){
+			options += '<li role="presentation"><a role="menuitem" tabindex="-1" style="text-decoration: none" href="javascript:void()" onclick="resetVideo(' + video.id + ')"><span class="glyphicon glyphicon-repeat"></span> Reset</a></li>';
+			showOptions = true;
+		}
+		if(video.state != 2 && video.state != 5 && video.state != 8){
+			options += '<li role="presentation"><a role="menuitem" tabindex="-1" style="text-decoration: none" href="javascript:void()" onclick="deleteVideo(' + video.id + ')"><span class="glyphicon glyphicon-trash"></span> Delete</a></li>';
+			showOptions = true;
+		}
+		options += '</ul></div>';
+		
+		$(tds[showChannels ? 4 : 3]).html(showOptions ? options : '');
 	});
 }
 
