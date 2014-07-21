@@ -107,15 +107,15 @@ public class ChannelDAO {
 	private JdbcTemplate				jdbcTemplate;
 
 	private final RowMapper<Channel>	rowMapper	= (rs, rowNum) -> {
-														final Channel channel = new Channel();
-														channel.setId(rs.getLong("id"));
-														channel.setName(rs.getString("name"));
-														channel.setUrl(rs.getString("url"));
-														channel.setExcludeRegex(rs.getString("exclude_regex"));
-														channel.setIncludeRegex(rs.getString("include_regex"));
-														channel.setSecurityToken(rs.getString("security_token"));
-														return channel;
-													};
+		final Channel channel = new Channel();
+		channel.setId(rs.getLong("id"));
+		channel.setName(rs.getString("name"));
+		channel.setUrl(rs.getString("url"));
+		channel.setExcludeRegex(rs.getString("exclude_regex"));
+		channel.setIncludeRegex(rs.getString("include_regex"));
+		channel.setSecurityToken(rs.getString("security_token"));
+		return channel;
+	};
 
 	@Autowired
 	private VideoDAO					videoDAO;

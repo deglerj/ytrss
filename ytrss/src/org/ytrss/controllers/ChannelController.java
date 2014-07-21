@@ -16,6 +16,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.WebDataBinder;
+import org.springframework.web.bind.annotation.InitBinder;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +27,7 @@ import org.ytrss.FeedGenerator;
 import org.ytrss.Ripper;
 import org.ytrss.db.Channel;
 import org.ytrss.db.ChannelDAO;
+import org.ytrss.db.UniqueChannelNameValidator;
 import org.ytrss.db.VideoDAO;
 
 import com.google.common.base.Throwables;
@@ -36,18 +39,21 @@ import com.sun.syndication.io.SyndFeedOutput;
 public class ChannelController {
 
 	@Autowired
-	private ChannelDAO		channelDAO;
+	private ChannelDAO					channelDAO;
 
 	@Autowired
-	private VideoDAO		videoDAO;
+	private VideoDAO					videoDAO;
 
 	@Autowired
-	private FeedGenerator	generator;
+	private FeedGenerator				generator;
 
 	@Autowired
-	private Ripper			ripper;
+	private Ripper						ripper;
 
-	private static Logger	log	= LoggerFactory.getLogger(ChannelController.class);
+	private static Logger				log	= LoggerFactory.getLogger(ChannelController.class);
+
+	@Autowired
+	private UniqueChannelNameValidator	uniqueChannelNameValidator;
 
 	@ModelAttribute
 	public Channel channel() {
@@ -140,6 +146,11 @@ public class ChannelController {
 			map.put(channel.getId(), channel);
 		}
 		return map;
+	}
+
+	@InitBinder
+	private void initBinder(final WebDataBinder binder) {
+		binder.addValidators(uniqueChannelNameValidator);
 	}
 
 	private void setFeedHeaders(final Channel channel, final String type, final HttpServletResponse response) {
