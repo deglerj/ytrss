@@ -26,13 +26,16 @@ public class SettingsController {
 
 		private String	password2;
 
+		private Integer	port;
+
 		public SettingsForm() {
 			// Empty default constructor
 		}
 
-		public SettingsForm(final String password, final String password2) {
+		public SettingsForm(final String password, final String password2, final Integer port) {
 			this.password = password;
 			this.password2 = password2;
+			this.port = port;
 		}
 
 		public String getPassword() {
@@ -43,12 +46,20 @@ public class SettingsController {
 			return password2;
 		}
 
+		public Integer getPort() {
+			return port;
+		}
+
 		public void setPassword(final String password) {
 			this.password = password;
 		}
 
 		public void setPassword2(final String password2) {
 			this.password2 = password2;
+		}
+
+		public void setPort(final Integer port) {
+			this.port = port;
 		}
 
 	}
@@ -58,7 +69,7 @@ public class SettingsController {
 
 	@RequestMapping(value = "/settings", method = RequestMethod.GET)
 	public String getSettings(final Model model) {
-		model.addAttribute("settingsForm", new SettingsForm("", ""));
+		model.addAttribute("settingsForm", new SettingsForm("", "", settingsService.getSetting("port", Integer.class)));
 
 		return "settings";
 	}
@@ -67,6 +78,7 @@ public class SettingsController {
 	public String postSettings(@ModelAttribute @Validated final SettingsForm settingsForm, final BindingResult bindingResult, final Model model,
 			final HttpServletRequest request) throws ServletException {
 		validatePasswords(settingsForm, bindingResult);
+		validatePort(settingsForm.getPort(), bindingResult);
 
 		if (bindingResult.hasErrors()) {
 			return "settings";
@@ -76,6 +88,8 @@ public class SettingsController {
 			updatePassword(settingsForm.getPassword());
 			request.logout();
 		}
+
+		settingsService.setSetting("port", settingsForm.getPort());
 
 		return "redirect:/";
 	}
@@ -95,6 +109,15 @@ public class SettingsController {
 
 		if (!password.equals(password2)) {
 			bindingResult.addError(new FieldError("settingsForm", "password2", "passwords must match"));
+		}
+	}
+
+	private void validatePort(final Integer port, final BindingResult bindingResult) {
+		if (port == null) {
+			bindingResult.addError(new FieldError("settingsForm", "port", "must not be empty"));
+		}
+		else if (port < 1 || port > 65535) {
+			bindingResult.addError(new FieldError("settingsForm", "port", "must be between 1 and 65535"));
 		}
 	}
 

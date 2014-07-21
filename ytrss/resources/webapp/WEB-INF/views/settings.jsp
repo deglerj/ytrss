@@ -32,6 +32,18 @@
 		</div>
 		
 		<div class="form-group">
+			<label for="inputPort" class="col-lg-2 control-label">Repeat password</label>
+			<div class="col-lg-4">
+				<form:input path="port" autocomplete="off" cssClass="form-control" id="inputPort" placeholder="8080" type="number"/>
+				<span class="help-block">Requires restart</span>
+			</div>
+			<div class="col-xs-2">
+				<form:errors path="port" cssClass="form-error"/>
+			</div>
+			
+		</div>
+		
+		<div class="form-group">
 			<div class="col-xs-offset-2 col-xs-10">
 				<button type="submit" class="btn btn-primary">Save</button>
 			</div>

@@ -3,17 +3,19 @@ package org.ytrss.config;
 import java.io.File;
 import java.io.IOException;
 
+import javax.annotation.PostConstruct;
+
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.GenericWebApplicationContext;
+import org.ytrss.db.SettingsService;
 
 import com.google.common.io.Files;
 
@@ -27,7 +29,9 @@ public class JettyConfiguration {
 	@Autowired
 	private ApplicationContext	applicationContext;
 
-	@Value("${jetty.port:8080}")
+	@Autowired
+	private SettingsService		settingsService;
+
 	private int					jettyPort;
 
 	/**
@@ -37,7 +41,6 @@ public class JettyConfiguration {
 	 */
 	@Bean(initMethod = "start", destroyMethod = "stop")
 	public Server jettyServer() throws IOException {
-
 		System.setProperty("org.apache.jasper.compiler.disablejsr199", "true");
 
 		/* Create the server. */
@@ -78,6 +81,11 @@ public class JettyConfiguration {
 		ctx.addEventListener(new WebAppInitializer());
 
 		return ctx;
+	}
+
+	@PostConstruct
+	private void loadSettings() {
+		jettyPort = settingsService.getSetting("port", 8080, Integer.class);
 	}
 
 }

@@ -23,7 +23,7 @@ public class UniqueChannelNameValidator implements Validator {
 		final Channel channel = (Channel) target;
 		for (final Channel other : channelDAO.findAll()) {
 			if ((channel.getId() == null || !channel.getId().equals(other.getId())) && Strings.nullToEmpty(channel.getName()).equals(other.getName())) {
-				errors.rejectValue("name", "nonUniqueChannelName", "Must be unique");
+				errors.rejectValue("name", "nonUniqueChannelName", "must be unique");
 			}
 		}
 	}
