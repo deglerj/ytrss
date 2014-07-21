@@ -14,6 +14,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.scheduling.annotation.Async;
 import org.ytrss.db.Video;
 import org.ytrss.db.VideoDAO;
+import org.ytrss.db.VideoState;
 import org.ytrss.db.Videos;
 
 public class FFMPEGCommandTranscoder implements Transcoder {
@@ -43,11 +44,13 @@ public class FFMPEGCommandTranscoder implements Transcoder {
 
 	@Override
 	@Async("transcoder")
-	public void transcode(final File videoFile, final Video video, final Consumer<Void> started, final Consumer<File> transcoded,
-			final Consumer<Throwable> failed) {
-		// Make sure the video has not been deleted while being enqueued for transcoding
-		if (isVideoDeleted(video)) {
-			log.info("Skipped transcoding video \"" + video.getName() + "\" because it was already deleted");
+	public void transcode(final File videoFile, Video video, final Consumer<Void> started, final Consumer<File> transcoded, final Consumer<Throwable> failed) {
+		// Reload video from DB in case it has changed (e.g. state has been altered)
+		video = videoDAO.findById(video.getId());
+
+		// Make sure the video has not been deleted or reset while being enqueued for transcoding
+		if (isInvalid(video)) {
+			log.info("Skipped transcoding video \"" + video.getName() + "\" because it was already deleted or is an invalid state");
 			return;
 		}
 
@@ -81,7 +84,7 @@ public class FFMPEGCommandTranscoder implements Transcoder {
 		transcoded.accept(mp3File);
 	}
 
-	private boolean isVideoDeleted(final Video video) {
+	private boolean isDeleted(final Video video) {
 		try {
 			videoDAO.findById(video.getId());
 			return false;
@@ -89,6 +92,14 @@ public class FFMPEGCommandTranscoder implements Transcoder {
 		catch (final EmptyResultDataAccessException e) {
 			return true;
 		}
+	}
+
+	private boolean isInvalid(final Video video) {
+		return isDeleted(video) || isInvalidState(video.getState());
+	}
+
+	private boolean isInvalidState(final VideoState state) {
+		return !(state == VideoState.TRANSCODING_ENQUEUED || state == VideoState.TRANSCODING_FAILED);
 	}
 
 }

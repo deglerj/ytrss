@@ -156,7 +156,7 @@ function updateTableContent(table, videos) {
 		}
 		options += '</ul></div>';
 		
-		$(tds[showChannels ? 4 : 3]).html(showOptions ? options : '');
+		$(tds[showChannels ? 4 : 3]).html(showOptions ? options : '<span class="glyphicon glyphicon-th" style="opacity:0.05;filter:alpha(opacity=05)"></span>');
 	});
 }
 

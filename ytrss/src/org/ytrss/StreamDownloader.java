@@ -13,6 +13,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 import org.ytrss.db.Video;
 import org.ytrss.db.VideoDAO;
+import org.ytrss.db.VideoState;
 import org.ytrss.db.Videos;
 import org.ytrss.youtube.StreamMapEntries;
 import org.ytrss.youtube.StreamMapEntry;
@@ -26,11 +27,14 @@ public class StreamDownloader {
 	private VideoDAO		videoDAO;
 
 	@Async("streamDownloader")
-	public void download(final Video video, final StreamMapEntry entry, final Consumer<Void> started, final Consumer<File> downloaded,
+	public void download(Video video, final StreamMapEntry entry, final Consumer<Void> started, final Consumer<File> downloaded,
 			final Consumer<Throwable> failed) {
-		// Make sure the video has not been deleted while being enqueued for downloading
-		if (isVideoDeleted(video)) {
-			log.info("Skipped downloading video \"" + video.getName() + "\" because it was already deleted");
+		// Reload video from DB in case it has changed (e.g. state has been altered)
+		video = videoDAO.findById(video.getId());
+
+		// Make sure the video has not been deleted or reset while being enqueued for downloading
+		if (isInvalid(video)) {
+			log.info("Skipped downloading video \"" + video.getName() + "\" because it was already deleted or is in an invalid state");
 			return;
 		}
 
@@ -51,7 +55,7 @@ public class StreamDownloader {
 		downloaded.accept(file);
 	}
 
-	private boolean isVideoDeleted(final Video video) {
+	private boolean isDeleted(final Video video) {
 		try {
 			videoDAO.findById(video.getId());
 			return false;
@@ -59,6 +63,14 @@ public class StreamDownloader {
 		catch (final EmptyResultDataAccessException e) {
 			return true;
 		}
+	}
+
+	private boolean isInvalid(final Video video) {
+		return isDeleted(video) || isInvalidState(video.getState());
+	}
+
+	private boolean isInvalidState(final VideoState state) {
+		return !(state == VideoState.NEW || state == VideoState.DOWNLOADING_ENQUEUED || state == VideoState.DOWNLOADING_FAILED);
 	}
 
 }
