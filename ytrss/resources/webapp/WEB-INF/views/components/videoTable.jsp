@@ -3,7 +3,7 @@
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="s" 	uri="http://www.springframework.org/tags" %>
 
-<table class="table" id="videoTable">
+<table class="table table-hover" id="videoTable">
 	<thead>
 		<tr>
 			<th>Uploaded</th>

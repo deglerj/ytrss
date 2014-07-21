@@ -163,7 +163,7 @@ public class VideoDAO {
 		return jdbcTemplate.query("SELECT * FROM \"VIDEO\" ORDER BY \"UPLOADED\" DESC, \"DISCOVERED\" DESC", rowMapper);
 	}
 
-	@Cacheable("videos")
+	@Cacheable(value = "videos", key = "'channel' + #channelID")
 	@Transactional(readOnly = true)
 	public List<Video> findByChannelID(final long channelID) {
 		return jdbcTemplate.query("SELECT * FROM \"VIDEO\" WHERE \"CHANNEL_FK\" = ? ORDER BY \"UPLOADED\" DESC, \"DISCOVERED\" DESC", rowMapper, channelID);

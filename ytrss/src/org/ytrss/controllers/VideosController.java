@@ -5,6 +5,7 @@ import static argo.jdom.JsonNodeFactories.field;
 import static argo.jdom.JsonNodeFactories.number;
 import static argo.jdom.JsonNodeFactories.object;
 
+import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
 import java.util.List;
 
@@ -80,8 +81,14 @@ public class VideosController {
 		responseFields.add(countdownField);
 
 		final JsonRootNode jsonResponse = object(responseFields);
-		return jsonFormatter.format(jsonResponse);
-
+		final String response = jsonFormatter.format(jsonResponse);
+		try {
+			return new String(response.getBytes("UTF-8"), "ISO-8859-1");
+		}
+		catch (final UnsupportedEncodingException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	@RequestMapping(value = "/videos/reset", method = RequestMethod.GET)
