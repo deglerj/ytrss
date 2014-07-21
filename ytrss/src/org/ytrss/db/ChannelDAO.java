@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
@@ -119,25 +117,26 @@ public class ChannelDAO {
 														return channel;
 													};
 
-	@CacheEvict(value = "channels", allEntries = true)
+	@Autowired
+	private VideoDAO					videoDAO;
+
 	public void delete(final long id) {
 		jdbcTemplate.update("DELETE FROM \"VIDEO\" WHERE \"CHANNEL_FK\" = ? ", id);
 		jdbcTemplate.update("DELETE FROM \"CHANNEL\" WHERE \"ID\" = ? ", id);
+
+		videoDAO.touch();
 	}
 
-	@Cacheable("channels")
 	@Transactional(readOnly = true)
 	public List<Channel> findAll() {
 		return jdbcTemplate.query("SELECT * FROM \"CHANNEL\" ORDER BY \"NAME\"", rowMapper);
 	}
 
-	@Cacheable("channels")
 	@Transactional(readOnly = true)
 	public Channel findById(final long id) {
 		return jdbcTemplate.queryForObject("SELECT * FROM \"CHANNEL\" WHERE \"ID\" = ?", rowMapper, id);
 	}
 
-	@CacheEvict(value = "channels", allEntries = true)
 	public void persist(final Channel channel) {
 		if (channel.getId() == null && Strings.isNullOrEmpty(channel.getSecurityToken())) {
 			channel.setSecurityToken(createSecurityToken());

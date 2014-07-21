@@ -114,6 +114,8 @@ function updateTableContent(table, videos) {
 			state += 'glyphicon-record'; break;
 		case 7:
 			state += 'glyphicon-download-alt'; break;
+		case 8:
+			state += 'glyphicon glyphicon-remove'; break;	
 		}
 		state += '"></i>';
 		switch(video.state) {
@@ -133,6 +135,8 @@ function updateTableContent(table, videos) {
 			state += 'TRC failed'; break;
 		case 7: 
 			state += 'Ready'; break;
+		case 8:
+			state += 'Deleted'; break;
 		}
 		state += '</span>';
 		if(video.state == 3 ||video.state == 6 || video.state == 7) {
@@ -140,12 +144,16 @@ function updateTableContent(table, videos) {
 		}
 		$(tds[showChannels ? 3 : 2]).html(state);
 		
-		$(tds[showChannels ? 4 : 3]).html('<div class="dropdown"> <span class="dropdown-toggle glyphicon glyphicon-th" style="cursor:pointer" id="videoOptionMenu1" data-toggle="dropdown"></span> <ul class="dropdown-menu" role="menu" aria-labelledby="videoOptionMenu1"> <li role="presentation"><a role="menuitem" tabindex="-1" style="text-decoration: none" href="#" onclick="resetVideo(' + video.id + ')"><span class="glyphicon glyphicon-repeat"></span> Reset</a></li> </ul> </div>');
+		$(tds[showChannels ? 4 : 3]).html('<div class="dropdown"> <span class="dropdown-toggle glyphicon glyphicon-th" style="cursor:pointer" id="videoOptionMenu1" data-toggle="dropdown"></span> <ul class="dropdown-menu" role="menu" aria-labelledby="videoOptionMenu1"> <li role="presentation"><a role="menuitem" tabindex="-1" style="text-decoration: none" href="javascript:void()" onclick="resetVideo(' + video.id + ')"><span class="glyphicon glyphicon-repeat"></span> Reset</a></li> <li role="presentation"><a role="menuitem" tabindex="-1" style="text-decoration: none" href="javascript:void()" onclick="deleteVideo(' + video.id + ')"><span class="glyphicon glyphicon-trash"></span> Delete</a></li> </ul> </div>');
 	});
 }
 
 function resetVideo(id) {
 	$.get('/videos/reset?id=' + id);
+}
+
+function deleteVideo(id) {
+	$.get('/videos/delete?id=' + id);
 }
 
 function updateCountdown(countdown) {

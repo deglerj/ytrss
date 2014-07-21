@@ -53,6 +53,19 @@ public class VideosController {
 
 	private final JdomParser	jsonParser		= new JdomParser();
 
+	@RequestMapping(value = "/videos/delete", method = RequestMethod.GET)
+	public @ResponseBody String deleteVideo(@RequestParam("id") final long videoID) {
+		final Video video = videoDAO.findById(videoID);
+
+		video.setState(VideoState.DELETED);
+		video.setErrorMessage(null);
+		video.setMp3File(null);
+		video.setVideoFile(null);
+		videoDAO.persist(video);
+
+		return "deleted";
+	}
+
 	@RequestMapping(value = "/videos", method = RequestMethod.GET)
 	public @ResponseBody String getVideos(final HttpServletRequest request) throws InvalidSyntaxException {
 		final String jsonRequestString = request.getParameterMap().keySet().iterator().next();
@@ -103,7 +116,7 @@ public class VideosController {
 
 		ripper.download(video);
 
-		return "reset";
+		return "reseted";
 	}
 
 	private JsonNode createVideoNode(final Video video) {

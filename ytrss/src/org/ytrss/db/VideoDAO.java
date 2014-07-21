@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
@@ -150,32 +148,27 @@ public class VideoDAO {
 													return video;
 												};
 
-	@CacheEvict(value = "videos", allEntries = true)
 	public void delete(final long id) {
 		jdbcTemplate.update("DELETE FROM \"VIDEO\" WHERE \"ID\" = ? ", id);
 
-		lastUpdate = System.currentTimeMillis();
+		touch();
 	}
 
-	@Cacheable("videos")
 	@Transactional(readOnly = true)
 	public List<Video> findAll() {
 		return jdbcTemplate.query("SELECT * FROM \"VIDEO\" ORDER BY \"UPLOADED\" DESC, \"DISCOVERED\" DESC", rowMapper);
 	}
 
-	@Cacheable(value = "videos", key = "'channel' + #channelID")
 	@Transactional(readOnly = true)
 	public List<Video> findByChannelID(final long channelID) {
 		return jdbcTemplate.query("SELECT * FROM \"VIDEO\" WHERE \"CHANNEL_FK\" = ? ORDER BY \"UPLOADED\" DESC, \"DISCOVERED\" DESC", rowMapper, channelID);
 	}
 
-	@Cacheable("videos")
 	@Transactional(readOnly = true)
 	public Video findById(final long id) {
 		return jdbcTemplate.queryForObject("SELECT * FROM \"VIDEO\" WHERE \"ID\" = ?", rowMapper, id);
 	}
 
-	@Cacheable("videos")
 	@Transactional(readOnly = true)
 	public Video findByYoutubeID(final String youtubeID) {
 		final List<Video> result = jdbcTemplate.query("SELECT * FROM \"VIDEO\" WHERE \"YOUT_ID\" = ? ", rowMapper, youtubeID);
@@ -186,7 +179,6 @@ public class VideoDAO {
 		return lastUpdate;
 	}
 
-	@CacheEvict(value = "videos", allEntries = true)
 	public void persist(final Video video) {
 		if (video.getId() == null && Strings.isNullOrEmpty(video.getSecurityToken())) {
 			video.setSecurityToken(createSecurityToken());
@@ -200,6 +192,10 @@ public class VideoDAO {
 			video.setId(keyHolder.getKey().longValue());
 		}
 
+		touch();
+	}
+
+	protected void touch() {
 		lastUpdate = System.currentTimeMillis();
 	}
 
