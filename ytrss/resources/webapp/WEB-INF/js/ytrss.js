@@ -3,17 +3,18 @@ var lastVideosUpdate = -1;
 function startVideoTableUpdates(tableId, channelId) {
 	var table = $("#" + tableId);
 	
+	//Insert elements for "empty table" and "next update in" after table
 	$('<div class="text-right text-info" style="font-size: 13px" id="countdown"></div>').insertAfter(table);
 	$('<div class="text-muted" style="padding-left: 10px; margin-bottom: 20px; display: none;" id="tableEmpty">No videos available</div>').insertAfter(table);
 	
 	//Hide loading indicator
 	$(table).find("tr").last().remove();
 	
-	updateTable(table, channelId);
-	window.setInterval(function(){updateTable(table, channelId)}, 1000);	
+	updateTable(table, channelId);	
 }
 
 function updateTable(table, channelId) {
+	//Create JSON request data
 	var reqData = '{"lastUpdate":' + lastVideosUpdate;
 	if(channelId != null) {
 		reqData += ',"channel":' + channelId;
@@ -21,14 +22,19 @@ function updateTable(table, channelId) {
 	reqData += '}';
 	
 	
+	//Request data from server
 	$.getJSON("/videos", reqData, function(data){
 		if(data.videos){
+			//Update displayed data
 			lastVideosUpdate = data.lastUpdate;
 			updateTableRowCount(table, data.videos.length);
 			updateTableContent(table, data.videos);
 			updateTableEmpty(data.videos.length == 0);
 		}
 		updateCountdown(data.countdown);
+		
+		//Update again in 1 second
+		setTimeout(function () {updateTable(table, channelId);}, 1000);
 	});	
 }
 

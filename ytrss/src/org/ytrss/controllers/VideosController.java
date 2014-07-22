@@ -35,6 +35,7 @@ import argo.jdom.JsonRootNode;
 import argo.saj.InvalidSyntaxException;
 
 import com.google.common.base.Strings;
+import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
 
 @Controller
@@ -96,11 +97,11 @@ public class VideosController {
 		final JsonRootNode jsonResponse = object(responseFields);
 		final String response = jsonFormatter.format(jsonResponse);
 		try {
+			// Encode as "ISO-8859-1" to avoid problems with special characters
 			return new String(response.getBytes("UTF-8"), "ISO-8859-1");
 		}
 		catch (final UnsupportedEncodingException e) {
-			e.printStackTrace();
-			return null;
+			throw Throwables.propagate(e);
 		}
 	}
 
