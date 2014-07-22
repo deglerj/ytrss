@@ -23,6 +23,8 @@ public class Video {
 	@NotBlank
 	private String		name;
 
+	private String		description;
+
 	@NotNull
 	private Timestamp	discovered;
 
@@ -70,6 +72,10 @@ public class Video {
 
 	public Long getChannelID() {
 		return channelID;
+	}
+
+	public String getDescription() {
+		return description;
 	}
 
 	public Timestamp getDiscovered() {
@@ -123,6 +129,10 @@ public class Video {
 
 	public void setChannelID(final Long channelID) {
 		this.channelID = channelID;
+	}
+
+	public void setDescription(final String description) {
+		this.description = description;
 	}
 
 	public void setDiscovered(final Timestamp discovered) {

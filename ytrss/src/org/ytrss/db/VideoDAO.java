@@ -36,7 +36,7 @@ public class VideoDAO {
 		public PreparedStatement createPreparedStatement(final Connection con) throws SQLException {
 			final PreparedStatement stmt = con
 					.prepareStatement(
-							"INSERT INTO \"VIDEO\" (\"CHANNEL_FK\", \"YOUT_ID\", \"NAME\", \"UPLOADED\", \"DISCOVERED\", \"STATE\", \"VIDEO_FILE\", \"MP3_FILE\", \"ERROR_MESSAGE\", \"SECURITY_TOKEN\") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+							"INSERT INTO \"VIDEO\" (\"CHANNEL_FK\", \"YOUT_ID\", \"NAME\", \"UPLOADED\", \"DISCOVERED\", \"STATE\", \"VIDEO_FILE\", \"MP3_FILE\", \"ERROR_MESSAGE\", \"SECURITY_TOKEN\", \"DESCRIPTION\") VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
 							Statement.RETURN_GENERATED_KEYS);
 
 			stmt.setLong(1, video.getChannelID());
@@ -74,6 +74,13 @@ public class VideoDAO {
 				stmt.setString(10, video.getSecurityToken());
 			}
 
+			if (video.getDescription() == null) {
+				stmt.setNull(11, Types.LONGVARCHAR);
+			}
+			else {
+				stmt.setString(11, video.getDescription());
+			}
+
 			return stmt;
 		}
 
@@ -90,7 +97,7 @@ public class VideoDAO {
 		@Override
 		public PreparedStatement createPreparedStatement(final Connection con) throws SQLException {
 			final PreparedStatement stmt = con
-					.prepareStatement("UPDATE \"VIDEO\" SET \"CHANNEL_FK\" = ?, \"YOUT_ID\" = ?, \"NAME\" = ?, \"UPLOADED\" = ?, \"DISCOVERED\" = ?, \"STATE\" = ?, \"VIDEO_FILE\" = ?, \"MP3_FILE\" = ?, \"ERROR_MESSAGE\" = ? WHERE \"ID\" = ?");
+					.prepareStatement("UPDATE \"VIDEO\" SET \"CHANNEL_FK\" = ?, \"YOUT_ID\" = ?, \"NAME\" = ?, \"UPLOADED\" = ?, \"DISCOVERED\" = ?, \"STATE\" = ?, \"VIDEO_FILE\" = ?, \"MP3_FILE\" = ?, \"ERROR_MESSAGE\" = ?, \"DESCRIPTION\" = ? WHERE \"ID\" = ?");
 
 			stmt.setLong(1, video.getChannelID());
 			stmt.setString(2, video.getYoutubeID());
@@ -120,7 +127,14 @@ public class VideoDAO {
 				stmt.setString(9, video.getErrorMessage());
 			}
 
-			stmt.setLong(10, video.getId());
+			if (video.getDescription() == null) {
+				stmt.setNull(10, Types.LONGVARCHAR);
+			}
+			else {
+				stmt.setString(10, video.getDescription());
+			}
+
+			stmt.setLong(11, video.getId());
 
 			return stmt;
 		}
@@ -133,20 +147,21 @@ public class VideoDAO {
 	private JdbcTemplate			jdbcTemplate;
 
 	private final RowMapper<Video>	rowMapper	= (rs, rowNum) -> {
-													final Video video = new Video();
-													video.setId(rs.getLong("id"));
-													video.setChannelID(rs.getLong("channel_fk"));
-													video.setYoutubeID(rs.getString("yout_id"));
-													video.setName(rs.getString("name"));
-													video.setUploaded(rs.getDate("uploaded"));
-													video.setDiscovered(rs.getTimestamp("discovered"));
-													video.setState(VideoState.values()[rs.getInt("state")]);
-													video.setVideoFile(rs.getString("video_file"));
-													video.setMp3File(rs.getString("mp3_file"));
-													video.setErrorMessage(rs.getString("error_message"));
-													video.setSecurityToken(rs.getString("security_token"));
-													return video;
-												};
+		final Video video = new Video();
+		video.setId(rs.getLong("id"));
+		video.setChannelID(rs.getLong("channel_fk"));
+		video.setYoutubeID(rs.getString("yout_id"));
+		video.setName(rs.getString("name"));
+		video.setUploaded(rs.getDate("uploaded"));
+		video.setDiscovered(rs.getTimestamp("discovered"));
+		video.setState(VideoState.values()[rs.getInt("state")]);
+		video.setVideoFile(rs.getString("video_file"));
+		video.setMp3File(rs.getString("mp3_file"));
+		video.setErrorMessage(rs.getString("error_message"));
+		video.setSecurityToken(rs.getString("security_token"));
+		video.setDescription(rs.getString("description"));
+		return video;
+	};
 
 	public void delete(final long id) {
 		jdbcTemplate.update("DELETE FROM \"VIDEO\" WHERE \"ID\" = ? ", id);

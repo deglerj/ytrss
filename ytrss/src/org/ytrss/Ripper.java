@@ -101,6 +101,7 @@ public class Ripper {
 		video.setState(VideoState.NEW);
 		video.setYoutubeID(videoPage.getVideoID());
 		video.setUploaded(videoPage.getUploaded());
+		video.setDescription(videoPage.getDescription());
 		videoDAO.persist(video);
 		return video;
 	}

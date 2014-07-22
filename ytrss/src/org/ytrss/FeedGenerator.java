@@ -16,6 +16,7 @@ import org.ytrss.db.VideoDAO;
 import org.ytrss.db.VideoState;
 import org.ytrss.youtube.ChannelPage;
 
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.sun.syndication.feed.module.itunes.FeedInformation;
 import com.sun.syndication.feed.module.itunes.FeedInformationImpl;
@@ -23,6 +24,7 @@ import com.sun.syndication.feed.module.mediarss.MediaModule;
 import com.sun.syndication.feed.module.mediarss.MediaModuleImpl;
 import com.sun.syndication.feed.module.mediarss.types.Metadata;
 import com.sun.syndication.feed.module.mediarss.types.Thumbnail;
+import com.sun.syndication.feed.synd.SyndContentImpl;
 import com.sun.syndication.feed.synd.SyndEnclosure;
 import com.sun.syndication.feed.synd.SyndEnclosureImpl;
 import com.sun.syndication.feed.synd.SyndEntry;
@@ -96,6 +98,10 @@ public class FeedGenerator {
 		entry.setLink(downloadURL);
 		entry.setTitle(video.getName());
 		entry.setPublishedDate(video.getUploaded());
+
+		final SyndContentImpl description = new SyndContentImpl();
+		description.setValue(Strings.isNullOrEmpty(video.getDescription()) ? video.getName() : video.getDescription());
+		entry.setDescription(description);
 
 		final SyndEnclosure enclosure = new SyndEnclosureImpl();
 		enclosure.setUrl(downloadURL);
