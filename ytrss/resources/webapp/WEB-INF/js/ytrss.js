@@ -35,7 +35,9 @@ function updateTable(table, channelId) {
 		
 		//Update again in 1 second
 		setTimeout(function () {updateTable(table, channelId);}, 1000);
-	});	
+	})
+	//Error? Try again in 1 second
+	.error(function() { setTimeout(function () {updateTable(table, channelId);}, 1000); });	
 }
 
 function updateTableEmpty(empty) {
