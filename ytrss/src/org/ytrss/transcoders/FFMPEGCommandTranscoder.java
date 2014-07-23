@@ -64,8 +64,7 @@ public class FFMPEGCommandTranscoder implements Transcoder {
 		final File mp3File = new File(fileName);
 
 		try {
-			final String command = "ffmpeg -y -loglevel panic -i \"" + videoFile.getAbsolutePath() + "\" -vn -codec:a libmp3lame -qscale:a 6 \""
-					+ mp3File.getAbsolutePath() + "\"";
+			final String command = "ffmpeg -y -i \"" + videoFile.getAbsolutePath() + "\" -vn -qscale:a 6 \"" + mp3File.getAbsolutePath() + "\"";
 			final CommandLine cmdLine = CommandLine.parse(command);
 			final DefaultExecutor executor = new DefaultExecutor();
 			executor.setWorkingDirectory(new File(userHome + "/.ytrss"));
