@@ -1,14 +1,13 @@
 var lastVideosUpdate = -1;
 
+var loadingIndicatorVisible = true;
+
 function startVideoTableUpdates(tableId, channelId) {
 	var table = $("#" + tableId);
 	
 	//Insert elements for "empty table" and "next update in" after table
 	$('<div class="text-right text-info" style="font-size: 13px" id="countdown"></div>').insertAfter(table);
 	$('<div class="text-muted" style="padding-left: 10px; margin-bottom: 20px; display: none;" id="tableEmpty">No videos available</div>').insertAfter(table);
-	
-	//Hide loading indicator
-	$(table).find("tr").last().remove();
 	
 	updateTable(table, channelId);	
 }
@@ -25,8 +24,14 @@ function updateTable(table, channelId) {
 	//Request data from server
 	$.getJSON("/videos", reqData, function(data){
 		if(data.videos){
-			//Update displayed data
 			lastVideosUpdate = data.lastUpdate;
+			
+			if(loadingIndicatorVisible) {
+				hideLoadingIndicator(table);
+				loadingIndicatorVisible = false;
+			}
+			
+			//Update displayed data
 			updateTableRowCount(table, data.videos.length);
 			updateTableContent(table, data.videos);
 			updateTableEmpty(data.videos.length == 0);
@@ -38,6 +43,10 @@ function updateTable(table, channelId) {
 	})
 	//Error? Try again in 1 second
 	.error(function() { setTimeout(function () {updateTable(table, channelId);}, 1000); });	
+}
+
+function hideLoadingIndicator(table) {
+	$(table).find("tr").last().remove();
 }
 
 function updateTableEmpty(empty) {
@@ -52,6 +61,7 @@ function updateTableEmpty(empty) {
 function updateTableRowCount(table, rows) {
 	var currentRows = $(table).find("tr").length - 1;
 	
+	//Not enough rows? Append some
 	if(rows > currentRows){		
 		//Append additional rows
 		for(var i = currentRows; i < rows; i++){
@@ -63,7 +73,7 @@ function updateTableRowCount(table, rows) {
 			table.find("tbody").get(0).appendChild(tr);
 		}
 	}
-	//Remove no longer required rows
+	//Too many rows? Remove no longer required rows
 	else if(rows < currentRows){
 		var trs = $(table).find("tr");
 		for(var i = currentRows; i > rows; i--){
@@ -76,7 +86,8 @@ function updateTableRowCount(table, rows) {
 
 function updateTableContent(table, videos) {
 	var showChannels = window.showChannels != false; //May be null
-	
+
+	//Loop through table rows and videos and update each table cell
 	$(table).find("tbody").find("tr").each(function(i) {
 		var video = videos[i];		
 		var tds = $(this).find("td");
