@@ -32,7 +32,7 @@
 		</div>
 		
 		<div class="form-group">
-			<label for="inputPort" class="col-lg-2 control-label">Repeat password</label>
+			<label for="inputPort" class="col-lg-2 control-label">Port</label>
 			<div class="col-lg-4">
 				<form:input path="port" autocomplete="off" cssClass="form-control" id="inputPort" placeholder="8080" type="number"/>
 				<span class="help-block">Requires restart</span>
