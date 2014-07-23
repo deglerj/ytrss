@@ -15,7 +15,7 @@ Getting started
 2. Make sure "ffmpeg" is available on the command line
   - If you're using Linux simply install ffmpeg through your package manager (e.g. apt-get install ffmpeg)
   - If you're using Windows download the latest version here: http://ffmpeg.zeranoe.com/builds/, extract it anywhere and add the "bin" directory to Windows' PATH variable
-3. Download ytrss-&lt;version&gt;.jar
+3. Download ytrss-&lt;version&gt;.jar from here: https://github.com/deglerj/ytrss/releases
 4. Run from command line using "java -jar ytrss-&lt;version&gt;.jar". RasPi (and other low-end device) users might want to add "-Xmx32m" as a parameter, to reduce memory usage.
 5. Wait a few seconds for the console output to say "Running"
 6. Open the web-interface at http://localhost:8080
