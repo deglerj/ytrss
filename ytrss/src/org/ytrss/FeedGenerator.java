@@ -66,7 +66,8 @@ public class FeedGenerator {
 		}
 
 		try {
-			final ChannelPage page = new ChannelPage(URLs.copyToString(channel.getUrl()));
+			final String url = URLs.cleanUpURL(channel.getUrl()) + "/videos";
+			final ChannelPage page = URLs.openPage(url, 10, s -> new ChannelPage(s));
 			final String profileImage = page.getProfileImage();
 
 			final Thumbnail thumbnail = new Thumbnail(new URI(profileImage));

@@ -2,6 +2,7 @@ package org.ytrss.db;
 
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.URL;
+import org.ytrss.URLs;
 
 public class Channel {
 
@@ -12,6 +13,7 @@ public class Channel {
 
 	@NotBlank
 	@URL
+	@ChannelURL
 	private String	url;
 
 	private String	securityToken;
@@ -107,7 +109,7 @@ public class Channel {
 	}
 
 	public void setUrl(final String url) {
-		this.url = url;
+		this.url = URLs.cleanUpURL(url);
 	}
 
 }
