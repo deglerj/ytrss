@@ -71,7 +71,7 @@
 				</ul>
 				<ul class="nav navbar-nav navbar-right">
 					<li><a href="https://github.com/deglerj/ytrss"><i
-							class="glyphicon glyphicon-globe"></i> ytrss 0.1.0</a></li>
+							class="glyphicon glyphicon-globe"></i> ytrss 0.1.1</a></li>
 				</ul>
 			</div>
 		</div>
