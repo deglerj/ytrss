@@ -1,8 +1,12 @@
 package org.ytrss.controllers;
 
+import java.io.File;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Controller;
@@ -29,6 +33,10 @@ public class SettingsController {
 		private Integer	port;
 
 		private String	files;
+
+		public SettingsForm() {
+			// Empty default constructor
+		}
 
 		public SettingsForm(final String password, final String password2, final Integer port, final String files) {
 			this.password = password;
@@ -74,6 +82,8 @@ public class SettingsController {
 	@Autowired
 	private SettingsService	settingsService;
 
+	private static Logger	log	= LoggerFactory.getLogger(SettingsController.class);
+
 	@RequestMapping(value = "/settings", method = RequestMethod.GET)
 	public String getSettings(final Model model) {
 		final Integer port = settingsService.getSetting("port", Integer.class);
@@ -89,7 +99,7 @@ public class SettingsController {
 			final HttpServletRequest request) throws ServletException {
 		validatePasswords(settingsForm, bindingResult);
 		validatePort(settingsForm.getPort(), bindingResult);
-		validateFiles(settingsForm.getFiles());
+		validateFiles(settingsForm.getFiles(), bindingResult);
 
 		if (bindingResult.hasErrors()) {
 			return "settings";
@@ -100,6 +110,7 @@ public class SettingsController {
 			request.logout();
 		}
 
+		settingsService.setSetting("files", settingsForm.getFiles());
 		settingsService.setSetting("port", settingsForm.getPort());
 
 		return "redirect:/";
@@ -114,9 +125,24 @@ public class SettingsController {
 		settingsService.setSetting("password", hashedPassword);
 	}
 
-	private void validateFiles(final String files) {
-		// TODO Auto-generated method stub
-
+	private void validateFiles(final String files, final BindingResult bindingResult) {
+		try {
+			final File dir = new File(files);
+			if (dir.exists()) {
+				if (!dir.isDirectory()) {
+					bindingResult.addError(new FieldError("settingsForm", "files", "is not a directory"));
+				}
+			}
+			else {
+				if (!dir.mkdirs()) {
+					bindingResult.addError(new FieldError("settingsForm", "files", "could not create directory"));
+				}
+			}
+		}
+		catch (final Throwable t) {
+			log.info("Validating directory \"" + files + "\" failed with exception (expected for invalid directories)", t);
+			bindingResult.addError(new FieldError("settingsForm", "files", "is not a valid, writeable directory"));
+		}
 	}
 
 	private void validatePasswords(final SettingsForm settingsForm, final BindingResult bindingResult) {

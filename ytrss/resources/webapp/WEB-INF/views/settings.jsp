@@ -40,7 +40,17 @@
 			<div class="col-xs-2">
 				<form:errors path="port" cssClass="form-error"/>
 			</div>
-			
+		</div>
+		
+		<div class="form-group">
+			<label for="inputFiles" class="col-lg-2 control-label">Download Directory</label>
+			<div class="col-lg-4">
+				<form:input path="files" autocomplete="off" cssClass="form-control" id="inputFiles" type="text"/>
+				<span class="help-block">Existing files will not be moved</span>
+			</div>
+			<div class="col-xs-2">
+				<form:errors path="files" cssClass="form-error"/>
+			</div>
 		</div>
 		
 		<div class="form-group">
