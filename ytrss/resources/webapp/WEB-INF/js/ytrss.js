@@ -5,8 +5,9 @@ var loadingIndicatorVisible = true;
 function startVideoTableUpdates(tableId, channelId) {
 	var table = $("#" + tableId);
 	
-	//Insert elements for "empty table" and "next update in" after table
-	$('<div class="text-right text-info" style="font-size: 13px" id="countdown"></div>').insertAfter(table);
+	//Insert elements "next update in" and options after table
+	$('<div class="text-right"><div class="text-info" style="font-size: 13px; display: inline-block" id="countdown"></div><div class="dropdown" style="display: inline-block; margin-left: 15px"><span class="dropdown-toggle glyphicon glyphicon-th" style="cursor:pointer" id="optionMenu" data-toggle="dropdown"></span><ul class="dropdown-menu" role="menu" aria-labelledby="optionMenu"><li role="presentation"><a role="menuitem" tabindex="-1" style="text-decoration: none" href="javascript:void()" onclick="forceUpdate()"><span class="glyphicon glyphicon-repeat"></span>Update now</a></li></ul></div></div>').insertAfter(table);
+	//Insert element for "empty table" after table
 	$('<div class="text-muted" style="padding-left: 10px; margin-bottom: 20px; display: none;" id="tableEmpty">No videos available</div>').insertAfter(table);
 	
 	updateTable(table, channelId);	
@@ -132,7 +133,7 @@ function updateTableContent(table, videos) {
 		case 5:
 			state += 'glyphicon-record'; break;
 		case 7:
-			state += 'glyphicon-download-alt'; break;
+			state += 'glyphicon-ok'; break;
 		case 8:
 			state += 'glyphicon glyphicon-remove'; break;	
 		}
@@ -164,7 +165,7 @@ function updateTableContent(table, videos) {
 		$(tds[showChannels ? 3 : 2]).html(state);
 		
 		var showOptions = false;
-		var options = '<div class="dropdown"><span class="dropdown-toggle glyphicon glyphicon-th" style="cursor:pointer" id="videoOptionMenu1" data-toggle="dropdown"></span><ul class="dropdown-menu" role="menu" aria-labelledby="videoOptionMenu1">';		
+		var options = '<div class="dropdown"><span class="dropdown-toggle glyphicon glyphicon-th" style="cursor:pointer" id="videoOptionMenu' + video.id +'" data-toggle="dropdown"></span><ul class="dropdown-menu" role="menu" aria-labelledby="videoOptionMenu' + video.id + '">';		
 		if(video.state == 4 || video.state == 6 || video.state == 7 || video.state == 8){
 			options += '<li role="presentation"><a role="menuitem" tabindex="-1" style="text-decoration: none" href="javascript:void()" onclick="resetVideo(' + video.id + ')"><span class="glyphicon glyphicon-repeat"></span> Reset</a></li>';
 			showOptions = true;
@@ -181,6 +182,10 @@ function updateTableContent(table, videos) {
 
 function resetVideo(id) {
 	$.get('/videos/reset?id=' + id);
+}
+
+function forceUpdate() {
+	$.get('/videos/forceUpdate');
 }
 
 function deleteVideo(id) {

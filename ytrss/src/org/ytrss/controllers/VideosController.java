@@ -67,6 +67,17 @@ public class VideosController {
 		return "deleted";
 	}
 
+	@RequestMapping(value = "/videos/forceUpdate", method = RequestMethod.GET)
+	public @ResponseBody String forceUpdate() {
+		if (ripper.isActive()) {
+			return "ignored";
+		}
+		else {
+			ripper.start();
+			return "updating";
+		}
+	}
+
 	@RequestMapping(value = "/videos", method = RequestMethod.GET)
 	public @ResponseBody String getVideos(final HttpServletRequest request) throws InvalidSyntaxException {
 		final String jsonRequestString = request.getParameterMap().keySet().iterator().next();

@@ -11,8 +11,8 @@ body {
 	font-size: 1em;
 }
 
-.table-state-label .glyphicon {
-	margin-right: 2px;
+.glyphicon {
+	margin-right: 5px;
 }
 
 .table-state-label, .table-state-label * {

@@ -77,6 +77,10 @@ public class Ripper {
 		}
 	}
 
+	public boolean isActive() {
+		return active;
+	}
+
 	@Async
 	public synchronized void start() {
 		active = true;
