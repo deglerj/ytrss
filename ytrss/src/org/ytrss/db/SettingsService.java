@@ -86,6 +86,8 @@ public class SettingsService {
 
 		initDefaultValue("port", 8080);
 		initDefaultValue("password", BCrypt.hashpw("ytrss", BCrypt.gensalt()));
+		initDefaultValue("downloaderThreads", 2);
+		initDefaultValue("transcoderThreads", 2);
 	}
 
 	private boolean isSettingAvailable(final String name) {

@@ -54,6 +54,28 @@
 		</div>
 		
 		<div class="form-group">
+			<label for="inputDownloaderThreads" class="col-lg-2 control-label">Max. parallel downloads</label>
+			<div class="col-lg-4">
+				<form:input path="downloaderThreads" autocomplete="off" cssClass="form-control" id="inputDownloaderThreads" placeholder="2" type="number"/>
+				<span class="help-block">Requires restart</span>
+			</div>
+			<div class="col-xs-2">
+				<form:errors path="downloaderThreads" cssClass="form-error"/>
+			</div>
+		</div>
+		
+		<div class="form-group">
+			<label for="inputTranscoderThreads" class="col-lg-2 control-label">Max. parallel transcodings</label>
+			<div class="col-lg-4">
+				<form:input path="transcoderThreads" autocomplete="off" cssClass="form-control" id="inputTranscoderThreads" placeholder="2" type="number"/>
+				<span class="help-block">Requires restart</span>
+			</div>
+			<div class="col-xs-2">
+				<form:errors path="transcoderThreads" cssClass="form-error"/>
+			</div>
+		</div>
+		
+		<div class="form-group">
 			<div class="col-xs-offset-2 col-xs-10">
 				<button type="submit" class="btn btn-primary">Save</button>
 			</div>

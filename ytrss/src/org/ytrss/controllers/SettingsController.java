@@ -34,15 +34,26 @@ public class SettingsController {
 
 		private String	files;
 
+		private Integer	downloaderThreads;
+
+		private Integer	transcoderThreads;
+
 		public SettingsForm() {
 			// Empty default constructor
 		}
 
-		public SettingsForm(final String password, final String password2, final Integer port, final String files) {
+		public SettingsForm(final String password, final String password2, final Integer port, final String files, final Integer downloaderThreads,
+				final Integer transcoderThreads) {
 			this.password = password;
 			this.password2 = password2;
 			this.port = port;
 			this.files = files;
+			this.downloaderThreads = downloaderThreads;
+			this.transcoderThreads = transcoderThreads;
+		}
+
+		public Integer getDownloaderThreads() {
+			return downloaderThreads;
 		}
 
 		public String getFiles() {
@@ -61,6 +72,14 @@ public class SettingsController {
 			return port;
 		}
 
+		public Integer getTranscoderThreads() {
+			return transcoderThreads;
+		}
+
+		public void setDownloaderThreads(final Integer downloaderThreads) {
+			this.downloaderThreads = downloaderThreads;
+		}
+
 		public void setFiles(final String files) {
 			this.files = files;
 		}
@@ -77,6 +96,10 @@ public class SettingsController {
 			this.port = port;
 		}
 
+		public void setTranscoderThreads(final Integer transcoderThreads) {
+			this.transcoderThreads = transcoderThreads;
+		}
+
 	}
 
 	@Autowired
@@ -87,9 +110,11 @@ public class SettingsController {
 	@RequestMapping(value = "/settings", method = RequestMethod.GET)
 	public String getSettings(final Model model) {
 		final Integer port = settingsService.getSetting("port", Integer.class);
-
 		final String files = settingsService.getSetting("files", String.class);
-		model.addAttribute("settingsForm", new SettingsForm("", "", port, files));
+		final Integer downloaderThreads = settingsService.getSetting("downloaderThreads", Integer.class);
+		final Integer transcoderThreads = settingsService.getSetting("transcoderThreads", Integer.class);
+
+		model.addAttribute("settingsForm", new SettingsForm("", "", port, files, downloaderThreads, transcoderThreads));
 
 		return "settings";
 	}
@@ -100,6 +125,8 @@ public class SettingsController {
 		validatePasswords(settingsForm, bindingResult);
 		validatePort(settingsForm.getPort(), bindingResult);
 		validateFiles(settingsForm.getFiles(), bindingResult);
+		validateDownloaderThreads(settingsForm.getDownloaderThreads(), bindingResult);
+		validateTranscoderThreads(settingsForm.getTranscoderThreads(), bindingResult);
 
 		if (bindingResult.hasErrors()) {
 			return "settings";
@@ -112,6 +139,8 @@ public class SettingsController {
 
 		settingsService.setSetting("files", settingsForm.getFiles());
 		settingsService.setSetting("port", settingsForm.getPort());
+		settingsService.setSetting("downloaderThreads", settingsForm.getDownloaderThreads());
+		settingsService.setSetting("transcoderThreads", settingsForm.getTranscoderThreads());
 
 		return "redirect:/";
 	}
@@ -123,6 +152,15 @@ public class SettingsController {
 	private void updatePassword(final String password) {
 		final String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
 		settingsService.setSetting("password", hashedPassword);
+	}
+
+	private void validateDownloaderThreads(final Integer downloaderThreads, final BindingResult bindingResult) {
+		if (downloaderThreads == null) {
+			bindingResult.addError(new FieldError("settingsForm", "downloaderThreads", "must not be empty"));
+		}
+		else if (downloaderThreads < 1) {
+			bindingResult.addError(new FieldError("settingsForm", "downloaderThreads", "must at least be 1"));
+		}
 	}
 
 	private void validateFiles(final String files, final BindingResult bindingResult) {
@@ -160,6 +198,15 @@ public class SettingsController {
 		}
 		else if (port < 1 || port > 65535) {
 			bindingResult.addError(new FieldError("settingsForm", "port", "must be between 1 and 65535"));
+		}
+	}
+
+	private void validateTranscoderThreads(final Integer transcoderThreads, final BindingResult bindingResult) {
+		if (transcoderThreads == null) {
+			bindingResult.addError(new FieldError("settingsForm", "transcoderThreads", "must not be empty"));
+		}
+		else if (transcoderThreads < 1) {
+			bindingResult.addError(new FieldError("settingsForm", "transcoderThreads", "must at least be 1"));
 		}
 	}
 

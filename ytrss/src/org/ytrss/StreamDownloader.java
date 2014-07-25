@@ -30,7 +30,7 @@ public class StreamDownloader {
 	@Autowired
 	private VideoDAO		videoDAO;
 
-	@Async("streamDownloader")
+	@Async("downloader")
 	public void download(Video video, final StreamMapEntry entry, final Consumer<Void> started, final Consumer<File> downloaded,
 			final Consumer<Throwable> failed) {
 		// Reload video from DB in case it has changed (e.g. state has been altered)
