@@ -221,7 +221,7 @@ public class Ripper {
 
 	private void rip(final Channel channel) {
 		final ChannelPage channelPage = openChannelPage(channel);
-		for (final ContentGridEntry contentEntry : channelPage.getContentGridEntries()) {
+		for (final ContentGridEntry contentEntry : channelPage.getContentGridEntries(channel.getMaxVideos())) {
 			if (!matchesPatterns(contentEntry, channel)) {
 				continue;
 			}

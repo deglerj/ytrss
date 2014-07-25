@@ -23,7 +23,7 @@ public class ChannelURLValidator implements ConstraintValidator<ChannelURL, Stri
 			final String url = URLs.cleanUpURL(value) + "/videos";
 			final ChannelPage page = URLs.openPage(url, 2, s -> new ChannelPage(s));
 			page.getProfileImage();
-			page.getContentGridEntries();
+			page.getContentGridEntries(30);
 			return true;
 		}
 		catch (final Throwable t) {

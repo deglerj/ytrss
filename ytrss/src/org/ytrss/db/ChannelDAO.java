@@ -33,9 +33,10 @@ public class ChannelDAO {
 
 		@Override
 		public PreparedStatement createPreparedStatement(final Connection con) throws SQLException {
-			final PreparedStatement stmt = con.prepareStatement(
-					"INSERT INTO \"CHANNEL\" (\"NAME\", \"URL\", \"EXCLUDE_REGEX\", \"INCLUDE_REGEX\", \"SECURITY_TOKEN\") VALUES (?, ?, ?, ?, ?)",
-					Statement.RETURN_GENERATED_KEYS);
+			final PreparedStatement stmt = con
+					.prepareStatement(
+							"INSERT INTO \"CHANNEL\" (\"NAME\", \"URL\", \"EXCLUDE_REGEX\", \"INCLUDE_REGEX\", \"SECURITY_TOKEN\", \"MAX_VIDEOS\") VALUES (?, ?, ?, ?, ?, ?)",
+							Statement.RETURN_GENERATED_KEYS);
 
 			stmt.setString(1, channel.getName());
 			stmt.setString(2, channel.getUrl());
@@ -61,6 +62,8 @@ public class ChannelDAO {
 				stmt.setString(5, channel.getSecurityToken());
 			}
 
+			stmt.setInt(6, channel.getMaxVideos());
+
 			return stmt;
 		}
 
@@ -77,7 +80,7 @@ public class ChannelDAO {
 		@Override
 		public PreparedStatement createPreparedStatement(final Connection con) throws SQLException {
 			final PreparedStatement stmt = con
-					.prepareStatement("UPDATE \"CHANNEL\" SET \"NAME\" = ?, \"URL\" = ?, \"EXCLUDE_REGEX\" = ?, \"INCLUDE_REGEX\" = ? WHERE \"ID\" = ?");
+					.prepareStatement("UPDATE \"CHANNEL\" SET \"NAME\" = ?, \"URL\" = ?, \"EXCLUDE_REGEX\" = ?, \"INCLUDE_REGEX\" = ?, \"MAX_VIDEOS\" = ? WHERE \"ID\" = ?");
 
 			stmt.setString(1, channel.getName());
 			stmt.setString(2, channel.getUrl());
@@ -96,7 +99,9 @@ public class ChannelDAO {
 				stmt.setString(4, channel.getIncludeRegex());
 			}
 
-			stmt.setLong(5, channel.getId());
+			stmt.setInt(5, channel.getMaxVideos());
+
+			stmt.setLong(6, channel.getId());
 
 			return stmt;
 		}
@@ -107,15 +112,16 @@ public class ChannelDAO {
 	private JdbcTemplate				jdbcTemplate;
 
 	private final RowMapper<Channel>	rowMapper	= (rs, rowNum) -> {
-		final Channel channel = new Channel();
-		channel.setId(rs.getLong("id"));
-		channel.setName(rs.getString("name"));
-		channel.setUrl(rs.getString("url"));
-		channel.setExcludeRegex(rs.getString("exclude_regex"));
-		channel.setIncludeRegex(rs.getString("include_regex"));
-		channel.setSecurityToken(rs.getString("security_token"));
-		return channel;
-	};
+														final Channel channel = new Channel();
+														channel.setId(rs.getLong("id"));
+														channel.setName(rs.getString("name"));
+														channel.setUrl(rs.getString("url"));
+														channel.setExcludeRegex(rs.getString("exclude_regex"));
+														channel.setIncludeRegex(rs.getString("include_regex"));
+														channel.setSecurityToken(rs.getString("security_token"));
+														channel.setMaxVideos(rs.getInt("max_videos"));
+														return channel;
+													};
 
 	@Autowired
 	private VideoDAO					videoDAO;

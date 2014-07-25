@@ -1,7 +1,7 @@
 package org.ytrss.youtube;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ public class ChannelPageTest {
 	@Test
 	public void testExtraSlashURLPage() {
 		final ChannelPage page = openPage("https://www.youtube.com/user/brentalfloss/");
-		testPage(page, null);
+		testPage(page, 31);
 	}
 
 	@Test
@@ -33,7 +33,7 @@ public class ChannelPageTest {
 	@Test
 	public void testWeirdURLPage() {
 		final ChannelPage page = openPage("http://www.youtube.com/channel/UCn0TDqRR4NjwWiAQR9FAd5w");
-		testPage(page, null);
+		testPage(page, 31);
 	}
 
 	private ChannelPage openPage(final String url) {
@@ -47,12 +47,10 @@ public class ChannelPageTest {
 		assertNotNull(videoPage.getTitle());
 	}
 
-	private void testPage(final ChannelPage page, final Integer expectedEntries) {
-		final List<ContentGridEntry> entries = page.getContentGridEntries();
+	private void testPage(final ChannelPage page, final int minExpectedEntries) {
+		final List<ContentGridEntry> entries = page.getContentGridEntries(minExpectedEntries + 31);
 
-		if (expectedEntries != null) {
-			assertEquals(expectedEntries.intValue(), entries.size());
-		}
+		assertTrue(entries.size() >= minExpectedEntries);
 
 		assertNotNull(page.getProfileImage());
 

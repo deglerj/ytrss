@@ -104,6 +104,8 @@ public class ChannelController {
 	@RequestMapping(value = "/channel", method = RequestMethod.GET)
 	public String getNewChannel(final Model model) {
 		final Channel channel = new Channel();
+		channel.setMaxVideos(30);
+
 		model.addAttribute("channel", channel);
 
 		addCommonModelAttributes(channel, model);

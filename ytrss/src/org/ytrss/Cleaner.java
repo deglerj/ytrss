@@ -29,9 +29,7 @@ import com.google.common.collect.Lists;
 @Component
 public class Cleaner {
 
-	private static final long	MAX_VIDEOS_PER_CHANNEL	= 30;
-
-	private static final long	MIN_FILE_AGE			= TimeUnit.DAYS.toMillis(1);
+	private static final long	MIN_FILE_AGE	= TimeUnit.DAYS.toMillis(1);
 
 	@Autowired
 	private VideoDAO			videoDAO;
@@ -42,7 +40,7 @@ public class Cleaner {
 	@Autowired
 	private SettingsService		settingsService;
 
-	private static Logger		log						= LoggerFactory.getLogger(Cleaner.class);
+	private static Logger		log				= LoggerFactory.getLogger(Cleaner.class);
 
 	@Scheduled(fixedDelay = 360000)
 	private void cleanUp() {
@@ -55,8 +53,8 @@ public class Cleaner {
 	private void cleanUpOldVideoEntities() {
 		for (final Channel channel : channelDAO.findAll()) {
 			final List<Video> videos = videoDAO.findByChannelID(channel.getId());
-			if (videos.size() > MAX_VIDEOS_PER_CHANNEL) {
-				videos.subList(30, videos.size()).forEach(v -> channelDAO.delete(v.getId()));
+			if (videos.size() > channel.getMaxVideos()) {
+				videos.subList(channel.getMaxVideos(), videos.size()).forEach(v -> channelDAO.delete(v.getId()));
 			}
 		}
 	}

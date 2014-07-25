@@ -73,6 +73,17 @@
 				</div>
 			</div>
 			
+			<div class="form-group">
+				<label for="inputMaxVideos" class="control-label col-xs-2">Max. videos</label>
+				<div class="col-xs-7">
+					<form:input path="maxVideos" cssClass="form-control" id="inputMaxVideos" type="number" placeholder="30"/>
+					<span class="help-block">ytrss will try to download up to, but more than the max. videos for this channel (soft limit, includes videos excluded by regular expressions)</span>
+				</div>
+				<div class="col-xs-2">
+					<form:errors path="maxVideos" cssClass="form-error"/>
+				</div>
+			</div>
+			
 			<form:hidden path="securityToken"/>
 
 			<div class="form-group">

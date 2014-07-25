@@ -1,5 +1,8 @@
 package org.ytrss.db;
 
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.URL;
 import org.ytrss.URLs;
@@ -23,6 +26,10 @@ public class Channel {
 
 	@RegularExpression
 	private String	excludeRegex;
+
+	@NotNull
+	@Min(1)
+	private Integer	maxVideos;
 
 	@Override
 	public boolean equals(final Object obj) {
@@ -67,6 +74,10 @@ public class Channel {
 		return includeRegex;
 	}
 
+	public Integer getMaxVideos() {
+		return maxVideos;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -98,6 +109,10 @@ public class Channel {
 
 	public void setIncludeRegex(final String includeRegex) {
 		this.includeRegex = includeRegex;
+	}
+
+	public void setMaxVideos(final Integer maxVideos) {
+		this.maxVideos = maxVideos;
 	}
 
 	public void setName(final String name) {
