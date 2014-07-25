@@ -2,13 +2,9 @@ package org.ytrss;
 
 import java.io.File;
 import java.sql.Timestamp;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
-
-import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -94,6 +90,23 @@ public class Ripper {
 			active = false;
 			lastExecuted = System.currentTimeMillis();
 		}
+	}
+
+	public void transcode(final File videoFile, final Video video) {
+		log.info("Requesting transcoding for " + video.getName());
+
+		updateVideoState(video, VideoState.TRANSCODING_ENQUEUED);
+
+		transcoder.transcode(videoFile, video, nil -> {
+			log.info("Started transcoding of " + video.getName());
+			updateVideoState(video, VideoState.TRANSCODING);
+		}, mp3File -> {
+			log.info("Completed transcoding " + video.getName());
+			onTranscodeComplete(mp3File, video);
+		}, t -> {
+			log.warn("Transcoding failed for " + video.getName(), t);
+			onTranscodeFailed(videoFile, video, t);
+		});
 	}
 
 	private Video createVideo(final Channel channel, final VideoPage videoPage) {
@@ -206,40 +219,6 @@ public class Ripper {
 		return URLs.openPage(url, 10, s -> new VideoPage(s));
 	}
 
-	@PostConstruct
-	private void resumeAfterRestart() {
-		final ExecutorService executor = Executors.newFixedThreadPool(2);
-		executor.submit(() -> {
-			resumeTranscoding();
-		});
-		executor.submit(() -> {
-			resumeDownloads();
-		});
-	}
-
-	private void resumeDownloads() {
-		for (final Video video : videoDAO.findAll()) {
-			if (video.getState() == VideoState.DOWNLOADING || video.getState() == VideoState.DOWNLOADING_ENQUEUED
-					|| video.getState() == VideoState.DOWNLOADING_FAILED) {
-				log.info("Resuming download of " + video.getName());
-				final VideoPage videoPage = openVideoPage(video);
-				final StreamMapEntry bestEntry = streamMapEntryScorer.findBestEntry(videoPage.getStreamMapEntries());
-				download(video, bestEntry);
-			}
-		}
-	}
-
-	private void resumeTranscoding() {
-		for (final Video video : videoDAO.findAll()) {
-			if (video.getState() == VideoState.TRANSCODING || video.getState() == VideoState.TRANSCODING_ENQUEUED
-					|| video.getState() == VideoState.TRANSCODING_FAILED) {
-				log.info("Resuming transcoding of " + video.getName());
-				final File videoFile = new File(video.getVideoFile());
-				transcode(videoFile, video);
-			}
-		}
-	}
-
 	private void rip(final Channel channel) {
 		final ChannelPage channelPage = openChannelPage(channel);
 		for (final ContentGridEntry contentEntry : channelPage.getContentGridEntries()) {
@@ -262,23 +241,6 @@ public class Ripper {
 		if (!active && delayExpired()) {
 			start();
 		}
-	}
-
-	private void transcode(final File videoFile, final Video video) {
-		log.info("Requesting transcoding for " + video.getName());
-
-		updateVideoState(video, VideoState.TRANSCODING_ENQUEUED);
-
-		transcoder.transcode(videoFile, video, nil -> {
-			log.info("Started transcoding of " + video.getName());
-			updateVideoState(video, VideoState.TRANSCODING);
-		}, mp3File -> {
-			log.info("Completed transcoding " + video.getName());
-			onTranscodeComplete(mp3File, video);
-		}, t -> {
-			log.warn("Transcoding failed for " + video.getName(), t);
-			onTranscodeFailed(videoFile, video, t);
-		});
 	}
 
 	private void updateVideoState(final Video video, final VideoState state) {
