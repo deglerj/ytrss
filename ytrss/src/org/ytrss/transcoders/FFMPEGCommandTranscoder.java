@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.scheduling.annotation.Async;
+import org.ytrss.db.SettingsService;
 import org.ytrss.db.Video;
 import org.ytrss.db.VideoDAO;
 import org.ytrss.db.VideoState;
@@ -40,6 +41,9 @@ public class FFMPEGCommandTranscoder implements Transcoder {
 	@Autowired
 	private VideoDAO		videoDAO;
 
+	@Autowired
+	private SettingsService	settingsService;
+
 	private static Logger	log	= LoggerFactory.getLogger(FFMPEGCommandTranscoder.class);
 
 	@Override
@@ -58,8 +62,8 @@ public class FFMPEGCommandTranscoder implements Transcoder {
 
 		log.info("Transcoding " + videoFile.getName());
 
-		final String userHome = System.getProperty("user.home");
-		final String fileName = userHome + "/.ytrss/mp3s/" + Videos.getFileName(video) + ".mp3";
+		final String fileName = settingsService.getSetting("files", String.class) + File.separator + "mp3s" + File.separator + Videos.getFileName(video)
+				+ ".mp3";
 
 		final File mp3File = new File(fileName);
 
@@ -67,7 +71,7 @@ public class FFMPEGCommandTranscoder implements Transcoder {
 			final String command = "ffmpeg -y -i \"" + videoFile.getAbsolutePath() + "\" -vn -qscale:a 6 \"" + mp3File.getAbsolutePath() + "\"";
 			final CommandLine cmdLine = CommandLine.parse(command);
 			final DefaultExecutor executor = new DefaultExecutor();
-			executor.setWorkingDirectory(new File(userHome + "/.ytrss"));
+			executor.setWorkingDirectory(new File(settingsService.getSetting("files", String.class)));
 			final StringOutputStream output = new StringOutputStream();
 			executor.setStreamHandler(new PumpStreamHandler(output, output));
 			final int exitValue = executor.execute(cmdLine);

@@ -1,5 +1,6 @@
 package org.ytrss;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
@@ -18,6 +19,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.ytrss.db.Channel;
 import org.ytrss.db.ChannelDAO;
+import org.ytrss.db.SettingsService;
 import org.ytrss.db.Video;
 import org.ytrss.db.VideoDAO;
 
@@ -36,6 +38,9 @@ public class Cleaner {
 
 	@Autowired
 	private ChannelDAO			channelDAO;
+
+	@Autowired
+	private SettingsService		settingsService;
 
 	private static Logger		log						= LoggerFactory.getLogger(Cleaner.class);
 
@@ -60,7 +65,7 @@ public class Cleaner {
 		final List<String> filesToKeep = Lists.transform(videoDAO.findAll(), v -> v.getMp3File());
 		filesToKeep.removeIf(s -> Strings.isNullOrEmpty(s));
 
-		final String directory = System.getProperty("user.home") + "/.ytrss/mp3s/";
+		final String directory = settingsService.getSetting("files", String.class) + File.separator + "mp3s" + File.separator;
 
 		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Paths.get(directory))) {
 			for (final Path path : directoryStream) {
@@ -89,7 +94,7 @@ public class Cleaner {
 		final List<String> filesToKeep = Lists.transform(videoDAO.findAll(), v -> v.getVideoFile());
 		filesToKeep.removeIf(s -> Strings.isNullOrEmpty(s));
 
-		final String directory = System.getProperty("user.home") + "/.ytrss/videos/";
+		final String directory = settingsService.getSetting("files", String.class) + File.separator + "videos" + File.separator;
 
 		try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(Paths.get(directory))) {
 			for (final Path path : directoryStream) {

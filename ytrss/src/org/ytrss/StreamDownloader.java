@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
+import org.ytrss.db.SettingsService;
 import org.ytrss.db.Video;
 import org.ytrss.db.VideoDAO;
 import org.ytrss.db.VideoState;
@@ -22,6 +23,9 @@ import org.ytrss.youtube.StreamMapEntry;
 public class StreamDownloader {
 
 	private static Logger	log	= LoggerFactory.getLogger(StreamDownloader.class);
+
+	@Autowired
+	private SettingsService	settingsService;
 
 	@Autowired
 	private VideoDAO		videoDAO;
@@ -40,8 +44,8 @@ public class StreamDownloader {
 
 		started.accept(null);
 
-		final String userHome = System.getProperty("user.home");
-		final String fileName = userHome + "/.ytrss/videos/" + Videos.getFileName(video) + "." + StreamMapEntries.getExtension(entry);
+		final String fileName = settingsService.getSetting("files", String.class) + File.separator + "videos" + File.separator + Videos.getFileName(video)
+				+ "." + StreamMapEntries.getExtension(entry);
 
 		final File file = new File(fileName);
 		try {

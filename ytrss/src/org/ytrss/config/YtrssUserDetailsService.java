@@ -5,7 +5,6 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.ytrss.db.SettingsService;
 
 import com.google.common.collect.Lists;
@@ -24,7 +23,7 @@ public class YtrssUserDetailsService implements UserDetailsService {
 	}
 
 	private String getPassword() {
-		return settingsService.getSetting("password", BCrypt.hashpw("ytrss", BCrypt.gensalt()), String.class);
+		return settingsService.getSetting("password", String.class);
 	}
 
 }

@@ -28,14 +28,17 @@ public class SettingsController {
 
 		private Integer	port;
 
-		public SettingsForm() {
-			// Empty default constructor
-		}
+		private String	files;
 
-		public SettingsForm(final String password, final String password2, final Integer port) {
+		public SettingsForm(final String password, final String password2, final Integer port, final String files) {
 			this.password = password;
 			this.password2 = password2;
 			this.port = port;
+			this.files = files;
+		}
+
+		public String getFiles() {
+			return files;
 		}
 
 		public String getPassword() {
@@ -48,6 +51,10 @@ public class SettingsController {
 
 		public Integer getPort() {
 			return port;
+		}
+
+		public void setFiles(final String files) {
+			this.files = files;
 		}
 
 		public void setPassword(final String password) {
@@ -69,7 +76,10 @@ public class SettingsController {
 
 	@RequestMapping(value = "/settings", method = RequestMethod.GET)
 	public String getSettings(final Model model) {
-		model.addAttribute("settingsForm", new SettingsForm("", "", settingsService.getSetting("port", Integer.class)));
+		final Integer port = settingsService.getSetting("port", Integer.class);
+
+		final String files = settingsService.getSetting("files", String.class);
+		model.addAttribute("settingsForm", new SettingsForm("", "", port, files));
 
 		return "settings";
 	}
@@ -79,6 +89,7 @@ public class SettingsController {
 			final HttpServletRequest request) throws ServletException {
 		validatePasswords(settingsForm, bindingResult);
 		validatePort(settingsForm.getPort(), bindingResult);
+		validateFiles(settingsForm.getFiles());
 
 		if (bindingResult.hasErrors()) {
 			return "settings";
@@ -101,6 +112,11 @@ public class SettingsController {
 	private void updatePassword(final String password) {
 		final String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
 		settingsService.setSetting("password", hashedPassword);
+	}
+
+	private void validateFiles(final String files) {
+		// TODO Auto-generated method stub
+
 	}
 
 	private void validatePasswords(final SettingsForm settingsForm, final BindingResult bindingResult) {

@@ -1,9 +1,14 @@
 package org.ytrss.db;
 
+import java.io.File;
+
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.ConversionService;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -22,17 +27,6 @@ public class SettingsService {
 		return conversionService.convert(value, clazz);
 	}
 
-	public <T> T getSetting(final String name, final T defaultValue, final Class<T> clazz) {
-		if (isSettingAvailable(name)) {
-			final String value = getValue(name);
-			return conversionService.convert(value, clazz);
-		}
-		else {
-			setSetting(name, defaultValue);
-			return defaultValue;
-		}
-	}
-
 	public <T> void setSetting(final String name, final T value) {
 		final String convertedValue = conversionService.convert(value, String.class);
 
@@ -41,6 +35,29 @@ public class SettingsService {
 		}
 		else {
 			createSetting(name, convertedValue);
+		}
+
+		if ("files".equals(name)) {
+			createFilesDir();
+		}
+	}
+
+	private void createFilesDir() {
+		final String baseDirectory = getSetting("files", String.class);
+
+		final File data = new File(baseDirectory + File.separator + "data");
+		if (!data.exists()) {
+			data.mkdirs();
+		}
+
+		final File videos = new File(baseDirectory + File.separator + "videos");
+		if (!videos.exists()) {
+			videos.mkdirs();
+		}
+
+		final File mp3s = new File(baseDirectory + File.separator + "mp3s");
+		if (!mp3s.exists()) {
+			mp3s.mkdirs();
 		}
 	}
 
@@ -53,6 +70,22 @@ public class SettingsService {
 			rs.next();
 			return rs.getString(1);
 		}, name);
+	}
+
+	private <T> void initDefaultValue(final String name, final T value) {
+		if (!isSettingAvailable(name)) {
+			setSetting(name, value);
+		}
+
+	}
+
+	@PostConstruct
+	private void initDefaultValues() {
+		initDefaultValue("files", System.getProperty("user.home") + File.separator + ".ytrss");
+		createFilesDir();
+
+		initDefaultValue("port", 8080);
+		initDefaultValue("password", BCrypt.hashpw("ytrss", BCrypt.gensalt()));
 	}
 
 	private boolean isSettingAvailable(final String name) {

@@ -85,7 +85,7 @@ public class JettyConfiguration {
 
 	@PostConstruct
 	private void loadSettings() {
-		jettyPort = settingsService.getSetting("port", 8080, Integer.class);
+		jettyPort = settingsService.getSetting("port", Integer.class);
 	}
 
 }
