@@ -149,8 +149,8 @@ public class Ripper {
 
 	}
 
-	private boolean hasBeenRipped(final VideoPage videoPage) {
-		return videoDAO.findByYoutubeID(videoPage.getVideoID()) != null;
+	private boolean hasBeenRipped(final ContentGridEntry entry) {
+		return videoDAO.findByYoutubeID(entry.getVideoID()) != null;
 	}
 
 	private boolean matchesPatterns(final ContentGridEntry contentEntry, final Channel channel) {
@@ -226,10 +226,9 @@ public class Ripper {
 				continue;
 			}
 
-			final VideoPage videoPage = openVideoPage(contentEntry);
-			if (!hasBeenRipped(videoPage)) {
+			if (!hasBeenRipped(contentEntry)) {
+				final VideoPage videoPage = openVideoPage(contentEntry);
 				final Video video = createVideo(channel, videoPage);
-
 				final StreamMapEntry bestEntry = streamMapEntryScorer.findBestEntry(videoPage.getStreamMapEntries());
 				download(video, bestEntry);
 			}
