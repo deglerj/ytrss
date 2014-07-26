@@ -1,6 +1,7 @@
 package org.ytrss.transcoders;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.function.Consumer;
 
 import org.apache.commons.exec.CommandLine;
@@ -36,6 +37,24 @@ public class FFMPEGCommandTranscoder implements Transcoder {
 			}
 			lines.append(line);
 		}
+	}
+
+	public static boolean isFfmpegAvailable() {
+		try {
+			final String command = "ffmpeg -version";
+			final CommandLine cmdLine = CommandLine.parse(command);
+			final DefaultExecutor executor = new DefaultExecutor();
+			final StringOutputStream output = new StringOutputStream();
+			executor.setStreamHandler(new PumpStreamHandler(output, output));
+			int exitValue;
+			exitValue = executor.execute(cmdLine);
+			return !executor.isFailure(exitValue);
+		}
+		catch (final IOException e) {
+			log.warn("ffmpeg detection failed", e);
+			return false;
+		}
+
 	}
 
 	@Autowired
