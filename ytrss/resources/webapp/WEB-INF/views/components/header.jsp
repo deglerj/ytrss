@@ -49,15 +49,15 @@
 			<div class="navbar-collapse collapse">
 				<ul class="nav navbar-nav">
 					<li class="${param.active == 1 ? 'active' : ''}"><a
-						href="${base}"><i class="glyphicon glyphicon-download"></i>
-							Downloads</a></li>
+						href="${base}"><i class="glyphicon glyphicon-home"></i>
+							Start</a></li>
 					<li class="dropdown ${param.active == 2 ? 'active' : ''}"><a
 						href="#" class="dropdown-toggle" data-toggle="dropdown"><i
 							class="glyphicon glyphicon-list-alt"></i>Channels<span
 							class="caret"></span></a>
 						<ul class="dropdown-menu" role="menu">
 							<c:if test="${!channels.isEmpty()}">
-								<c:forEach var="channel" items="${channels.values()}">
+								<c:forEach var="channel" items="${channels}">
 									<li><a href="channel/${channel.id}">${channel.name}</a></li>
 								</c:forEach>
 								<li class="divider"></li>

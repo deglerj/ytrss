@@ -1,16 +1,5 @@
 package org.ytrss.controllers;
 
-import static com.google.common.base.Preconditions.checkArgument;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,18 +11,10 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.ytrss.FeedGenerator;
 import org.ytrss.Ripper;
 import org.ytrss.db.Channel;
 import org.ytrss.db.ChannelDAO;
 import org.ytrss.db.UniqueChannelNameValidator;
-import org.ytrss.db.VideoDAO;
-
-import com.google.common.base.Throwables;
-import com.sun.syndication.feed.synd.SyndFeed;
-import com.sun.syndication.io.FeedException;
-import com.sun.syndication.io.SyndFeedOutput;
 
 @Controller
 public class ChannelController {
@@ -42,15 +23,7 @@ public class ChannelController {
 	private ChannelDAO					channelDAO;
 
 	@Autowired
-	private VideoDAO					videoDAO;
-
-	@Autowired
-	private FeedGenerator				generator;
-
-	@Autowired
 	private Ripper						ripper;
-
-	private static Logger				log	= LoggerFactory.getLogger(ChannelController.class);
 
 	@Autowired
 	private UniqueChannelNameValidator	uniqueChannelNameValidator;
@@ -75,30 +48,6 @@ public class ChannelController {
 		addCommonModelAttributes(channel, model);
 
 		return "channel";
-	}
-
-	@RequestMapping(value = "/channel/{id}/feed", method = RequestMethod.GET)
-	public void getFeed(@PathVariable("id") final long id, @RequestParam("token") final String token, @RequestParam("type") final String type,
-			final HttpServletResponse response, final HttpServletRequest request) {
-
-		checkArgument("rss".equals(type) || "atom".equals(type), "Type must be \"rss\" or \"atom\"");
-
-		final Channel channel = channelDAO.findById(id);
-		checkArgument(token.equals(channel.getSecurityToken()), "Token mismatch");
-
-		final String requestURL = request.getRequestURL().toString();
-
-		final SyndFeed feed = generator.generateFeed(channel, requestURL, type);
-		setFeedHeaders(channel, type, response);
-
-		try {
-			final SyndFeedOutput feedOutput = new SyndFeedOutput();
-			feedOutput.output(feed, response.getWriter());
-		}
-		catch (IOException | FeedException e) {
-			log.error("Error writing feed to HTTP response", e);
-			throw Throwables.propagate(e);
-		}
 	}
 
 	@RequestMapping(value = "/channel", method = RequestMethod.GET)
@@ -139,35 +88,12 @@ public class ChannelController {
 	}
 
 	private void addCommonModelAttributes(final Channel channel, final Model model) {
-		model.addAttribute("channels", createChannelIDMap());
-	}
-
-	private Map<Long, Channel> createChannelIDMap() {
-		final Map<Long, Channel> map = new HashMap<>();
-		for (final Channel channel : channelDAO.findAll()) {
-			map.put(channel.getId(), channel);
-		}
-		return map;
+		model.addAttribute("channels", channelDAO.findAll());
 	}
 
 	@InitBinder
 	private void initBinder(final WebDataBinder binder) {
 		binder.addValidators(uniqueChannelNameValidator);
-	}
-
-	private void setFeedHeaders(final Channel channel, final String type, final HttpServletResponse response) {
-		String fileName = channel.getName().replaceAll("[^\\w\\d]", "");
-
-		if ("rss".equals(type)) {
-			response.setContentType("application/rss+xml");
-			fileName += ".rss";
-		}
-		else {
-			response.setContentType("application/atom+xml");
-			fileName += ".atom";
-		}
-
-		response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
 	}
 
 }
