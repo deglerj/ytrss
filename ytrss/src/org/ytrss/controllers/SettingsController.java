@@ -17,6 +17,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.ytrss.db.ChannelDAO;
 import org.ytrss.db.SettingsService;
 
 import com.google.common.base.Strings;
@@ -107,6 +108,9 @@ public class SettingsController {
 
 	private static Logger	log	= LoggerFactory.getLogger(SettingsController.class);
 
+	@Autowired
+	private ChannelDAO		channelDAO;
+
 	@RequestMapping(value = "/settings", method = RequestMethod.GET)
 	public String getSettings(final Model model) {
 		final Integer port = settingsService.getSetting("port", Integer.class);
@@ -115,6 +119,7 @@ public class SettingsController {
 		final Integer transcoderThreads = settingsService.getSetting("transcoderThreads", Integer.class);
 
 		model.addAttribute("settingsForm", new SettingsForm("", "", port, files, downloaderThreads, transcoderThreads));
+		model.addAttribute("channels", channelDAO.findAll());
 
 		return "settings";
 	}
