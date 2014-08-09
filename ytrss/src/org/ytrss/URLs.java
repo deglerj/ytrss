@@ -55,10 +55,10 @@ public class URLs {
 			}
 			catch (final Exception e) {
 				if (i < 9) {
-					log.warn("Could not open page \"" + url + "\". Retrying...");
+					log.warn("Could not open page \"" + url + "\". Reason: \"" + e.getMessage() + "\" - Retrying...");
 				}
 				else {
-					log.warn("Could not open page \"" + url + "\". Giving up...");
+					log.warn("Could not open page \"" + url + "\". Reason: \"" + e.getMessage() + "\" - Giving up...");
 					throw Throwables.propagate(e);
 				}
 			}

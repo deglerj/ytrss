@@ -39,7 +39,7 @@ public class ChannelPage {
 			final Matcher entriesMatcher = GRID_ENTRY_PATTERN.matcher(contentNode.getText());
 			while (entriesMatcher.find()) {
 				final String title = entriesMatcher.group(1);
-				final String href = entriesMatcher.group(2);
+				final String href = entriesMatcher.group(2).replace("&amp;", "&");
 				entries.add(new ContentGridEntry(title, href));
 			}
 
