@@ -4,7 +4,7 @@
 <%@ taglib prefix="s" 	uri="http://www.springframework.org/tags" %>
 
 <jsp:include page="components/header.jsp">
-	<jsp:param value="Downloads" name="title"/>
+	<jsp:param value="Start" name="title"/>
 	<jsp:param value="1" name="active"/>
 </jsp:include>
 

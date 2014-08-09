@@ -68,26 +68,28 @@ public class FFMPEGCommandTranscoder implements Transcoder {
 	@Override
 	@Async("transcoder")
 	public void transcode(final File videoFile, Video video, final Consumer<Void> started, final Consumer<File> transcoded, final Consumer<Throwable> failed) {
-		// Reload video from DB in case it has changed (e.g. state has been altered)
-		video = videoDAO.findById(video.getId());
-
-		// Make sure the video has not been deleted or reset while being enqueued for transcoding
-		if (isInvalid(video)) {
-			log.info("Skipped transcoding video \"" + video.getName() + "\" because it was already deleted or is an invalid state");
-			return;
-		}
-
-		started.accept(null);
-
-		log.info("Transcoding " + videoFile.getName());
-
-		final String fileName = settingsService.getSetting("files", String.class) + File.separator + "mp3s" + File.separator + Videos.getFileName(video)
-				+ ".mp3";
-
-		final File mp3File = new File(fileName);
-
 		try {
-			final String command = "ffmpeg -y -i \"" + videoFile.getAbsolutePath() + "\" -vn -qscale:a 6 \"" + mp3File.getAbsolutePath() + "\"";
+
+			// Reload video from DB in case it has changed (e.g. state has been altered)
+			video = videoDAO.findById(video.getId());
+
+			// Make sure the video has not been deleted or reset while being enqueued for transcoding
+			if (isInvalid(video)) {
+				log.info("Skipped transcoding video \"" + video.getName() + "\" because it was already deleted or is an invalid state");
+				return;
+			}
+
+			started.accept(null);
+
+			log.info("Transcoding " + videoFile.getName());
+
+			final String fileName = settingsService.getSetting("files", String.class) + File.separator + "mp3s" + File.separator + Videos.getFileName(video)
+					+ ".mp3";
+
+			final File mp3File = new File(fileName);
+
+			final String bitrate = getBitrateArgument();
+			final String command = "ffmpeg -y -i \"" + videoFile.getAbsolutePath() + "\" -vn " + bitrate + " \"" + mp3File.getAbsolutePath() + "\"";
 			final CommandLine cmdLine = CommandLine.parse(command);
 			final DefaultExecutor executor = new DefaultExecutor();
 			executor.setWorkingDirectory(new File(settingsService.getSetting("files", String.class)));
@@ -98,13 +100,34 @@ public class FFMPEGCommandTranscoder implements Transcoder {
 				throw new RuntimeException("Transconding failed. ffmpeg output was:\n" + output.toString());
 			}
 
+			transcoded.accept(mp3File);
 		}
 		catch (final Throwable t) {
 			failed.accept(t);
 			return;
 		}
+	}
 
-		transcoded.accept(mp3File);
+	private String getBitrateArgument() {
+		final Bitrate bitrate = settingsService.getSetting("bitrate", Bitrate.class);
+		switch (bitrate) {
+			case CBR_192:
+				return "-b:a 192k";
+			case CBR_128:
+				return "-b:a 128k";
+			case CBR_96:
+				return "-b:a 96k";
+			case CBR_64:
+				return "-b:a 64k";
+			case VBR_HIGH:
+				return "-q:a 1";
+			case VBR_MEDIUM:
+				return "-q:a 4";
+			case VBR_LOW:
+				return "-q:a 9";
+			default:
+				throw new IllegalStateException("Unknown or unsupported bitrate \"" + bitrate + "\"");
+		}
 	}
 
 	private boolean isDeleted(final Video video) {

@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.ytrss.db.ChannelDAO;
 import org.ytrss.db.SettingsService;
+import org.ytrss.transcoders.Bitrate;
 
 import com.google.common.base.Strings;
 
@@ -39,18 +40,25 @@ public class SettingsController {
 
 		private Integer	transcoderThreads;
 
+		private Bitrate	bitrate;
+
 		public SettingsForm() {
 			// Empty default constructor
 		}
 
 		public SettingsForm(final String password, final String password2, final Integer port, final String files, final Integer downloaderThreads,
-				final Integer transcoderThreads) {
+				final Integer transcoderThreads, final Bitrate bitrate) {
 			this.password = password;
 			this.password2 = password2;
 			this.port = port;
 			this.files = files;
 			this.downloaderThreads = downloaderThreads;
 			this.transcoderThreads = transcoderThreads;
+			this.bitrate = bitrate;
+		}
+
+		public Bitrate getBitrate() {
+			return bitrate;
 		}
 
 		public Integer getDownloaderThreads() {
@@ -75,6 +83,10 @@ public class SettingsController {
 
 		public Integer getTranscoderThreads() {
 			return transcoderThreads;
+		}
+
+		public void setBitrate(final Bitrate bitrate) {
+			this.bitrate = bitrate;
 		}
 
 		public void setDownloaderThreads(final Integer downloaderThreads) {
@@ -117,8 +129,9 @@ public class SettingsController {
 		final String files = settingsService.getSetting("files", String.class);
 		final Integer downloaderThreads = settingsService.getSetting("downloaderThreads", Integer.class);
 		final Integer transcoderThreads = settingsService.getSetting("transcoderThreads", Integer.class);
+		final Bitrate bitrate = settingsService.getSetting("bitrate", Bitrate.class);
 
-		model.addAttribute("settingsForm", new SettingsForm("", "", port, files, downloaderThreads, transcoderThreads));
+		model.addAttribute("settingsForm", new SettingsForm("", "", port, files, downloaderThreads, transcoderThreads, bitrate));
 		model.addAttribute("channels", channelDAO.findAll());
 
 		return "settings";
@@ -146,6 +159,7 @@ public class SettingsController {
 		settingsService.setSetting("port", settingsForm.getPort());
 		settingsService.setSetting("downloaderThreads", settingsForm.getDownloaderThreads());
 		settingsService.setSetting("transcoderThreads", settingsForm.getTranscoderThreads());
+		settingsService.setSetting("bitrate", settingsForm.getBitrate());
 
 		return "redirect:/";
 	}

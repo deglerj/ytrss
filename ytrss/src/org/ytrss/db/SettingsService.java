@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.ytrss.transcoders.Bitrate;
 
 @Component
 @Transactional
@@ -88,6 +89,7 @@ public class SettingsService {
 		initDefaultValue("password", BCrypt.hashpw("ytrss", BCrypt.gensalt()));
 		initDefaultValue("downloaderThreads", 2);
 		initDefaultValue("transcoderThreads", 2);
+		initDefaultValue("bitrate", Bitrate.CBR_96);
 	}
 
 	private boolean isSettingAvailable(final String name) {

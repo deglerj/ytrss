@@ -76,6 +76,19 @@
 		</div>
 		
 		<div class="form-group">
+			<label for="inputBitrate" class="col-lg-2 control-label">MP3 bitrate</label>
+			<div class="col-lg-4">
+				<form:select path="bitrate" cssClass="form-control" id="inputBitrate" >
+					<form:options itemLabel="description"/>
+				</form:select>
+				<span class="help-block">Existing MP3s will not be affected</span>
+			</div>
+			<div class="col-xs-2">
+				<form:errors path="bitrate" cssClass="form-error"/>
+			</div>
+		</div>
+		
+		<div class="form-group">
 			<div class="col-xs-offset-2 col-xs-10">
 				<button type="submit" class="btn btn-primary">Save</button>
 			</div>
