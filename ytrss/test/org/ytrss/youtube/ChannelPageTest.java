@@ -14,19 +14,19 @@ public class ChannelPageTest {
 
 	@Test
 	public void testExtraSlashURLPage() {
-		final ChannelPage page = openPage("https://www.youtube.com/user/brentalfloss/");
+		final ChannelPage page = openPage("http://www.youtube.com/user/brentalfloss/");
 		testPage(page, 31);
 	}
 
 	@Test
 	public void testNormalPage() {
-		final ChannelPage page = openPage("https://www.youtube.com/user/ROCKETBEANSTV");
+		final ChannelPage page = openPage("http://www.youtube.com/user/ROCKETBEANSTV");
 		testPage(page, 30);
 	}
 
 	@Test
 	public void testOneEntryPage() {
-		final ChannelPage page = openPage("https://www.youtube.com/user/freekthecat");
+		final ChannelPage page = openPage("http://www.youtube.com/user/freekthecat");
 		testPage(page, 1);
 	}
 
@@ -38,12 +38,13 @@ public class ChannelPageTest {
 
 	private ChannelPage openPage(final String url) {
 		final String cleanURL = URLs.cleanUpURL(url);
-		return new ChannelPage(URLs.copyToString(cleanURL + "/videos"));
+		return URLs.openPage(cleanURL + "/videos", s -> new ChannelPage(s));
+
 	}
 
 	private void testEntry(final ContentGridEntry entry) {
 		final String url = "http://youtube.com" + entry.getHref() + "&gl=gb&hl=en"; // Force locale to make date parsing easier
-		final VideoPage videoPage = new VideoPage(URLs.copyToString(url));
+		final VideoPage videoPage = URLs.openPage(url, s -> new VideoPage(s));
 		assertNotNull(videoPage.getTitle());
 	}
 

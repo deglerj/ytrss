@@ -206,17 +206,17 @@ public class Ripper {
 
 	private ChannelPage openChannelPage(final Channel channel) {
 		final String url = URLs.cleanUpURL(channel.getUrl()) + "/videos";
-		return URLs.openPage(url, 10, s -> new ChannelPage(s));
+		return URLs.openPage(url, s -> new ChannelPage(s));
 	}
 
 	private VideoPage openVideoPage(final ContentGridEntry contentEntry) {
 		final String url = "http://youtube.com" + contentEntry.getHref() + "&gl=gb&hl=en"; // Force locale to make date parsing easier
-		return URLs.openPage(url, 10, s -> new VideoPage(s));
+		return URLs.openPage(url, s -> new VideoPage(s));
 	}
 
 	private VideoPage openVideoPage(final Video video) {
 		final String url = "http://youtube.com/watch?v=" + video.getYoutubeID() + "&gl=gb&hl=en"; // Force locale to make date parsing easier
-		return URLs.openPage(url, 10, s -> new VideoPage(s));
+		return URLs.openPage(url, s -> new VideoPage(s));
 	}
 
 	private void rip(final Channel channel) {

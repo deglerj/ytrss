@@ -126,7 +126,7 @@ public class FeedController {
 
 		try {
 			final String url = URLs.cleanUpURL(channel.getUrl()) + "/videos";
-			final ChannelPage page = URLs.openPage(url, 10, s -> new ChannelPage(s));
+			final ChannelPage page = URLs.openPage(url, s -> new ChannelPage(s));
 			final String profileImage = page.getProfileImage();
 
 			final Thumbnail thumbnail = new Thumbnail(new URI(profileImage));

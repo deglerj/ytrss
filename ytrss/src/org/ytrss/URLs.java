@@ -46,9 +46,9 @@ public class URLs {
 		}
 	}
 
-	public static <P> P openPage(final String url, final int maxRetries, final Function<String, P> factory) {
+	public static <P> P openPage(final String url, final Function<String, P> factory) {
 		// Try multiple times, sometimes opening a page fails due to temporary Youtube problems
-		for (int i = 0; i < maxRetries; i++) {
+		for (int i = 0; i < 20; i++) {
 			try {
 				final String source = URLs.copyToString(url);
 				return factory.apply(source);

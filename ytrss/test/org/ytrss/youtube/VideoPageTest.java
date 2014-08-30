@@ -6,7 +6,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.net.URL;
 import java.sql.Date;
 import java.text.SimpleDateFormat;
 import java.util.List;
@@ -15,8 +14,6 @@ import java.util.Locale;
 import org.junit.Before;
 import org.junit.Test;
 import org.ytrss.URLs;
-import org.ytrss.youtube.StreamMapEntry;
-import org.ytrss.youtube.VideoPage;
 
 public class VideoPageTest {
 
@@ -24,7 +21,7 @@ public class VideoPageTest {
 
 	@Before
 	public void setUp() throws MalformedURLException, IOException {
-		page = new VideoPage(URLs.copyToString(new URL("https://www.youtube.com/watch?v=ALZZx1xmAzg&gl=gb&hl=en")));
+		page = URLs.openPage("https://www.youtube.com/watch?v=ALZZx1xmAzg&gl=gb&hl=en", s -> new VideoPage(s));
 	}
 
 	@Test
