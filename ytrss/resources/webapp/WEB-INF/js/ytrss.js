@@ -166,6 +166,9 @@ function updateTableContent(table, videos) {
 		
 		var showOptions = false;
 		var options = '<div class="dropdown"><span class="dropdown-toggle glyphicon glyphicon-th" style="cursor:pointer" id="videoOptionMenu' + video.id +'" data-toggle="dropdown"></span><ul class="dropdown-menu" role="menu" aria-labelledby="videoOptionMenu' + video.id + '">';		
+		if(video.state == 7){
+			options += '<li role="presentation"><a role="menuitem" tabindex="-1" style="text-decoration: none" href="javascript:void()" onclick="stream(' + video.id + ')"><span class="glyphicon glyphicon-play"></span> Stream</a></li>';
+		}
 		if(video.state == 4 || video.state == 6 || video.state == 7 || video.state == 8){
 			options += '<li role="presentation"><a role="menuitem" tabindex="-1" style="text-decoration: none" href="javascript:void()" onclick="resetVideo(' + video.id + ')"><span class="glyphicon glyphicon-repeat"></span> Reset</a></li>';
 			showOptions = true;
@@ -190,6 +193,12 @@ function forceUpdate() {
 
 function deleteVideo(id) {
 	$.get('/videos/delete?id=' + id);
+}
+
+function stream(id) {
+	 popup = window.open("/stream?id=" + id, "ytrss - Stream", "width=550,height=100,resizable=yes");
+	 popup.focus();
+	 return false;
 }
 
 function updateCountdown(countdown) {

@@ -37,3 +37,4 @@ Getting started
 - JDT (http://eclipse.org/jdt/)
 - Argo (http://argo.sourceforge.net)
 - Gradle (http://gradle.org/)
+- audio.js (http://kolber.github.io/audiojs/)

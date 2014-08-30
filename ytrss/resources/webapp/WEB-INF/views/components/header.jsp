@@ -23,7 +23,7 @@
 
 <link href="images/favicon.ico" rel="shortcut icon">
 <link href="css/bootstrap.min.css" rel="stylesheet">
-<link href="css/ytrss-0.1.3.min.css" rel="stylesheet">
+<link href="css/ytrss-0.1.4.min.css" rel="stylesheet">
 <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 <!--[if lt IE 9]>
@@ -71,7 +71,7 @@
 				</ul>
 				<ul class="nav navbar-nav navbar-right">
 					<li><a href="https://github.com/deglerj/ytrss"><i
-							class="glyphicon glyphicon-globe"></i> ytrss 0.1.3</a></li>
+							class="glyphicon glyphicon-globe"></i> ytrss 0.1.4</a></li>
 				</ul>
 			</div>
 		</div>

@@ -29,6 +29,7 @@ public class MvcConfiguration extends WebMvcConfigurerAdapter {
 		registry.addResourceHandler("/js/**").addResourceLocations("/WEB-INF/js/").setCachePeriod((int) TimeUnit.DAYS.toSeconds(100));
 		registry.addResourceHandler("/fonts/**").addResourceLocations("/WEB-INF/fonts/").setCachePeriod((int) TimeUnit.DAYS.toSeconds(100));
 		registry.addResourceHandler("/images/**").addResourceLocations("/WEB-INF/images/").setCachePeriod((int) TimeUnit.DAYS.toSeconds(100));
+		registry.addResourceHandler("/audiojs/**").addResourceLocations("/WEB-INF/audiojs/").setCachePeriod((int) TimeUnit.DAYS.toSeconds(100));
 	}
 
 	@Override
