@@ -5,6 +5,6 @@
 
 	<script src="js/jquery-1.11.1.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>
-	<script src="js/ytrss-0.1.4.min.js"></script>
+	<script src="js/ytrss.js"></script>
 </body>
 </html>

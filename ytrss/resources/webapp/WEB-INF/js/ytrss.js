@@ -6,7 +6,7 @@ function startVideoTableUpdates(tableId, channelId) {
 	var table = $("#" + tableId);
 	
 	//Insert elements "next update in" and options after table
-	$('<div class="text-right"><div class="text-info" style="font-size: 13px; display: inline-block" id="countdown"></div><div class="dropdown" style="display: inline-block; margin-left: 15px"><span class="dropdown-toggle glyphicon glyphicon-th" style="cursor:pointer" id="optionMenu" data-toggle="dropdown"></span><ul class="dropdown-menu" role="menu" aria-labelledby="optionMenu"><li role="presentation"><a role="menuitem" tabindex="-1" style="text-decoration: none" href="javascript:void()" onclick="forceUpdate()"><span class="glyphicon glyphicon-repeat"></span>Update now</a></li></ul></div></div>').insertAfter(table);
+	$('<div class="text-right"><div class="text-info" style="font-size: 13px; display: inline-block" id="countdown"></div><div class="dropdown" style="display: inline-block; margin-left: 15px"><span class="dropdown-toggle glyphicon glyphicon-th-large" style="cursor:pointer" id="optionMenu" data-toggle="dropdown"></span><ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="optionMenu"><li role="presentation"><a role="menuitem" tabindex="-1" style="text-decoration: none" href="javascript:void()" onclick="forceUpdate()"><span class="glyphicon glyphicon-repeat"></span>Update now</a></li></ul></div></div>').insertAfter(table);
 	//Insert element for "empty table" after table
 	$('<div class="text-muted" style="padding-left: 10px; margin-bottom: 20px; display: none;" id="tableEmpty">No videos available</div>').insertAfter(table);
 	
@@ -165,7 +165,7 @@ function updateTableContent(table, videos) {
 		$(tds[showChannels ? 3 : 2]).html(state);
 		
 		var showOptions = false;
-		var options = '<div class="dropdown"><span class="dropdown-toggle glyphicon glyphicon-th" style="cursor:pointer" id="videoOptionMenu' + video.id +'" data-toggle="dropdown"></span><ul class="dropdown-menu" role="menu" aria-labelledby="videoOptionMenu' + video.id + '">';		
+		var options = '<div class="dropdown"><span class="dropdown-toggle glyphicon glyphicon-th-large" style="cursor:pointer" id="videoOptionMenu' + video.id +'" data-toggle="dropdown"></span><ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="videoOptionMenu' + video.id + '">';		
 		if(video.state == 7){
 			options += '<li role="presentation"><a role="menuitem" tabindex="-1" style="text-decoration: none" href="javascript:void()" onclick="stream(' + video.id + ')"><span class="glyphicon glyphicon-play"></span> Stream</a></li>';
 		}
@@ -179,7 +179,7 @@ function updateTableContent(table, videos) {
 		}
 		options += '</ul></div>';
 		
-		$(tds[showChannels ? 4 : 3]).html(showOptions ? options : '<span class="glyphicon glyphicon-th" style="opacity:0.05;filter:alpha(opacity=05)"></span>');
+		$(tds[showChannels ? 4 : 3]).html(showOptions ? options : '<span class="glyphicon glyphicon-th-large" style="opacity:0.05;filter:alpha(opacity=05)"></span>');
 	});
 }
 
