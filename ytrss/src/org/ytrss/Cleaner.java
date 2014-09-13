@@ -54,7 +54,7 @@ public class Cleaner {
 		for (final Channel channel : channelDAO.findAll()) {
 			final List<Video> videos = videoDAO.findByChannelID(channel.getId());
 			if (videos.size() > channel.getMaxVideos()) {
-				videos.subList(channel.getMaxVideos(), videos.size()).forEach(v -> channelDAO.delete(v.getId()));
+				videos.subList(channel.getMaxVideos(), videos.size()).forEach(v -> videoDAO.delete(v.getId()));
 			}
 		}
 	}
