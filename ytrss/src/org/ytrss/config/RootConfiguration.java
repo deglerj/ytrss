@@ -11,6 +11,8 @@ import org.springframework.stereotype.Controller;
 import org.ytrss.transcoders.FFMPEGCommandTranscoder;
 import org.ytrss.transcoders.Transcoder;
 
+import com.google.common.eventbus.EventBus;
+
 /**
  * The root application context.
  * <p/>
@@ -36,6 +38,11 @@ public class RootConfiguration {
 	@Bean
 	public ConversionService getConversionService() {
 		return new DefaultConversionService();
+	}
+
+	@Bean
+	public EventBus getEventBus() {
+		return new EventBus();
 	}
 
 	@Bean

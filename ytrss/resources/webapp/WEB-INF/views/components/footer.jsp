@@ -5,6 +5,8 @@
 
 	<script src="js/jquery-1.11.1.min.js"></script>
 	<script src="js/bootstrap.min.js"></script>
-	<script src="js/ytrss-0.1.5.min.js"></script>
+	<script src="js/sockjs-0.3.4.min.js"></script>
+	<script src="js/ytrss.js"></script>
+ 	
 </body>
 </html>

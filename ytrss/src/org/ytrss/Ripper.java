@@ -14,6 +14,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.ytrss.db.Channel;
 import org.ytrss.db.ChannelDAO;
+import org.ytrss.db.ServerStateChangeEvent;
 import org.ytrss.db.Video;
 import org.ytrss.db.VideoDAO;
 import org.ytrss.db.VideoState;
@@ -25,6 +26,7 @@ import org.ytrss.youtube.StreamMapEntryScorer;
 import org.ytrss.youtube.VideoPage;
 
 import com.google.common.base.Strings;
+import com.google.common.eventbus.EventBus;
 
 @Component
 public class Ripper {
@@ -58,6 +60,9 @@ public class Ripper {
 	@Autowired
 	private ID3Tagger					id3Tagger;
 
+	@Autowired
+	private EventBus					eventBus;
+
 	public void download(final Video video) {
 		final VideoPage videoPage = openVideoPage(video);
 		final StreamMapEntry bestEntry = streamMapEntryScorer.findBestEntry(videoPage.getStreamMapEntries());
@@ -81,6 +86,8 @@ public class Ripper {
 	public synchronized void start() {
 		active = true;
 
+		eventBus.post(new ServerStateChangeEvent());
+
 		try {
 			for (final Channel channel : channelDAO.findAll()) {
 				rip(channel);
@@ -89,6 +96,8 @@ public class Ripper {
 		finally {
 			active = false;
 			lastExecuted = System.currentTimeMillis();
+
+			eventBus.post(new ServerStateChangeEvent());
 		}
 	}
 

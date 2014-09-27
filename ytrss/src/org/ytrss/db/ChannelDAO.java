@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Strings;
+import com.google.common.eventbus.EventBus;
 
 @Component
 @Transactional
@@ -111,17 +112,20 @@ public class ChannelDAO {
 	@Autowired
 	private JdbcTemplate				jdbcTemplate;
 
+	@Autowired
+	private EventBus					eventBus;
+
 	private final RowMapper<Channel>	rowMapper	= (rs, rowNum) -> {
-														final Channel channel = new Channel();
-														channel.setId(rs.getLong("id"));
-														channel.setName(rs.getString("name"));
-														channel.setUrl(rs.getString("url"));
-														channel.setExcludeRegex(rs.getString("exclude_regex"));
-														channel.setIncludeRegex(rs.getString("include_regex"));
-														channel.setSecurityToken(rs.getString("security_token"));
-														channel.setMaxVideos(rs.getInt("max_videos"));
-														return channel;
-													};
+		final Channel channel = new Channel();
+		channel.setId(rs.getLong("id"));
+		channel.setName(rs.getString("name"));
+		channel.setUrl(rs.getString("url"));
+		channel.setExcludeRegex(rs.getString("exclude_regex"));
+		channel.setIncludeRegex(rs.getString("include_regex"));
+		channel.setSecurityToken(rs.getString("security_token"));
+		channel.setMaxVideos(rs.getInt("max_videos"));
+		return channel;
+	};
 
 	@Autowired
 	private VideoDAO					videoDAO;
@@ -130,7 +134,7 @@ public class ChannelDAO {
 		jdbcTemplate.update("DELETE FROM \"VIDEO\" WHERE \"CHANNEL_FK\" = ? ", id);
 		jdbcTemplate.update("DELETE FROM \"CHANNEL\" WHERE \"ID\" = ? ", id);
 
-		videoDAO.touch();
+		eventBus.post(new ServerStateChangeEvent());
 	}
 
 	@Transactional(readOnly = true)

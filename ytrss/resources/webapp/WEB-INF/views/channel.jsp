@@ -54,7 +54,7 @@
 			<div class="form-group">
 				<label for="inputInclude" class="control-label col-xs-2">Include</label>
 				<div class="col-xs-7">
-					<form:input path="includeRegex" cssClass="form-control" id="inputInclude" type="text" placeholder=".*talk.*"/>
+					<form:input path="includeRegex" cssClass="form-control" id="inputInclude" type="text" placeholder=".*song.*"/>
 					<span class="help-block">Only videos with a name matching this regular expression will be downloaded (case insensitive)</span>
 				</div>
 				<div class="col-xs-2">
@@ -65,7 +65,7 @@
 			<div class="form-group">
 				<label for="inputExclude" class="control-label col-xs-2">Exclude</label>
 				<div class="col-xs-7">
-					<form:input path="excludeRegex" cssClass="form-control" id="inputExclude" type="text" placeholder=".*cloud.*"/>
+					<form:input path="excludeRegex" cssClass="form-control" id="inputExclude" type="text" placeholder=".*spam.*"/>
 					<span class="help-block">Any video with a name matching this regular expression will not be downloaded (case insensitive)</span>
 				</div>
 				<div class="col-xs-2">

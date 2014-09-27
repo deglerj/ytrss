@@ -17,6 +17,7 @@ repositories {
 dependencies {
 	compile 'org.springframework:spring-web:4.+'
 	compile 'org.springframework:spring-webmvc:4.+'
+	compile 'org.springframework:spring-websocket:4.+'	
 	compile 'org.springframework:spring-jdbc:4.+'
 	compile 'org.springframework.security:spring-security-web:+'
 	compile 'org.springframework.security:spring-security-config:+'
@@ -37,10 +38,12 @@ dependencies {
 	compile 'org.eclipse.jetty:jetty-jsp:9.+'
 	compile 'org.eclipse.jetty:jetty-servlets:9.+'
 	compile 'org.eclipse.jetty.toolchain:jetty-jsp-jdt:+'
+	compile 'org.eclipse.jetty.websocket:websocket-server:+'
 	compile 'org.slf4j:slf4j-jdk14:+'
 	compile 'org.slf4j:log4j-over-slf4j:+'
 	compile 'com.mpatric:mp3agic:+'
 	compile 'net.sourceforge.argo:argo:+'
+	compile 'com.fasterxml.jackson.core:jackson-databind:+'
 	
     testCompile 'junit:junit:+'    
 }

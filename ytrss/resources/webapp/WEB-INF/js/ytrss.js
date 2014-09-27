@@ -1,49 +1,47 @@
-var lastVideosUpdate = -1;
-
 var loadingIndicatorVisible = true;
+
+var countdown = 0;
 
 function startVideoTableUpdates(tableId, channelId) {
 	var table = $("#" + tableId);
 	
 	//Insert elements "next update in" and options after table
-	$('<div class="text-right"><div class="text-info" style="font-size: 13px; display: inline-block" id="countdown"></div><div class="dropdown" style="display: inline-block; margin-left: 15px"><span class="dropdown-toggle glyphicon glyphicon-th-large" style="cursor:pointer" id="optionMenu" data-toggle="dropdown"></span><ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="optionMenu"><li role="presentation"><a role="menuitem" tabindex="-1" style="text-decoration: none" href="javascript:void()" onclick="forceUpdate()"><span class="glyphicon glyphicon-repeat"></span>Update now</a></li></ul></div></div>').insertAfter(table);
+	$('<div class="text-right"><div class="text-info" style="font-size: 13px; display: inline-block" id="countdown"></div><div class="dropdown" style="display: inline-block; margin-left: 15px"><span class="dropdown-toggle glyphicon glyphicon-th-large" style="cursor:pointer" id="optionMenu" data-toggle="dropdown"></span><ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="optionMenu"><li role="presentation"><a role="menuitem" tabindex="-1" style="text-decoration: none" href="javascript:void(0)" onclick="forceUpdate()"><span class="glyphicon glyphicon-repeat"></span>Update now</a></li></ul></div></div>').insertAfter(table);
 	//Insert element for "empty table" after table
 	$('<div class="text-muted" style="padding-left: 10px; margin-bottom: 20px; display: none;" id="tableEmpty">No videos available</div>').insertAfter(table);
 	
-	updateTable(table, channelId);	
+	
+	var sock = new SockJS('/videos');
+   
+	sock.onopen = function() {
+		var send = channelId == null ? {} : {channelID : channelId};
+		sock.send(JSON.stringify(send));
+		
+		//Start countdown updates
+		setInterval(function () {updateCountdown();}, 1000);
+	};
+	
+	sock.onmessage = function(message) {
+		updateTable(message.data, table, channelId);
+	};
+		
+	//FIXME JD handle connection errors
 }
 
-function updateTable(table, channelId) {
-	//Create JSON request data
-	var reqData = '{"lastUpdate":' + lastVideosUpdate;
-	if(channelId != null) {
-		reqData += ',"channel":' + channelId;
+function updateTable(message, table, channelId) {
+	var data = $.parseJSON(message);
+	
+	if(loadingIndicatorVisible) {
+		hideLoadingIndicator(table);
+		loadingIndicatorVisible = false;
 	}
-	reqData += '}';
 	
-	
-	//Request data from server
-	$.getJSON("/videos", reqData, function(data){
-		if(data.videos){
-			lastVideosUpdate = data.lastUpdate;
-			
-			if(loadingIndicatorVisible) {
-				hideLoadingIndicator(table);
-				loadingIndicatorVisible = false;
-			}
-			
-			//Update displayed data
-			updateTableRowCount(table, data.videos.length);
-			updateTableContent(table, data.videos);
-			updateTableEmpty(data.videos.length == 0);
-		}
-		updateCountdown(data.countdown);
-		
-		//Update again in 1 second
-		setTimeout(function () {updateTable(table, channelId);}, 1000);
-	})
-	//Error? Try again in 1 second
-	.error(function() { setTimeout(function () {updateTable(table, channelId);}, 1000); });	
+	//Update displayed data
+	updateTableRowCount(table, data.videos.length);
+	updateTableContent(table, data.videos);
+	updateTableEmpty(data.videos.length == 0);
+
+	countdown = data.countdown / 1000;
 }
 
 function hideLoadingIndicator(table) {
@@ -167,14 +165,14 @@ function updateTableContent(table, videos) {
 		var showOptions = false;
 		var options = '<div class="dropdown"><span class="dropdown-toggle glyphicon glyphicon-th-large" style="cursor:pointer" id="videoOptionMenu' + video.id +'" data-toggle="dropdown"></span><ul class="dropdown-menu dropdown-menu-right" role="menu" aria-labelledby="videoOptionMenu' + video.id + '">';		
 		if(video.state == 7){
-			options += '<li role="presentation"><a role="menuitem" tabindex="-1" style="text-decoration: none" href="javascript:void()" onclick="stream(' + video.id + ')"><span class="glyphicon glyphicon-play"></span> Stream</a></li>';
+			options += '<li role="presentation"><a role="menuitem" tabindex="-1" style="text-decoration: none" href="javascript:void(0)" onclick="stream(' + video.id + ')"><span class="glyphicon glyphicon-play"></span> Stream</a></li>';
 		}
 		if(video.state == 4 || video.state == 6 || video.state == 7 || video.state == 8){
-			options += '<li role="presentation"><a role="menuitem" tabindex="-1" style="text-decoration: none" href="javascript:void()" onclick="resetVideo(' + video.id + ')"><span class="glyphicon glyphicon-repeat"></span> Reset</a></li>';
+			options += '<li role="presentation"><a role="menuitem" tabindex="-1" style="text-decoration: none" href="javascript:void(0)" onclick="resetVideo(' + video.id + ')"><span class="glyphicon glyphicon-repeat"></span> Reset</a></li>';
 			showOptions = true;
 		}
 		if(video.state != 2 && video.state != 5 && video.state != 8){
-			options += '<li role="presentation"><a role="menuitem" tabindex="-1" style="text-decoration: none" href="javascript:void()" onclick="deleteVideo(' + video.id + ')"><span class="glyphicon glyphicon-trash"></span> Delete</a></li>';
+			options += '<li role="presentation"><a role="menuitem" tabindex="-1" style="text-decoration: none" href="javascript:void(0)" onclick="deleteVideo(' + video.id + ')"><span class="glyphicon glyphicon-trash"></span> Delete</a></li>';
 			showOptions = true;
 		}
 		options += '</ul></div>';
@@ -201,15 +199,13 @@ function stream(id) {
 	 return false;
 }
 
-function updateCountdown(countdown) {
-	var seconds = countdown / 1000;
-	
+function updateCountdown() {
 	if(countdown == 0) {
 		$("#countdown").text("Updating...");
 	}
 	else {
-		 var minutes = Math.floor(seconds / 60);
-		 var remSeconds = Math.floor(seconds % 60);
+		 var minutes = Math.floor(countdown / 60);
+		 var remSeconds = Math.floor(countdown % 60);
 		 
 		 var text = "Next update in: " + minutes;
 		 if(minutes == 1) {
@@ -227,5 +223,9 @@ function updateCountdown(countdown) {
 		 }
 		 
 		 $("#countdown").text(text);
+		 
+		 countdown--; //FIXME JD auf currentTimeMillis + countdown hinarbeiten statt runterzählen (sonst ungenau)
 	}
+	
+	
 }

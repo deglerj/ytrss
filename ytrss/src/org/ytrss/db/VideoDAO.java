@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
+import com.google.common.eventbus.EventBus;
 
 @Component
 @Transactional
@@ -141,8 +142,6 @@ public class VideoDAO {
 
 	}
 
-	private long					lastUpdate	= System.currentTimeMillis();
-
 	@Autowired
 	private JdbcTemplate			jdbcTemplate;
 
@@ -163,10 +162,13 @@ public class VideoDAO {
 		return video;
 	};
 
+	@Autowired
+	private EventBus				eventBus;
+
 	public void delete(final long id) {
 		jdbcTemplate.update("DELETE FROM \"VIDEO\" WHERE \"ID\" = ? ", id);
 
-		touch();
+		eventBus.post(new ServerStateChangeEvent());
 	}
 
 	@Transactional(readOnly = true)
@@ -190,10 +192,6 @@ public class VideoDAO {
 		return Iterables.getOnlyElement(result, null);
 	}
 
-	public long getLastUpdate() {
-		return lastUpdate;
-	}
-
 	public void persist(final Video video) {
 		if (video.getId() == null && Strings.isNullOrEmpty(video.getSecurityToken())) {
 			video.setSecurityToken(createSecurityToken());
@@ -207,11 +205,7 @@ public class VideoDAO {
 			video.setId(keyHolder.getKey().longValue());
 		}
 
-		touch();
-	}
-
-	protected void touch() {
-		lastUpdate = System.currentTimeMillis();
+		eventBus.post(new ServerStateChangeEvent());
 	}
 
 	private String createSecurityToken() {
