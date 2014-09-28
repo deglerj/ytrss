@@ -13,6 +13,10 @@ function startVideoTableUpdates(tableId, channelId) {
 	
 	var sock = new SockJS('/videos');
    
+	sock.onerror = function() {
+		window.alert('Could not connect to the server. Please reload this page and try again.');
+	};
+	
 	sock.onopen = function() {
 		var send = channelId == null ? {} : {channelID : channelId};
 		sock.send(JSON.stringify(send));
@@ -25,7 +29,6 @@ function startVideoTableUpdates(tableId, channelId) {
 		updateTable(message.data, table, channelId);
 	};
 		
-	//FIXME JD handle connection errors
 }
 
 function updateTable(message, table, channelId) {
