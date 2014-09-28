@@ -38,7 +38,7 @@ public class VideoPage {
 
 	private static final Pattern	KEY_VALUE_PATTERN	= Pattern.compile("^([^=]+)=(.+)$");
 
-	private static final Pattern	UPLOADED_PATTERN	= Pattern.compile("<strong>.+on\\s+([^<]+)");
+	private static final Pattern	UPLOADED_PATTERN	= Pattern.compile("<strong[^>]*>.+on\\s+([^<]+)");
 
 	private static Logger			log					= LoggerFactory.getLogger(ChannelController.class);
 
