@@ -15,6 +15,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.apache.commons.lang3.StringEscapeUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.socket.TextMessage;
@@ -59,6 +61,8 @@ public class VideosWebsocketController extends TextWebSocketHandler {
 	private final JsonFormatter					jsonFormatter	= new CompactJsonFormatter();
 
 	private final JdomParser					jsonParser		= new JdomParser();
+
+	private static Logger						log				= LoggerFactory.getLogger(VideosWebsocketController.class);
 
 	@Subscribe
 	public void onServerStateChanged(final ServerStateChangeEvent event) throws UnsupportedEncodingException {
@@ -130,8 +134,7 @@ public class VideosWebsocketController extends TextWebSocketHandler {
 			session.sendMessage(new TextMessage(encodedResponse));
 		}
 		catch (final IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			log.warn("Could not send update to WebsocketSession \"" + session.getId() + "\"", e);
 		}
 	}
 

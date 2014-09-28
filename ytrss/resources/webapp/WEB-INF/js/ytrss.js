@@ -1,6 +1,6 @@
 var loadingIndicatorVisible = true;
 
-var countdown = 0;
+var countdownTarget;
 
 function startVideoTableUpdates(tableId, channelId) {
 	var table = $("#" + tableId);
@@ -41,7 +41,7 @@ function updateTable(message, table, channelId) {
 	updateTableContent(table, data.videos);
 	updateTableEmpty(data.videos.length == 0);
 
-	countdown = data.countdown / 1000;
+	countdownTarget = new Date().getTime() + data.countdown;
 }
 
 function hideLoadingIndicator(table) {
@@ -200,7 +200,9 @@ function stream(id) {
 }
 
 function updateCountdown() {
-	if(countdown == 0) {
+	var countdown = (countdownTarget - new Date().getTime()) / 1000;
+	
+	if(countdown <= 0) {
 		$("#countdown").text("Updating...");
 	}
 	else {
@@ -223,8 +225,6 @@ function updateCountdown() {
 		 }
 		 
 		 $("#countdown").text(text);
-		 
-		 countdown--; //FIXME JD auf currentTimeMillis + countdown hinarbeiten statt runterzählen (sonst ungenau)
 	}
 	
 	
