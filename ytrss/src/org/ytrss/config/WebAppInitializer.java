@@ -1,5 +1,6 @@
 package org.ytrss.config;
 
+import javax.servlet.FilterRegistration.Dynamic;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
@@ -30,7 +31,9 @@ public class WebAppInitializer extends AbstractAnnotationConfigDispatcherServlet
 	public void onStartup(final ServletContext servletContext) throws ServletException {
 		super.onStartup(servletContext);
 
-		servletContext.addFilter("springSecurityFilterChain", new DelegatingFilterProxy()).addMappingForUrlPatterns(null, false, "/*");
+		final Dynamic securityFilter = servletContext.addFilter("springSecurityFilterChain", new DelegatingFilterProxy());
+		securityFilter.setAsyncSupported(true);
+		securityFilter.addMappingForUrlPatterns(null, false, "/*");
 	}
 
 	/**

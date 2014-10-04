@@ -6,6 +6,7 @@
 	<filter>
 		<filter-name>GzipFilter</filter-name>
 		<filter-class>org.eclipse.jetty.servlets.GzipFilter</filter-class>
+		<async-supported>true</async-supported>
 		<init-param>
 			<param-name>mimeTypes</param-name>
 			<param-value>text/html,application/json,text/css,application/javascript,font/woff</param-value>
