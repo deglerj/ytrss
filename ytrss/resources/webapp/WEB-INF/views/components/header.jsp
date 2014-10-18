@@ -2,6 +2,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="s" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="y" uri="http://github.com/deglerj/ytrss"%>
 
 <c:set var="req" value="${pageContext.request}" />
 <c:set var="url">${req.requestURL}</c:set>
@@ -22,8 +23,7 @@
 <title>ytrss - ${param.title}</title>
 
 <link href="images/favicon.ico" rel="shortcut icon">
-<link href="css/bootstrap.min.css" rel="stylesheet">
-<link href="css/ytrss-0.1.6.min.css" rel="stylesheet">
+<y:css/>
 <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
 <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
 <!--[if lt IE 9]>
@@ -71,7 +71,7 @@
 				</ul>
 				<ul class="nav navbar-nav navbar-right">
 					<li><a href="https://github.com/deglerj/ytrss"><i
-							class="glyphicon glyphicon-globe"></i> ytrss 0.1.6a</a></li>
+							class="glyphicon glyphicon-globe"></i> ytrss 0.1.7</a></li>
 				</ul>
 			</div>
 		</div>

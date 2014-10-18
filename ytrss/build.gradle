@@ -44,6 +44,7 @@ dependencies {
 	compile 'com.mpatric:mp3agic:+'
 	compile 'net.sourceforge.argo:argo:+'
 	compile 'com.fasterxml.jackson.core:jackson-databind:+'
+	compile 'com.yahoo.platform.yui:yuicompressor:+'
 	
     testCompile 'junit:junit:+'    
 }
