@@ -116,8 +116,15 @@ function hasOptionsCell(video) {
 	
 	//Delete option available?
 	if(video.state != 2 && video.state != 5 && video.state != 8) {
-		
+		return true;
 	}
+	
+	// Download option available?
+	if(video.state == 9 || video.state == 10) {
+		return true;
+	}
+	
+	return false;
 }
 
 function createOptionsCell(video) {
@@ -134,8 +141,13 @@ function createOptionsCell(video) {
 	}
 	
 	//Delete option available?
-	if(video.state != 2 && video.state != 5 && video.state != 8) {
+	if(video.state != 2 && video.state != 5 && video.state != 8 && video.state != 9 && video.state != 10) {
 		options += '<li role="presentation"><a role="menuitem" tabindex="-1" style="text-decoration: none" href="javascript:void(0)" onclick="deleteVideo(' + video.id + ')"><span class="glyphicon glyphicon-trash"></span> Delete</a></li>';
+	}
+	
+	//Force download option available?
+	if(video.state == 9 || video.state == 10) {
+		options += '<li role="presentation"><a role="menuitem" tabindex="-1" style="text-decoration: none" href="javascript:void(0)" onclick="forceDownload(' + video.id + ')"><span class="glyphicon glyphicon-download"></span> Download</a></li>';
 	}
 	
 	options += '</ul></div>';
@@ -233,6 +245,10 @@ function createStateCell(video) {
 
 function resetVideo(id) {
 	$.get('/videos/reset?id=' + id);
+}
+
+function forceDownload(id) {
+	$.get('/videos/forceDownload?id=' + id);
 }
 
 function forceUpdate() {

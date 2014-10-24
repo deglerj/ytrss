@@ -33,6 +33,15 @@ public class VideosController {
 		return "deleted";
 	}
 
+	@RequestMapping(value = "/videos/forceDownload", method = RequestMethod.GET)
+	public @ResponseBody String forceDownload(@RequestParam("id") final long videoID) {
+		final Video video = videoDAO.findById(videoID);
+
+		ripper.download(video);
+
+		return "downloading";
+	}
+
 	@RequestMapping(value = "/videos/forceUpdate", method = RequestMethod.GET)
 	public @ResponseBody String forceUpdate() {
 		if (ripper.isActive()) {
