@@ -4,7 +4,7 @@ defaultTasks 'build'
 
 sourceCompatibility = 1.8 
 
-version = '0.1.6a'
+version = '0.2-DEV'
 
 repositories {
 	mavenCentral()
@@ -32,7 +32,7 @@ dependencies {
 	compile 'org.apache.commons:commons-exec:+'
     compile 'com.googlecode.flyway:flyway-core:+'
     compile 'javax.validation:validation-api:+'
-	compile 'org.hibernate:hibernate-validator:5.+'
+	compile 'org.hibernate:hibernate-validator:5.1.+'
     compile 'org.rometools:rome-modules:+'
 	compile 'org.eclipse.jetty:jetty-webapp:9.2.+'
 	compile 'org.eclipse.jetty:jetty-jsp:9.2.+'

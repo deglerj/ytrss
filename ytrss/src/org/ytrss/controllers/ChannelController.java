@@ -100,7 +100,12 @@ public class ChannelController {
 	private void addCommonModelAttributes(final Channel channel, final Model model) throws UnsupportedEncodingException {
 		model.addAttribute("channels", channelDAO.findAll());
 
-		model.addAttribute("initialVideos", videosSerializer.serialize(videoDAO.findByChannelID(channel.getId())));
+		if (channel.getId() == null) {
+			model.addAttribute("initialVideos", "");
+		}
+		else {
+			model.addAttribute("initialVideos", videosSerializer.serialize(videoDAO.findByChannelID(channel.getId())));
+		}
 	}
 
 	@InitBinder

@@ -165,7 +165,15 @@ function createStateCell(video) {
 	default:
 		state += 'label-default'; break;
 	}
-	state += '">';
+	state += '"';
+	
+	//Excluded or not included? -> Add information to tooltip
+	if(video.state == 9)
+		state += ' title="Video title did match the channel\'s exclude expression"';
+	else if(video.state == 10)
+		state += ' title="Video title did not match the channel\'s include expression"';
+	
+	state += '>';
 
 	//Add icon matching the video's state
 	state += '<i class="glyphicon ';
@@ -183,7 +191,9 @@ function createStateCell(video) {
 	case 7:
 		state += 'glyphicon-ok'; break;
 	case 8:
-		state += 'glyphicon glyphicon-remove'; break;	
+		state += 'glyphicon glyphicon-remove'; break;
+	case 9: case 10:
+		state += 'glyphicon-thumbs-down'; break;
 	}
 	state += '"></i>';
 	
@@ -207,6 +217,9 @@ function createStateCell(video) {
 		state += 'Ready'; break;
 	case 8:
 		state += 'Deleted'; break;
+	case 9: case 10:
+		state += 'Skipped'; break;
+		state += 'Skipped'; break;
 	}
 	state += '</span>';
 	

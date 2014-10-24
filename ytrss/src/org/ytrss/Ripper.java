@@ -158,22 +158,27 @@ public class Ripper {
 
 	}
 
-	private boolean hasBeenRipped(final ContentGridEntry entry) {
-		return videoDAO.findByYoutubeID(entry.getVideoID()) != null;
+	private boolean isExcluded(final ContentGridEntry contentEntry, final Channel channel) {
+		if (Strings.isNullOrEmpty(channel.getExcludeRegex())) {
+			return false;
+		}
+
+		return Pattern.compile(channel.getExcludeRegex(), Pattern.CASE_INSENSITIVE).matcher(contentEntry.getTitle()).matches();
 	}
 
-	private boolean matchesPatterns(final ContentGridEntry contentEntry, final Channel channel) {
-		boolean included = true;
-		if (!Strings.isNullOrEmpty(channel.getIncludeRegex())) {
-			included = Pattern.compile(channel.getIncludeRegex(), Pattern.CASE_INSENSITIVE).matcher(contentEntry.getTitle()).matches();
+	private boolean isIncluded(final ContentGridEntry contentEntry, final Channel channel) {
+		if (Strings.isNullOrEmpty(channel.getIncludeRegex())) {
+			return true;
 		}
 
-		boolean excluded = false;
-		if (!Strings.isNullOrEmpty(channel.getExcludeRegex())) {
-			excluded = Pattern.compile(channel.getExcludeRegex(), Pattern.CASE_INSENSITIVE).matcher(contentEntry.getTitle()).matches();
-		}
+		return Pattern.compile(channel.getIncludeRegex(), Pattern.CASE_INSENSITIVE).matcher(contentEntry.getTitle()).matches();
+	}
 
-		return included && !excluded;
+	private void markAsSkipped(final Channel channel, final ContentGridEntry entry, final VideoState state) {
+		final VideoPage videoPage = openVideoPage(entry);
+		final Video video = createVideo(channel, videoPage);
+		video.setState(state);
+		videoDAO.persist(video);
 	}
 
 	private void onDownloadComplete(final Video video, final File videoFile) {
@@ -230,18 +235,65 @@ public class Ripper {
 
 	private void rip(final Channel channel) {
 		final ChannelPage channelPage = openChannelPage(channel);
-		for (final ContentGridEntry contentEntry : channelPage.getContentGridEntries(channel.getMaxVideos())) {
-			if (!matchesPatterns(contentEntry, channel)) {
+		for (final ContentGridEntry entry : channelPage.getContentGridEntries(channel.getMaxVideos())) {
+			// Get existing video for this entry (or null if it's a new entry)
+			final Video video = videoDAO.findByYoutubeID(entry.getVideoID());
+
+			// New entry? -> Start ripping
+			if (video == null) {
+				ripNew(channel, entry);
 				continue;
 			}
 
-			if (!hasBeenRipped(contentEntry)) {
-				final VideoPage videoPage = openVideoPage(contentEntry);
-				final Video video = createVideo(channel, videoPage);
-				final StreamMapEntry bestEntry = streamMapEntryScorer.findBestEntry(videoPage.getStreamMapEntries());
-				download(video, bestEntry);
+			// Previously processed entry? -> Decide depending on video state
+			switch (video.getState()) {
+				case DELETED:
+				case READY:
+				case DOWNLOADING:
+				case DOWNLOADING_ENQUEUED:
+				case TRANSCODING:
+				case TRANSCODING_ENQUEUED:
+				case EXCLUDED:
+				case NOT_INCLUDED:
+					log.info("Skipping YouTube entry \"{}\" with video state {} (no action necessary)", entry.getTitle(), video.getState());
+					// Nothing to do
+					break;
+
+				case NEW:
+				case DOWNLOADING_FAILED:
+				case TRANSCODING_FAILED:
+					log.info("Starting ripping of previously processed YouTube entry \"{}\" with video state {}", entry.getTitle(), video.getState());
+					ripExisting(entry, video);
+					break;
 			}
 		}
+	}
+
+	private void ripExisting(final ContentGridEntry entry, final Video video) {
+		final VideoPage videoPage = openVideoPage(entry);
+		final StreamMapEntry bestEntry = streamMapEntryScorer.findBestEntry(videoPage.getStreamMapEntries());
+		download(video, bestEntry);
+	}
+
+	private void ripNew(final Channel channel, final ContentGridEntry entry) {
+		if (isExcluded(entry, channel)) {
+			log.info("Skipping new YouTube entry \"{}\": matches the channel's exclude regex", entry.getTitle());
+			markAsSkipped(channel, entry, VideoState.EXCLUDED);
+			return;
+		}
+
+		if (!isIncluded(entry, channel)) {
+			log.info("Skipping new YouTube entry \"{}\": does not match the channel's include regex", entry.getTitle());
+			markAsSkipped(channel, entry, VideoState.NOT_INCLUDED);
+			return;
+		}
+
+		log.info("Starting ripping of new YouTube entry \"{}\"", entry.getTitle());
+
+		final VideoPage videoPage = openVideoPage(entry);
+		final Video video = createVideo(channel, videoPage);
+
+		ripExisting(entry, video);
 	}
 
 	@Scheduled(fixedDelay = 1000)
