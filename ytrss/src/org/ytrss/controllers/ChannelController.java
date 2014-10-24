@@ -1,7 +1,10 @@
 package org.ytrss.controllers;
 
 import java.io.UnsupportedEncodingException;
+import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -18,7 +21,11 @@ import org.ytrss.Ripper;
 import org.ytrss.db.Channel;
 import org.ytrss.db.ChannelDAO;
 import org.ytrss.db.UniqueChannelNameValidator;
+import org.ytrss.db.Video;
 import org.ytrss.db.VideoDAO;
+import org.ytrss.db.VideoState;
+
+import com.google.common.base.Strings;
 
 @Controller
 public class ChannelController {
@@ -37,6 +44,8 @@ public class ChannelController {
 
 	@Autowired
 	private VideoDAO					videoDAO;
+
+	private static Logger				log	= LoggerFactory.getLogger(ChannelController.class);
 
 	@ModelAttribute
 	public Channel channel() {
@@ -76,6 +85,7 @@ public class ChannelController {
 	public String postChannel(@ModelAttribute @Validated final Channel channel, final BindingResult bindingResult, final Model model) throws Exception {
 		if (!bindingResult.hasErrors()) {
 			channelDAO.persist(channel);
+			resetSkippedVideos(channel);
 			ripper.start();
 		}
 
@@ -111,6 +121,51 @@ public class ChannelController {
 	@InitBinder
 	private void initBinder(final WebDataBinder binder) {
 		binder.addValidators(uniqueChannelNameValidator);
+	}
+
+	private void resetExcludedVideos(final Channel channel) {
+		if (Strings.isNullOrEmpty(channel.getExcludeRegex())) {
+			for (final Video video : videoDAO.findByChannelID(channel.getId())) {
+				if (video.getState() == VideoState.EXCLUDED) {
+					log.info("Video \"{}\" is no longer excluded. Starting download...", video.getName());
+					ripper.download(video);
+				}
+			}
+		}
+		else {
+			final Pattern pattern = Pattern.compile(channel.getExcludeRegex(), Pattern.CASE_INSENSITIVE);
+			for (final Video video : videoDAO.findByChannelID(channel.getId())) {
+				if (video.getState() == VideoState.EXCLUDED && !pattern.matcher(video.getName()).matches()) {
+					log.info("Video \"{}\" is no longer excluded. Starting download...", video.getName());
+					ripper.download(video);
+				}
+			}
+		}
+	}
+
+	private void resetNonInludedVideos(final Channel channel) {
+		if (Strings.isNullOrEmpty(channel.getIncludeRegex())) {
+			for (final Video video : videoDAO.findByChannelID(channel.getId())) {
+				if (video.getState() == VideoState.NOT_INCLUDED) {
+					log.info("Video \"{}\" is now included. Starting download...", video.getName());
+					ripper.download(video);
+				}
+			}
+		}
+		else {
+			final Pattern pattern = Pattern.compile(channel.getIncludeRegex(), Pattern.CASE_INSENSITIVE);
+			for (final Video video : videoDAO.findByChannelID(channel.getId())) {
+				if (video.getState() == VideoState.NOT_INCLUDED && pattern.matcher(video.getName()).matches()) {
+					log.info("Video \"{}\" is now included. Starting download...", video.getName());
+					ripper.download(video);
+				}
+			}
+		}
+	}
+
+	private void resetSkippedVideos(final Channel channel) {
+		resetExcludedVideos(channel);
+		resetNonInludedVideos(channel);
 	}
 
 }
