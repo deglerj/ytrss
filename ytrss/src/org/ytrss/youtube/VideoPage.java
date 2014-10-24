@@ -30,11 +30,11 @@ public class VideoPage {
 
 	private static final Pattern	STREAM_MAP_PATTERN	= Pattern.compile("\"url_encoded_fmt_stream_map\"\\s*:\\s*\"([^\"]+)");
 
-	private static final Pattern	TITLE_PATTERN		= Pattern.compile("og:title\" content=\"(.+)\">");
+	private static final Pattern	TITLE_PATTERN		= Pattern.compile("og:title\"\\s*content=\"(.+)\">");
 
-	private static final Pattern	DESCRIPTION_PATTERN	= Pattern.compile("og:description\" content=\"(.+)\">");
+	private static final Pattern	DESCRIPTION_PATTERN	= Pattern.compile("og:description\"\\s*content=\"(.+)\">");
 
-	private static final Pattern	VIDEO_ID_PATTERN	= Pattern.compile("videoId\" content=\"(.+)\">");
+	private static final Pattern	VIDEO_ID_PATTERN	= Pattern.compile("videoId\"\\s*content=\"(.+)\">");
 
 	private static final Pattern	KEY_VALUE_PATTERN	= Pattern.compile("^([^=]+)=(.+)$");
 

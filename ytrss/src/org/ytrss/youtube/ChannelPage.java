@@ -64,7 +64,7 @@ public class ChannelPage {
 
 	private static final Pattern	PROFILE_IMAGE_PATTERN	= Pattern.compile("channel-header-profile-image\"\\s*src=\"([^\"]+)\"", Pattern.MULTILINE);
 
-	private static final Pattern	CHANNEL_ID_PATTERN		= Pattern.compile("meta\\s+itemprop=\"channelId\"\\s+content=\"([^\"]+)\">", Pattern.MULTILINE);
+	private static final Pattern	CHANNEL_ID_PATTERN		= Pattern.compile("meta\\s*itemprop=\"channelId\"\\s*content=\"([^\"]+)\">", Pattern.MULTILINE);
 
 	private static final Logger		log						= LoggerFactory.getLogger(ChannelPage.class);
 
