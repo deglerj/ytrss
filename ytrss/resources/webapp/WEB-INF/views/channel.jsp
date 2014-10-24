@@ -124,6 +124,7 @@
 			
 			<jsp:include page="components/videoTable.jsp">
 				<jsp:param value="${channel.id}" name="channelID"/>
+				<jsp:param value="${initialVideos}" name="initialVideos"/>
 			</jsp:include>
 		</fieldset>
 	</c:if>

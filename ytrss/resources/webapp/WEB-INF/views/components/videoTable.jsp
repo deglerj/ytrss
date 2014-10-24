@@ -13,28 +13,20 @@
 			<th>Options</th>
 		</tr>
 	</thead>
-	<tbody>
-		<tr>
-			<td colspan="5">
-				<div class="progress progress-striped active">
-	                <div style="width: 100%" class="progress-bar">Loading...</div>
-	            </div>
-			</td>
-		</tr>
-	</tbody>
+	<tbody/>
 </table>
 
 <c:if test="${param.channelID == null}">
 	<script type="text/javascript">
 		window.addEventListener("load", function(){
-			startVideoTableUpdates("videoTable", null);	
+			startVideoTableUpdates("videoTable", null, '${param.initialVideos}');	
 		}, false);
 	</script>
 </c:if>
 <c:if test="${param.channelID != null}">
 	<script type="text/javascript">
 		window.addEventListener("load", function(){
-			startVideoTableUpdates("videoTable", ${param.channelID});	
+			startVideoTableUpdates("videoTable", ${param.channelID}, '${param.initialVideos}');	
 		}, false);
 	</script>
 </c:if>

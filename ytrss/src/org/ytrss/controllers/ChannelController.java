@@ -1,5 +1,7 @@
 package org.ytrss.controllers;
 
+import java.io.UnsupportedEncodingException;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -11,10 +13,12 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.ytrss.JsonVideosSerializer;
 import org.ytrss.Ripper;
 import org.ytrss.db.Channel;
 import org.ytrss.db.ChannelDAO;
 import org.ytrss.db.UniqueChannelNameValidator;
+import org.ytrss.db.VideoDAO;
 
 @Controller
 public class ChannelController {
@@ -27,6 +31,12 @@ public class ChannelController {
 
 	@Autowired
 	private UniqueChannelNameValidator	uniqueChannelNameValidator;
+
+	@Autowired
+	private JsonVideosSerializer		videosSerializer;
+
+	@Autowired
+	private VideoDAO					videoDAO;
 
 	@ModelAttribute
 	public Channel channel() {
@@ -41,7 +51,7 @@ public class ChannelController {
 	}
 
 	@RequestMapping(value = "/channel/{id}", method = RequestMethod.GET)
-	public String getChannel(@PathVariable(value = "id") final long id, final Model model) {
+	public String getChannel(@PathVariable(value = "id") final long id, final Model model) throws Exception {
 		final Channel channel = channelDAO.findById(id);
 		model.addAttribute("channel", channel);
 
@@ -51,7 +61,7 @@ public class ChannelController {
 	}
 
 	@RequestMapping(value = "/channel", method = RequestMethod.GET)
-	public String getNewChannel(final Model model) {
+	public String getNewChannel(final Model model) throws Exception {
 		final Channel channel = new Channel();
 		channel.setMaxVideos(30);
 
@@ -63,7 +73,7 @@ public class ChannelController {
 	}
 
 	@RequestMapping(value = "/channel/{id}", method = RequestMethod.POST)
-	public String postChannel(@ModelAttribute @Validated final Channel channel, final BindingResult bindingResult, final Model model) {
+	public String postChannel(@ModelAttribute @Validated final Channel channel, final BindingResult bindingResult, final Model model) throws Exception {
 		if (!bindingResult.hasErrors()) {
 			channelDAO.persist(channel);
 			ripper.start();
@@ -75,7 +85,7 @@ public class ChannelController {
 	}
 
 	@RequestMapping(value = "/channel", method = RequestMethod.POST)
-	public String postNewChannel(@ModelAttribute @Validated final Channel channel, final BindingResult bindingResult, final Model model) {
+	public String postNewChannel(@ModelAttribute @Validated final Channel channel, final BindingResult bindingResult, final Model model) throws Exception {
 		if (bindingResult.hasErrors()) {
 			addCommonModelAttributes(channel, model);
 			return "channel";
@@ -87,8 +97,10 @@ public class ChannelController {
 		return "redirect:/channel/" + channel.getId();
 	}
 
-	private void addCommonModelAttributes(final Channel channel, final Model model) {
+	private void addCommonModelAttributes(final Channel channel, final Model model) throws UnsupportedEncodingException {
 		model.addAttribute("channels", channelDAO.findAll());
+
+		model.addAttribute("initialVideos", videosSerializer.serialize(videoDAO.findByChannelID(channel.getId())));
 	}
 
 	@InitBinder

@@ -1,8 +1,6 @@
-var loadingIndicatorVisible = true;
-
 var countdownTarget;
 
-function startVideoTableUpdates(tableId, channelId) {
+function startVideoTableUpdates(tableId, channelId, initialVideos) {
 	var table = $("#" + tableId);
 	
 	//Insert elements "next update in" and options after table
@@ -10,6 +8,8 @@ function startVideoTableUpdates(tableId, channelId) {
 	//Insert element for "empty table" after table
 	$('<div class="text-muted" style="padding-left: 10px; margin-bottom: 20px; display: none;" id="tableEmpty">No videos available</div>').insertAfter(table);
 	
+	
+	updateTable(initialVideos, table, channelId);
 	
 	var sock = new SockJS('/videos');
    
@@ -27,17 +27,11 @@ function startVideoTableUpdates(tableId, channelId) {
 	
 	sock.onmessage = function(message) {
 		updateTable(message.data, table, channelId);
-	};
-		
+	};	
 }
 
 function updateTable(message, table, channelId) {
 	var data = $.parseJSON(message);
-	
-	if(loadingIndicatorVisible) {
-		hideLoadingIndicator(table);
-		loadingIndicatorVisible = false;
-	}
 	
 	//Update displayed data
 	updateTableRowCount(table, data.videos.length);
@@ -45,10 +39,6 @@ function updateTable(message, table, channelId) {
 	updateTableEmpty(data.videos.length == 0);
 
 	countdownTarget = new Date().getTime() + data.countdown;
-}
-
-function hideLoadingIndicator(table) {
-	$(table).find("tr").last().remove();
 }
 
 function updateTableEmpty(empty) {
@@ -247,6 +237,11 @@ function stream(id) {
 }
 
 function updateCountdown() {
+	//Ignore if countdown target has not been initialized yet
+	if(countdownTarget == null) {
+		return;
+	}
+	
 	var countdown = (countdownTarget - new Date().getTime()) / 1000;
 	
 	if(countdown <= 0) {
