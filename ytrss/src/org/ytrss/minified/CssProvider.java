@@ -1,17 +1,11 @@
 package org.ytrss.minified;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
-import com.google.common.base.Throwables;
-import com.yahoo.platform.yui.compressor.CssCompressor;
 
 @Component
 public class CssProvider extends BaseMinifyProvider {
@@ -27,22 +21,21 @@ public class CssProvider extends BaseMinifyProvider {
 	protected String minify(final String content) {
 		log.info("Compressing CSS");
 
-		final StringReader reader = new StringReader(content);
-		final StringWriter writer = new StringWriter();
-		try {
-			final CssCompressor compressor = new CssCompressor(reader);
-			compressor.compress(writer, -1);
-		}
-		catch (final IOException e) {
-			// This should never happen since we're not using any file resources
-			throw Throwables.propagate(e);
-		}
+		// Remove comments
+		String minified = Pattern.compile("(?:\\/\\*(?:[\\s\\S]*?)\\*\\/)|(?:([\\s;])+\\/\\/(?:.*)$)", Pattern.MULTILINE).matcher(content).replaceAll("");
 
-		IOUtils.closeQuietly(reader);
-		IOUtils.closeQuietly(writer);
+		// Remove line breaks
+		minified = minified.replaceAll("\\n", "");
 
-		log.info("CSS compressed");
+		// Remove multiple whitespaces
+		minified = minified.replaceAll("\\s+", " ");
 
-		return writer.toString();
+		// Replace " : " with ":" (and similar cases)
+		minified = minified.replaceAll("\\s*([:,{};])\\s*", "$1");
+
+		// Replace ";}" (last attribute) with "}"
+		minified = minified.replaceAll(";}", "}");
+
+		return minified;
 	}
 }

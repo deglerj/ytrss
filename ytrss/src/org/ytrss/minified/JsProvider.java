@@ -1,23 +1,11 @@
 package org.ytrss.minified;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.io.Reader;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.io.Writer;
 import java.util.Arrays;
+import java.util.regex.Pattern;
 
-import org.apache.commons.io.IOUtils;
-import org.mozilla.javascript.tools.ToolErrorReporter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
-import com.google.common.base.Throwables;
-import com.yahoo.platform.yui.compressor.JavaScriptCompressor;
 
 @Component
 public class JsProvider extends BaseMinifyProvider {
@@ -34,28 +22,15 @@ public class JsProvider extends BaseMinifyProvider {
 	protected String minify(final String content) {
 		log.info("Compressing JavaScript");
 
-		final Reader reader = new StringReader(content);
-		final Writer writer = new StringWriter();
+		// Remove comments
+		String minified = Pattern.compile("(?:\\/\\*(?:[\\s\\S]*?)\\*\\/)|(?:([\\s;])+\\/\\/(?:.*)$)", Pattern.MULTILINE).matcher(content).replaceAll("");
 
-		final OutputStream errors = new ByteArrayOutputStream();
-		final PrintStream errorsStream = new PrintStream(errors);
+		// Remove whitespace at line start
+		minified = Pattern.compile("^\\s+", Pattern.MULTILINE).matcher(minified).replaceAll("");
 
-		try {
-			final JavaScriptCompressor compressor = new JavaScriptCompressor(reader, new ToolErrorReporter(false, errorsStream));
-			compressor.compress(writer, -1, false, false, false, false);
-		}
-		catch (final IOException e) {
-			// This should never happen since we're not using any file resources
-			throw Throwables.propagate(e);
-		}
+		// Remove line break where safe
+		minified = Pattern.compile(";\\s*\\n", Pattern.MULTILINE).matcher(minified).replaceAll(";");
 
-		IOUtils.closeQuietly(reader);
-		IOUtils.closeQuietly(writer);
-		IOUtils.closeQuietly(errorsStream);
-		IOUtils.closeQuietly(errors);
-
-		log.info("JavaScript compressed");
-
-		return writer.toString();
+		return minified;
 	}
 }

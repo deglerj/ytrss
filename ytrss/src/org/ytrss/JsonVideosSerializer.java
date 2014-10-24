@@ -75,8 +75,9 @@ public class JsonVideosSerializer {
 
 	private JsonNode string(final String string, final boolean escapeHtml) {
 		final String nonNull = Strings.nullToEmpty(string);
+
 		if (escapeHtml) {
-			return JsonNodeFactories.string(StringEscapeUtils.escapeHtml4(nonNull));
+			return JsonNodeFactories.string(StringEscapeUtils.escapeHtml4(nonNull).replace("'", "&#39;"));
 		}
 		else {
 			return JsonNodeFactories.string(nonNull);
