@@ -28,7 +28,7 @@ public class VideoPage {
 
 	private final String			source;
 
-	private static final Pattern	STREAM_MAP_PATTERN	= Pattern.compile("\"url_encoded_fmt_stream_map\": \"([^\"]+)");
+	private static final Pattern	STREAM_MAP_PATTERN	= Pattern.compile("\"url_encoded_fmt_stream_map\"\\s*:\\s*\"([^\"]+)");
 
 	private static final Pattern	TITLE_PATTERN		= Pattern.compile("og:title\" content=\"(.+)\">");
 
