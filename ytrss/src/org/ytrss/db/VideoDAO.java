@@ -5,6 +5,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Types;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -17,6 +18,7 @@ import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
 import com.google.common.collect.Iterables;
 import com.google.common.eventbus.EventBus;
@@ -146,21 +148,21 @@ public class VideoDAO {
 	private JdbcTemplate			jdbcTemplate;
 
 	private final RowMapper<Video>	rowMapper	= (rs, rowNum) -> {
-		final Video video = new Video();
-		video.setId(rs.getLong("id"));
-		video.setChannelID(rs.getLong("channel_fk"));
-		video.setYoutubeID(rs.getString("yout_id"));
-		video.setName(rs.getString("name"));
-		video.setUploaded(rs.getDate("uploaded"));
-		video.setDiscovered(rs.getTimestamp("discovered"));
-		video.setState(VideoState.values()[rs.getInt("state")]);
-		video.setVideoFile(rs.getString("video_file"));
-		video.setMp3File(rs.getString("mp3_file"));
-		video.setErrorMessage(rs.getString("error_message"));
-		video.setSecurityToken(rs.getString("security_token"));
-		video.setDescription(rs.getString("description"));
-		return video;
-	};
+													final Video video = new Video();
+													video.setId(rs.getLong("id"));
+													video.setChannelID(rs.getLong("channel_fk"));
+													video.setYoutubeID(rs.getString("yout_id"));
+													video.setName(rs.getString("name"));
+													video.setUploaded(rs.getDate("uploaded"));
+													video.setDiscovered(rs.getTimestamp("discovered"));
+													video.setState(VideoState.values()[rs.getInt("state")]);
+													video.setVideoFile(rs.getString("video_file"));
+													video.setMp3File(rs.getString("mp3_file"));
+													video.setErrorMessage(rs.getString("error_message"));
+													video.setSecurityToken(rs.getString("security_token"));
+													video.setDescription(rs.getString("description"));
+													return video;
+												};
 
 	@Autowired
 	private EventBus				eventBus;
@@ -184,6 +186,20 @@ public class VideoDAO {
 	@Transactional(readOnly = true)
 	public Video findById(final long id) {
 		return jdbcTemplate.queryForObject("SELECT * FROM \"VIDEO\" WHERE \"ID\" = ?", rowMapper, id);
+	}
+
+	@Transactional(readOnly = true)
+	public List<Video> findByState(final VideoState... states) {
+		if (states.length == 0) {
+			return findAll();
+		}
+
+		final Iterable<Integer> ordinals = Iterables.transform(Arrays.asList(states), input -> input.ordinal());
+
+		String query = "SELECT * FROM \"VIDEO\" WHERE \"STATE\" IN (";
+		query += Joiner.on(", ").join(ordinals);
+		query += ") ORDER BY \"UPLOADED\" DESC, \"DISCOVERED\" DESC";
+		return jdbcTemplate.query(query, rowMapper);
 	}
 
 	@Transactional(readOnly = true)

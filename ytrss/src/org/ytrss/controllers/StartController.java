@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.ytrss.JsonVideosSerializer;
 import org.ytrss.db.ChannelDAO;
 import org.ytrss.db.VideoDAO;
+import org.ytrss.db.VideoState;
 
 @Controller
 public class StartController {
@@ -25,7 +26,10 @@ public class StartController {
 	public String getStart(final Model model) throws Exception {
 		model.addAttribute("channels", channelDAO.findAll());
 
-		model.addAttribute("initialVideos", videosSerializer.serialize(videoDAO.findAll()));
+		// All videos except with state "excluded" and "not included"
+		model.addAttribute("initialVideos", videosSerializer.serialize(videoDAO.findByState(VideoState.DELETED, VideoState.DOWNLOADING,
+				VideoState.DOWNLOADING_ENQUEUED, VideoState.DOWNLOADING_FAILED, VideoState.NEW, VideoState.READY, VideoState.TRANSCODING,
+				VideoState.TRANSCODING_ENQUEUED, VideoState.TRANSCODING_FAILED)));
 
 		return "start";
 	}

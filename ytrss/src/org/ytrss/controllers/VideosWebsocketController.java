@@ -19,6 +19,7 @@ import org.ytrss.JsonVideosSerializer;
 import org.ytrss.db.ServerStateChangeEvent;
 import org.ytrss.db.Video;
 import org.ytrss.db.VideoDAO;
+import org.ytrss.db.VideoState;
 
 import argo.jdom.JdomParser;
 import argo.jdom.JsonRootNode;
@@ -75,7 +76,10 @@ public class VideosWebsocketController extends TextWebSocketHandler {
 	}
 
 	private void sendUpdate(final WebSocketSession session, final Long channelID) throws UnsupportedEncodingException {
-		final List<Video> videos = channelID == null ? videoDAO.findAll() : videoDAO.findByChannelID(channelID);
+		// Channel ID? -> All videos for channel. No channel ID? -> All videos except with state "excluded" and "not included"
+		final List<Video> videos = channelID == null ? videoDAO.findByState(VideoState.DELETED, VideoState.DOWNLOADING, VideoState.DOWNLOADING_ENQUEUED,
+				VideoState.DOWNLOADING_FAILED, VideoState.NEW, VideoState.READY, VideoState.TRANSCODING, VideoState.TRANSCODING_ENQUEUED,
+				VideoState.TRANSCODING_FAILED) : videoDAO.findByChannelID(channelID);
 
 		final String serialized = videosSerializer.serialize(videos);
 
