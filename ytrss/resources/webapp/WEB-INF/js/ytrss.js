@@ -35,7 +35,7 @@ function updateTable(message, table, channelId) {
 	
 	//Update displayed data
 	updateTableRowCount(table, data.videos.length);
-	updateTableContent(table, data.videos);
+	updateTableContent(table, data.videos, channelId);
 	updateTableEmpty(data.videos.length == 0);
 
 	countdownTarget = new Date().getTime() + data.countdown;
@@ -76,8 +76,8 @@ function updateTableRowCount(table, rows) {
 	
 }
 
-function updateTableContent(table, videos) {
-	var showChannels = window.showChannels != false; //May be null
+function updateTableContent(table, videos, channelId) {
+	var showChannels = channelId == null;
 
 	//Loop through table rows and videos and update each table cell
 	$(table).find("tbody").find("tr").each(function(i) {
