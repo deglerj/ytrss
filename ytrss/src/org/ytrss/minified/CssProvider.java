@@ -14,7 +14,7 @@ public class CssProvider extends BaseMinifyProvider {
 
 	@Override
 	protected Iterable<String> getFiles() {
-		return Arrays.asList("/webapp/WEB-INF/css/bootstrap.css", "/webapp/WEB-INF/css/ytrss.css");
+		return Arrays.asList("/webapp/WEB-INF/css/bootstrap.min.css", "/webapp/WEB-INF/css/ytrss.css");
 	}
 
 	@Override

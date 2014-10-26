@@ -14,8 +14,8 @@ public class JsProvider extends BaseMinifyProvider {
 
 	@Override
 	protected Iterable<String> getFiles() {
-		return Arrays.asList("/webapp/WEB-INF/js/jquery-2.1.1.js", "/webapp/WEB-INF/js/bootstrap.js", "/webapp/WEB-INF/js/ytrss.js",
-				"/webapp/WEB-INF/js/sockjs-0.3.4.js");
+		return Arrays.asList("/webapp/WEB-INF/js/jquery-2.1.1.min.js", "/webapp/WEB-INF/js/bootstrap.min.js", "/webapp/WEB-INF/js/sockjs-0.3.4.min.js",
+				"/webapp/WEB-INF/js/ytrss.js");
 	}
 
 	@Override
