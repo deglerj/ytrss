@@ -41,7 +41,12 @@ public class JettyConfiguration {
 	 */
 	@Bean(initMethod = "start", destroyMethod = "stop")
 	public Server jettyServer() throws IOException {
+		// Use non-JDK compiler (makes ytrss work on systems without a JDK)
 		System.setProperty("org.apache.jasper.compiler.disablejsr199", "true");
+
+		// Make Jetty use UTF-8
+		System.setProperty("org.eclipse.jetty.util.URI.charset", "UTF-8");
+		System.setProperty("org.eclipse.jetty.util.UrlEncoding.charset", "UTF-8");
 
 		/* Create the server. */
 		final Server server = new Server();

@@ -47,11 +47,7 @@ public class JsonVideosSerializer {
 		responseFields.add(lastUpdateField);
 
 		final JsonRootNode jsonResponse = object(responseFields);
-		final String response = jsonFormatter.format(jsonResponse);
-		// Encode as "ISO-8859-1" to avoid problems with special characters
-		final String encodedResponse = new String(response.getBytes("UTF-8"), "ISO-8859-1");
-
-		return encodedResponse;
+		return jsonFormatter.format(jsonResponse);
 	}
 
 	private JsonNode createVideoNode(final Video video) {

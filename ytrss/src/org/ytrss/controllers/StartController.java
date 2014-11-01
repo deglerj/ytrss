@@ -24,6 +24,7 @@ public class StartController {
 
 	@RequestMapping(value = "/", method = RequestMethod.GET)
 	public String getStart(final Model model) throws Exception {
+
 		model.addAttribute("channels", channelDAO.findAll());
 
 		// All videos except with state "excluded" and "not included"
