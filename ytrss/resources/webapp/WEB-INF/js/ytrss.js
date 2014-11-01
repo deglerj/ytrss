@@ -168,12 +168,22 @@ function createStateCell(video) {
 	//Add CSS style matching the video's state
 	state += '<span class="label table-state-label ';
 	switch(video.state) {
-	case 0: case 2: case 5:
+	//New or enqueued? -> Grey blue
+	case 0: case 1: case 4:
+		state += 'label-grey-blue'; break;
+	//Downloading or transcoding? -> Blue
+	case 2: case 5:
 		state += 'label-info'; break;
+	//Download or transcoding failed? -> Red
 	case 3: case 6:
 		state += 'label-danger'; break;
+	//Ready? -> Green
 	case 7:
 		state += 'label-success'; break;
+	//Deleted, excluded or not included? -> Gray
+	case 8: case 9: case 10:
+		state += 'label-default'; break;
+	//Anything else (should not happen, switch covers all states) -> Gray
 	default:
 		state += 'label-default'; break;
 	}
