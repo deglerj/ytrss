@@ -16,6 +16,7 @@ import java.util.regex.Pattern;
 import org.apache.commons.lang3.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.ytrss.HTML;
 import org.ytrss.Patterns;
 import org.ytrss.controllers.ChannelController;
 
@@ -32,7 +33,7 @@ public class VideoPage {
 
 	private static final Pattern	TITLE_PATTERN		= Pattern.compile("og:title\"\\s*content=\"(.+)\">");
 
-	private static final Pattern	DESCRIPTION_PATTERN	= Pattern.compile("og:description\"\\s*content=\"(.+)\">");
+	private static final Pattern	DESCRIPTION_PATTERN	= Pattern.compile("id=\"eow-description\"\\s*>\\s*(.+)<\\/p>[\\s|\\n]*<\\/div>", Pattern.MULTILINE);
 
 	private static final Pattern	VIDEO_ID_PATTERN	= Pattern.compile("videoId\"\\s*content=\"(.+)\">");
 
@@ -48,7 +49,9 @@ public class VideoPage {
 	}
 
 	public String getDescription() {
-		return getFromPattern(VideoPage.DESCRIPTION_PATTERN);
+		final String description = getFromPattern(VideoPage.DESCRIPTION_PATTERN);
+		final String plainDescription = HTML.toFormattedPlainText(description);
+		return plainDescription;
 	}
 
 	public List<StreamMapEntry> getStreamMapEntries() {

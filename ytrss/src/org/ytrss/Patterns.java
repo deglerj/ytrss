@@ -16,4 +16,8 @@ public class Patterns {
 		}
 	}
 
+	private Patterns() {
+		// Static utility class, no instances allowed
+	}
+
 }
