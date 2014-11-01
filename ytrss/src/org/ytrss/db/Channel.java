@@ -31,6 +31,8 @@ public class Channel {
 	@Min(1)
 	private Integer	maxVideos;
 
+	private boolean	hidden;
+
 	@Override
 	public boolean equals(final Object obj) {
 		if (this == obj) {
@@ -99,8 +101,16 @@ public class Channel {
 		return result;
 	}
 
+	public boolean isHidden() {
+		return hidden;
+	}
+
 	public void setExcludeRegex(final String excludeRegex) {
 		this.excludeRegex = excludeRegex;
+	}
+
+	public void setHidden(final boolean hidden) {
+		this.hidden = hidden;
 	}
 
 	public void setId(final Long id) {
@@ -125,6 +135,11 @@ public class Channel {
 
 	public void setUrl(final String url) {
 		this.url = URLs.cleanUpURL(url);
+	}
+
+	@Override
+	public String toString() {
+		return "Channel [id=" + id + ", name=" + name + "]";
 	}
 
 }

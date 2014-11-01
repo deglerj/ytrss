@@ -65,7 +65,10 @@
 							<li><a href="channel"><i
 									class="glyphicon glyphicon-plus"></i>Add</a></li>
 						</ul></li>
-					<li class="${param.active == 3 ? 'active' : ''}"><a
+					<li class="${param.active == 3 ? 'active' : ''}">
+						<a href="singles"><i class="lp-icon"></i>Singles</a>
+					</li>
+					<li class="${param.active == 4 ? 'active' : ''}"><a
 						href="settings"><i class="glyphicon glyphicon-cog"></i>
 							Settings</a></li>
 				</ul>

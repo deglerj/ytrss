@@ -36,7 +36,7 @@ public class ChannelDAO {
 		public PreparedStatement createPreparedStatement(final Connection con) throws SQLException {
 			final PreparedStatement stmt = con
 					.prepareStatement(
-							"INSERT INTO \"CHANNEL\" (\"NAME\", \"URL\", \"EXCLUDE_REGEX\", \"INCLUDE_REGEX\", \"SECURITY_TOKEN\", \"MAX_VIDEOS\") VALUES (?, ?, ?, ?, ?, ?)",
+							"INSERT INTO \"CHANNEL\" (\"NAME\", \"URL\", \"EXCLUDE_REGEX\", \"INCLUDE_REGEX\", \"SECURITY_TOKEN\", \"MAX_VIDEOS\", \"HIDDEN\") VALUES (?, ?, ?, ?, ?, ?, ?)",
 							Statement.RETURN_GENERATED_KEYS);
 
 			stmt.setString(1, channel.getName());
@@ -64,6 +64,7 @@ public class ChannelDAO {
 			}
 
 			stmt.setInt(6, channel.getMaxVideos());
+			stmt.setBoolean(7, channel.isHidden());
 
 			return stmt;
 		}
@@ -81,7 +82,7 @@ public class ChannelDAO {
 		@Override
 		public PreparedStatement createPreparedStatement(final Connection con) throws SQLException {
 			final PreparedStatement stmt = con
-					.prepareStatement("UPDATE \"CHANNEL\" SET \"NAME\" = ?, \"URL\" = ?, \"EXCLUDE_REGEX\" = ?, \"INCLUDE_REGEX\" = ?, \"MAX_VIDEOS\" = ? WHERE \"ID\" = ?");
+					.prepareStatement("UPDATE \"CHANNEL\" SET \"NAME\" = ?, \"URL\" = ?, \"EXCLUDE_REGEX\" = ?, \"INCLUDE_REGEX\" = ?, \"MAX_VIDEOS\" = ?, \"HIDDEN\" = ? WHERE \"ID\" = ?");
 
 			stmt.setString(1, channel.getName());
 			stmt.setString(2, channel.getUrl());
@@ -102,7 +103,9 @@ public class ChannelDAO {
 
 			stmt.setInt(5, channel.getMaxVideos());
 
-			stmt.setLong(6, channel.getId());
+			stmt.setBoolean(6, channel.isHidden());
+
+			stmt.setLong(7, channel.getId());
 
 			return stmt;
 		}
@@ -124,6 +127,7 @@ public class ChannelDAO {
 		channel.setIncludeRegex(rs.getString("include_regex"));
 		channel.setSecurityToken(rs.getString("security_token"));
 		channel.setMaxVideos(rs.getInt("max_videos"));
+		channel.setHidden(rs.getBoolean("hidden"));
 		return channel;
 	};
 
@@ -139,12 +143,17 @@ public class ChannelDAO {
 
 	@Transactional(readOnly = true)
 	public List<Channel> findAll() {
-		return jdbcTemplate.query("SELECT * FROM \"CHANNEL\" ORDER BY \"NAME\"", rowMapper);
+		return jdbcTemplate.query("SELECT * FROM \"CHANNEL\" WHERE \"HIDDEN\" = FALSE ORDER BY \"NAME\"", rowMapper);
 	}
 
 	@Transactional(readOnly = true)
 	public Channel findById(final long id) {
 		return jdbcTemplate.queryForObject("SELECT * FROM \"CHANNEL\" WHERE \"ID\" = ?", rowMapper, id);
+	}
+
+	@Transactional(readOnly = true)
+	public Channel findByName(final String name) {
+		return jdbcTemplate.queryForObject("SELECT * FROM \"CHANNEL\" WHERE \"NAME\" = ?", rowMapper, name);
 	}
 
 	public void persist(final Channel channel) {

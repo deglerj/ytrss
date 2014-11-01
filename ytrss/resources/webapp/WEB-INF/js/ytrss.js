@@ -88,7 +88,12 @@ function updateTableContent(table, videos, channelId) {
 
 		//Show channel name? Add link to channel to first cell
 		if(showChannels){
-			$(tds[1]).html('<a href="channel/' + video.channelID + '">' + video.channelName + '</a>');
+			if(video.channelName == 'Singles') {
+				$(tds[1]).html('<a href="singles">Singles</a>');
+			}
+			else {
+				$(tds[1]).html('<a href="channel/' + video.channelID + '">' + video.channelName + '</a>');
+			}
 		}
 		
 		//Add link to YouTube video to next cell

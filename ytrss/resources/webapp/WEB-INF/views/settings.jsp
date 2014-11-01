@@ -6,7 +6,7 @@
 
 <jsp:include page="components/header.jsp">
 	<jsp:param value="Settings" name="title"/>
-	<jsp:param value="3" name="active"/>
+	<jsp:param value="4" name="active"/>
 </jsp:include>
 
 <div class="container">

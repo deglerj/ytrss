@@ -1,7 +1,6 @@
 package org.ytrss;
 
 import java.io.File;
-import java.sql.Timestamp;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
@@ -118,19 +117,6 @@ public class Ripper {
 		});
 	}
 
-	private Video createVideo(final Channel channel, final VideoPage videoPage) {
-		final Video video = new Video();
-		video.setChannelID(channel.getId());
-		video.setDiscovered(new Timestamp(System.currentTimeMillis()));
-		video.setName(videoPage.getTitle());
-		video.setState(VideoState.NEW);
-		video.setYoutubeID(videoPage.getVideoID());
-		video.setUploaded(videoPage.getUploaded());
-		video.setDescription(videoPage.getDescription());
-		videoDAO.persist(video);
-		return video;
-	}
-
 	private boolean delayExpired() {
 		if (lastExecuted == null) {
 			return true;
@@ -176,7 +162,7 @@ public class Ripper {
 
 	private void markAsSkipped(final Channel channel, final ContentGridEntry entry, final VideoState state) {
 		final VideoPage videoPage = openVideoPage(entry);
-		final Video video = createVideo(channel, videoPage);
+		final Video video = videoDAO.create(channel, videoPage);
 		video.setState(state);
 		videoDAO.persist(video);
 	}
@@ -291,7 +277,7 @@ public class Ripper {
 		log.info("Starting ripping of new YouTube entry \"{}\"", entry.getTitle());
 
 		final VideoPage videoPage = openVideoPage(entry);
-		final Video video = createVideo(channel, videoPage);
+		final Video video = videoDAO.create(channel, videoPage);
 
 		ripExisting(entry, video);
 	}

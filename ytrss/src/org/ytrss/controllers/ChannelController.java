@@ -62,6 +62,12 @@ public class ChannelController {
 	@RequestMapping(value = "/channel/{id}", method = RequestMethod.GET)
 	public String getChannel(@PathVariable(value = "id") final long id, final Model model) throws Exception {
 		final Channel channel = channelDAO.findById(id);
+
+		if (channel.isHidden()) {
+			log.warn("User tried to open hidden channel \"{}\"", channel);
+			return "redirect:/";
+		}
+
 		model.addAttribute("channel", channel);
 
 		addCommonModelAttributes(channel, model);

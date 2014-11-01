@@ -3,7 +3,7 @@ body {
 	padding-top: 70px;
 }
 
-.spread-nav .glyphicon {
+.spread-nav .glyphicon, .spread-nav .lp-icon {
 	margin-right: 5px;
 }
 
@@ -57,4 +57,13 @@ body {
 
 .label-grey-blue {
 	background-color:#5B7C87;
+}
+
+.lp-icon {
+	width: 13px;
+	height: 13px;
+	background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAA0AAAANCAYAAABy6+R8AAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAYdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjAuM4zml1AAAAC8SURBVChThZLtDYJAEETJtYNdQE0m/McasBnpAOxEO+B8cwyEjzO8ZLOZ3RmOE4stMcZA1dM0PahOXVpzW/ZguFFvDCeYj1Rp64wDX3uyaL8G0QGRPeEIvpEWFNI772D5ohp1j7bUejVddsXGdHF1dJ8WRn6FntYJdKMA/e7eeJVAdxq21gn01Untvzv1lO60Cwhm1fI0/SqX4Bto84dGlNTVd/rIlwILDmZPZD6cAgvsj/+9lqo0twWK4gfzIQ0iwZWeLAAAAABJRU5ErkJggg==');
+	display: inline-block;
+	position: relative;
+	top: 2px;
 }

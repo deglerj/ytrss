@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.Arrays;
 import java.util.List;
@@ -17,6 +18,7 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.ytrss.youtube.VideoPage;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Strings;
@@ -148,24 +150,37 @@ public class VideoDAO {
 	private JdbcTemplate			jdbcTemplate;
 
 	private final RowMapper<Video>	rowMapper	= (rs, rowNum) -> {
-													final Video video = new Video();
-													video.setId(rs.getLong("id"));
-													video.setChannelID(rs.getLong("channel_fk"));
-													video.setYoutubeID(rs.getString("yout_id"));
-													video.setName(rs.getString("name"));
-													video.setUploaded(rs.getDate("uploaded"));
-													video.setDiscovered(rs.getTimestamp("discovered"));
-													video.setState(VideoState.values()[rs.getInt("state")]);
-													video.setVideoFile(rs.getString("video_file"));
-													video.setMp3File(rs.getString("mp3_file"));
-													video.setErrorMessage(rs.getString("error_message"));
-													video.setSecurityToken(rs.getString("security_token"));
-													video.setDescription(rs.getString("description"));
-													return video;
-												};
+		final Video video = new Video();
+		video.setId(rs.getLong("id"));
+		video.setChannelID(rs.getLong("channel_fk"));
+		video.setYoutubeID(rs.getString("yout_id"));
+		video.setName(rs.getString("name"));
+		video.setUploaded(rs.getDate("uploaded"));
+		video.setDiscovered(rs.getTimestamp("discovered"));
+		video.setState(VideoState.values()[rs.getInt("state")]);
+		video.setVideoFile(rs.getString("video_file"));
+		video.setMp3File(rs.getString("mp3_file"));
+		video.setErrorMessage(rs.getString("error_message"));
+		video.setSecurityToken(rs.getString("security_token"));
+		video.setDescription(rs.getString("description"));
+		return video;
+	};
 
 	@Autowired
 	private EventBus				eventBus;
+
+	public Video create(final Channel channel, final VideoPage videoPage) {
+		final Video video = new Video();
+		video.setChannelID(channel.getId());
+		video.setDiscovered(new Timestamp(System.currentTimeMillis()));
+		video.setName(videoPage.getTitle());
+		video.setState(VideoState.NEW);
+		video.setYoutubeID(videoPage.getVideoID());
+		video.setUploaded(videoPage.getUploaded());
+		video.setDescription(videoPage.getDescription());
+		persist(video);
+		return video;
+	}
 
 	public void delete(final long id) {
 		jdbcTemplate.update("DELETE FROM \"VIDEO\" WHERE \"ID\" = ? ", id);

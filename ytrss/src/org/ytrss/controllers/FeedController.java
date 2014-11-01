@@ -28,6 +28,7 @@ import org.ytrss.db.VideoDAO;
 import org.ytrss.db.VideoState;
 import org.ytrss.youtube.ChannelPage;
 
+import com.google.common.base.Function;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
@@ -61,24 +62,70 @@ public class FeedController {
 	@RequestMapping(value = "/channel/{id}/feed", method = RequestMethod.GET)
 	public void getFeed(@PathVariable("id") final long id, @RequestParam("token") final String token, @RequestParam("type") final String type,
 			final HttpServletResponse response, final HttpServletRequest request) {
-
-		checkArgument("rss".equals(type) || "atom".equals(type), "Type must be \"rss\" or \"atom\"");
-
 		final Channel channel = channelDAO.findById(id);
-		checkArgument(token.equals(channel.getSecurityToken()), "Token mismatch");
+		getFeed(channel, token, type, response, request, feed -> {
+			addChannelPageThumbnail(channel, feed);
+			return null;
+		});
+	}
 
-		final String requestURL = request.getRequestURL().toString();
+	@RequestMapping(value = "/singles/feed", method = RequestMethod.GET)
+	public void getSinglesFeed(@RequestParam("token") final String token, @RequestParam("type") final String type, final HttpServletResponse response,
+			final HttpServletRequest request) {
+		final Channel channel = channelDAO.findByName("Singles");
+		getFeed(channel, token, type, response, request, feed -> {
+			addSinglesThumbnail(feed, request);
+			return null;
+		});
+	}
 
-		final SyndFeed feed = generateFeed(channel, requestURL, type);
-		setHeaders(channel, type, response);
-
+	@SuppressWarnings("unchecked")
+	private void addChannelPageThumbnail(final Channel channel, final SyndFeed feed) {
 		try {
-			final SyndFeedOutput feedOutput = new SyndFeedOutput();
-			feedOutput.output(feed, response.getWriter());
+			final String url = URLs.cleanUpURL(channel.getUrl()) + "/videos";
+			final ChannelPage page = URLs.openPage(url, s -> new ChannelPage(s));
+			final String profileImage = page.getProfileImage();
+
+			final Thumbnail thumbnail = new Thumbnail(new URI(profileImage));
+
+			final Metadata metadata = new Metadata();
+			metadata.setThumbnail(new Thumbnail[] { thumbnail });
+
+			final MediaModule mediaModule = new MediaModuleImpl();
+			((MediaModuleImpl) mediaModule).setMetadata(metadata);
+			feed.getModules().add(mediaModule);
+
+			final FeedInformation itunesModule = new FeedInformationImpl();
+			itunesModule.setImage(new URL(profileImage));
+			feed.getModules().add(itunesModule);
 		}
-		catch (IOException | FeedException e) {
-			log.error("Error writing feed to HTTP response", e);
-			throw Throwables.propagate(e);
+		catch (final URISyntaxException | MalformedURLException e) {
+			// Create feed anyway, but log exception
+			log.warn("Could not add thumbnail to feed", e);
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	private void addSinglesThumbnail(final SyndFeed feed, final HttpServletRequest request) {
+		try {
+			final String hostBaseUrl = request.getRequestURL().toString().replace("/singles/feed", "");
+			final String thumbnailUrl = hostBaseUrl + "/images/singles_thumbnail.png";
+
+			final Thumbnail thumbnail = new Thumbnail(new URI(thumbnailUrl));
+			final Metadata metadata = new Metadata();
+			metadata.setThumbnail(new Thumbnail[] { thumbnail });
+
+			final MediaModule mediaModule = new MediaModuleImpl();
+			((MediaModuleImpl) mediaModule).setMetadata(metadata);
+			feed.getModules().add(mediaModule);
+
+			final FeedInformation itunesModule = new FeedInformationImpl();
+			itunesModule.setImage(new URL(thumbnailUrl));
+			feed.getModules().add(itunesModule);
+		}
+		catch (final URISyntaxException | MalformedURLException e) {
+			// Create feed anyway, but log exception
+			log.warn("Could not add thumbnail to singles feed", e);
 		}
 	}
 
@@ -103,7 +150,6 @@ public class FeedController {
 		return entry;
 	}
 
-	@SuppressWarnings("unchecked")
 	private SyndFeed generateFeed(final Channel channel, final String requestURL, final String type) {
 		final List<Video> videos = videoDAO.findByChannelID(channel.getId());
 		videos.removeIf(v -> v.getState() != VideoState.READY);
@@ -124,30 +170,29 @@ public class FeedController {
 			feed.setFeedType("atom_1.0");
 		}
 
-		try {
-			final String url = URLs.cleanUpURL(channel.getUrl()) + "/videos";
-			final ChannelPage page = URLs.openPage(url, s -> new ChannelPage(s));
-			final String profileImage = page.getProfileImage();
-
-			final Thumbnail thumbnail = new Thumbnail(new URI(profileImage));
-
-			final Metadata metadata = new Metadata();
-			metadata.setThumbnail(new Thumbnail[] { thumbnail });
-
-			final MediaModule mediaModule = new MediaModuleImpl();
-			((MediaModuleImpl) mediaModule).setMetadata(metadata);
-			feed.getModules().add(mediaModule);
-
-			final FeedInformation itunesModule = new FeedInformationImpl();
-			itunesModule.setImage(new URL(profileImage));
-			feed.getModules().add(itunesModule);
-		}
-		catch (final URISyntaxException | MalformedURLException e) {
-			// Create feed anyway, but log exception
-			log.warn("Could not add thumbnail to feed", e);
-		}
-
 		return feed;
+	}
+
+	private void getFeed(final Channel channel, final String token, final String type, final HttpServletResponse response, final HttpServletRequest request,
+			final Function<SyndFeed, Void> customizeFeed) {
+		checkArgument(token.equals(channel.getSecurityToken()), "Token mismatch");
+
+		checkArgument("rss".equals(type) || "atom".equals(type), "Type must be \"rss\" or \"atom\"");
+
+		final String requestURL = request.getRequestURL().toString();
+
+		final SyndFeed feed = generateFeed(channel, requestURL, type);
+		customizeFeed.apply(feed);
+		setHeaders(channel, type, response);
+
+		try {
+			final SyndFeedOutput feedOutput = new SyndFeedOutput();
+			feedOutput.output(feed, response.getWriter());
+		}
+		catch (IOException | FeedException e) {
+			log.error("Error writing feed to HTTP response", e);
+			throw Throwables.propagate(e);
+		}
 	}
 
 	private void setHeaders(final Channel channel, final String type, final HttpServletResponse response) {
