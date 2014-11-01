@@ -175,4 +175,9 @@ public class Video {
 		this.youtubeID = youtubeID;
 	}
 
+	@Override
+	public String toString() {
+		return "Video [id=" + id + ", name=" + name + "]";
+	}
+
 }

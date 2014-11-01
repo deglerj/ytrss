@@ -33,8 +33,16 @@ public class StreamDownloader {
 	@Async("downloader")
 	public void download(Video video, final StreamMapEntry entry, final Consumer<Void> started, final Consumer<File> downloaded,
 			final Consumer<Throwable> failed) {
-		// Reload video from DB in case it has changed (e.g. state has been altered)
-		video = videoDAO.findById(video.getId());
+
+		try {
+			// Reload video from DB in case it has changed (e.g. state has been altered)
+			video = videoDAO.findById(video.getId());
+		}
+		// Catch exception thrown if the video has been deleted and stop downloading
+		catch (final EmptyResultDataAccessException e) {
+			log.info("Canceling downloading video \"{}\" because it has been deleted", video);
+			return;
+		}
 
 		// Make sure the video has not been deleted or reset while being enqueued for downloading
 		if (isInvalid(video)) {

@@ -70,8 +70,15 @@ public class FFMPEGCommandTranscoder implements Transcoder {
 	public void transcode(final File videoFile, Video video, final Consumer<Void> started, final Consumer<File> transcoded, final Consumer<Throwable> failed) {
 		try {
 
-			// Reload video from DB in case it has changed (e.g. state has been altered)
-			video = videoDAO.findById(video.getId());
+			try {
+				// Reload video from DB in case it has changed (e.g. state has been altered)
+				video = videoDAO.findById(video.getId());
+			}
+			// Catch exception thrown if the video has been deleted and stop transcoding
+			catch (final EmptyResultDataAccessException e) {
+				log.info("Canceling transcoding video \"{}\" because it has been deleted", video);
+				return;
+			}
 
 			// Make sure the video has not been deleted or reset while being enqueued for transcoding
 			if (isInvalid(video)) {
