@@ -34,6 +34,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 		// Allow anonymous access to feed and mp3 downloads
 		http.authorizeRequests().antMatchers("/download").permitAll();
 		http.authorizeRequests().antMatchers("/channel/**/feed").permitAll();
+		http.authorizeRequests().antMatchers("/singles/feed").permitAll();
+		http.authorizeRequests().antMatchers("/images/**").permitAll();
 
 		// Require authentication for all other pages
 		http.authorizeRequests().anyRequest().hasAuthority("ADMIN");

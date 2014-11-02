@@ -75,8 +75,13 @@ public class FeedController {
 		final Channel channel = channelDAO.findByName("Singles");
 		getFeed(channel, token, type, response, request, feed -> {
 			addSinglesThumbnail(feed, request);
-			return null;
-		});
+
+			// Set better name and description
+				feed.setDescription("ytrss feed for single YouTube videos");
+				feed.setTitle("ytrss Singles");
+
+				return null;
+			});
 	}
 
 	@SuppressWarnings("unchecked")
