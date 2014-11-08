@@ -2,6 +2,7 @@
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
 <%@ taglib prefix="s" uri="http://www.springframework.org/tags"%>
+<%@ taglib prefix="y" uri="http://github.com/deglerj/ytrss"%>
 
 <c:set var="req" value="${pageContext.request}" />
 <c:set var="url">${req.requestURL}</c:set>
@@ -23,20 +24,16 @@
 
 <link href="images/favicon.ico" rel="shortcut icon">
 
+<link href="stream/css/oiplayer.css" rel="stylesheet" type="text/css" />
+
 </head>
 
-<body style="padding: 30px; background-color: #2b3e50">
+<body style="padding: 15px; background-color: #2b3e50">
 	
-	<audio src="/download?id=${video.id}&token=${video.securityToken}"></audio>
+	<audio src="/download?id=${video.id}&token=${video.securityToken}" controls style="width: 100%">
+		<div>Your browser does not support the audio-tag. Please consider upgrading.</div>
+	</audio>
 
-
-	<script src="js/bootstrap.min.js"></script>
-	<script src="audiojs/audio.min.js"></script>
-	<script>
-		audiojs.events.ready(function() {
-			var as = audiojs.createAll();
-		});
-	</script>
 </body>
 
 </html>
