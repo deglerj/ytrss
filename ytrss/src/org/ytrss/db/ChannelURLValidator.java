@@ -21,7 +21,7 @@ public class ChannelURLValidator implements ConstraintValidator<ChannelURL, Stri
 	public boolean isValid(final String value, final ConstraintValidatorContext context) {
 		try {
 			final String url = URLs.cleanUpURL(value) + "/videos";
-			final ChannelPage page = URLs.openPage(url, s -> new ChannelPage(s));
+			final ChannelPage page = new ChannelPage(URLs.getSource(url, false));
 			page.getProfileImage();
 			page.getContentGridEntries(30);
 			return true;

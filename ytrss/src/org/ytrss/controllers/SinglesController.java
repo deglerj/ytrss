@@ -100,7 +100,7 @@ public class SinglesController {
 		try {
 			final String internalURL = processUserURL(url);
 
-			final VideoPage page = URLs.openPage(internalURL, s -> new VideoPage(s));
+			final VideoPage page = new VideoPage(URLs.getSource(internalURL, false));
 			final Video video = videoDAO.create(singlesChannel, page);
 			ripper.download(video);
 			return true;

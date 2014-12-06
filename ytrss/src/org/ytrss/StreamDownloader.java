@@ -55,16 +55,15 @@ public class StreamDownloader {
 		final String fileName = settingsService.getSetting("files", String.class) + File.separator + "videos" + File.separator + Videos.getFileName(video)
 				+ "." + StreamMapEntries.getExtension(entry);
 
-		final File file = new File(fileName);
 		try {
+			final File file = new File(fileName);
 			FileUtils.copyURLToFile(new URL(entry.getUrl()), file);
+			downloaded.accept(file);
 		}
 		catch (final Throwable t) {
 			failed.accept(t);
 			return;
 		}
-
-		downloaded.accept(file);
 	}
 
 	private boolean isDeleted(final Video video) {

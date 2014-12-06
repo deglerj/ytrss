@@ -38,8 +38,8 @@ public class ChannelPage {
 
 			final Matcher entriesMatcher = GRID_ENTRY_PATTERN.matcher(contentNode.getText());
 			while (entriesMatcher.find()) {
-				final String title = entriesMatcher.group(1);
-				final String href = entriesMatcher.group(2).replace("&amp;", "&");
+				final String title = entriesMatcher.group(2);
+				final String href = entriesMatcher.group(1).replace("&amp;", "&");
 				entries.add(new ContentGridEntry(title, href));
 			}
 
@@ -59,8 +59,9 @@ public class ChannelPage {
 
 	private final String			source;
 
-	// Value of title attribute is matched in group 1, href in group 2
-	private static final Pattern	GRID_ENTRY_PATTERN		= Pattern.compile("<a[^<]*title=\"([^\"]+)\"[^<]*href=\"([^\"]+)\"[^<]*>", Pattern.MULTILINE);
+	// Value of title attribute is matched in group 2, href in group 1
+	private static final Pattern	GRID_ENTRY_PATTERN		= Pattern.compile("<a[^>]*yt-uix-tile-link[^>]*href=\"([^\"]+)\"[^>]*>\\s*([^<]+)",
+			Pattern.MULTILINE);
 
 	private static final Pattern	PROFILE_IMAGE_PATTERN	= Pattern.compile("channel-header-profile-image\"\\s*src=\"([^\"]+)\"", Pattern.MULTILINE);
 
@@ -113,7 +114,7 @@ public class ChannelPage {
 		final String url = "https://www.youtube.com/c4_browse_ajax?action_load_more_videos=1&view=0&paging=" + page + "&channel_id=" + getChannelId()
 				+ "&sort=dd&flow=grid&fluid=True";
 
-		final String gridSource = URLs.copyToString(url);
+		final String gridSource = URLs.getSource(url, true);
 
 		final JsonRootNode json = new JdomParser().parse(gridSource);
 		return new ContentGrid(json);

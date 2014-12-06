@@ -195,6 +195,8 @@ public class Ripper {
 	}
 
 	private void onTranscodeFailed(final File videoFile, final Video video, final Throwable errors) {
+		log.error("Transconding of file \"" + videoFile.getAbsolutePath() + "\" belonging to video \"" + video + "\" failed", errors);
+
 		// Mark as failed
 		updateVideoState(video, VideoState.TRANSCODING_FAILED, errors);
 
@@ -206,17 +208,17 @@ public class Ripper {
 
 	private ChannelPage openChannelPage(final Channel channel) {
 		final String url = URLs.cleanUpURL(channel.getUrl()) + "/videos";
-		return URLs.openPage(url, s -> new ChannelPage(s));
+		return new ChannelPage(URLs.getSource(url, false));
 	}
 
 	private VideoPage openVideoPage(final ContentGridEntry contentEntry) {
 		final String url = "http://youtube.com" + contentEntry.getHref() + "&gl=gb&hl=en"; // Force locale to make date parsing easier
-		return URLs.openPage(url, s -> new VideoPage(s));
+		return new VideoPage(URLs.getSource(url, false));
 	}
 
 	private VideoPage openVideoPage(final Video video) {
 		final String url = "http://youtube.com/watch?v=" + video.getYoutubeID() + "&gl=gb&hl=en"; // Force locale to make date parsing easier
-		return URLs.openPage(url, s -> new VideoPage(s));
+		return new VideoPage(URLs.getSource(url, false));
 	}
 
 	private void rip(final Channel channel) {
@@ -241,7 +243,7 @@ public class Ripper {
 				case TRANSCODING_ENQUEUED:
 				case EXCLUDED:
 				case NOT_INCLUDED:
-					log.info("Skipping YouTube entry \"{}\" with video state {} (no action necessary)", entry.getTitle(), video.getState());
+					log.debug("Skipping YouTube entry \"{}\" with video state {} (no action necessary)", entry.getTitle(), video.getState());
 					// Nothing to do
 					break;
 

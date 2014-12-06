@@ -38,13 +38,13 @@ public class ChannelPageTest {
 
 	private ChannelPage openPage(final String url) {
 		final String cleanURL = URLs.cleanUpURL(url);
-		return URLs.openPage(cleanURL + "/videos", s -> new ChannelPage(s));
+		return new ChannelPage(URLs.getSource(cleanURL, false));
 
 	}
 
 	private void testEntry(final ContentGridEntry entry) {
 		final String url = "http://youtube.com" + entry.getHref() + "&gl=gb&hl=en"; // Force locale to make date parsing easier
-		final VideoPage videoPage = URLs.openPage(url, s -> new VideoPage(s));
+		final VideoPage videoPage = new VideoPage(URLs.getSource(url, false));
 		assertNotNull(videoPage.getTitle());
 	}
 

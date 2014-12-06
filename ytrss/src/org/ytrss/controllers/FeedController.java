@@ -77,18 +77,18 @@ public class FeedController {
 			addSinglesThumbnail(feed, request);
 
 			// Set better name and description
-				feed.setDescription("ytrss feed for single YouTube videos");
-				feed.setTitle("ytrss Singles");
+			feed.setDescription("ytrss feed for single YouTube videos");
+			feed.setTitle("ytrss Singles");
 
-				return null;
-			});
+			return null;
+		});
 	}
 
 	@SuppressWarnings("unchecked")
 	private void addChannelPageThumbnail(final Channel channel, final SyndFeed feed) {
 		try {
 			final String url = URLs.cleanUpURL(channel.getUrl()) + "/videos";
-			final ChannelPage page = URLs.openPage(url, s -> new ChannelPage(s));
+			final ChannelPage page = new ChannelPage(URLs.getSource(url, false));
 			final String profileImage = page.getProfileImage();
 
 			final Thumbnail thumbnail = new Thumbnail(new URI(profileImage));

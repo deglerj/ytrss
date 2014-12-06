@@ -21,7 +21,7 @@ public class VideoPageTest {
 
 	@Before
 	public void setUp() throws MalformedURLException, IOException {
-		page = URLs.openPage("https://www.youtube.com/watch?v=ALZZx1xmAzg&gl=gb&hl=en", s -> new VideoPage(s));
+		page = new VideoPage(URLs.getSource("https://www.youtube.com/watch?v=ALZZx1xmAzg&gl=gb&hl=en", false));
 	}
 
 	@Test
