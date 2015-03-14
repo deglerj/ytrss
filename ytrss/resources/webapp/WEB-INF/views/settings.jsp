@@ -54,6 +54,17 @@
 		</div>
 		
 		<div class="form-group">
+			<label for="inputDelay" class="col-lg-2 control-label">Delay between updates</label>
+			<div class="col-lg-4">
+				<form:input path="delay" autocomplete="off" cssClass="form-control" id="inputDleay" placeholder="30" type="number"/>
+				<span class="help-block">Check subscribed channels for updates every x minutes</span>
+			</div>
+			<div class="col-xs-2">
+				<form:errors path="delay" cssClass="form-error"/>
+			</div>
+		</div>
+		
+		<div class="form-group">
 			<label for="inputDownloaderThreads" class="col-lg-2 control-label">Max. parallel downloads</label>
 			<div class="col-lg-4">
 				<form:input path="downloaderThreads" autocomplete="off" cssClass="form-control" id="inputDownloaderThreads" placeholder="2" type="number"/>

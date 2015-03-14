@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.ytrss.db.Channel;
 import org.ytrss.db.ChannelDAO;
 import org.ytrss.db.ServerStateChangeEvent;
+import org.ytrss.db.SettingsService;
 import org.ytrss.db.Video;
 import org.ytrss.db.VideoDAO;
 import org.ytrss.db.VideoState;
@@ -30,9 +31,7 @@ import com.google.common.eventbus.EventBus;
 @Component
 public class Ripper {
 
-	private static final long			DELAY	= TimeUnit.MINUTES.toMillis(30);
-
-	private static Logger				log		= LoggerFactory.getLogger(Ripper.class);
+	private static Logger				log	= LoggerFactory.getLogger(Ripper.class);
 
 	private Long						lastExecuted;
 
@@ -62,6 +61,9 @@ public class Ripper {
 	@Autowired
 	private EventBus					eventBus;
 
+	@Autowired
+	private SettingsService				settings;
+
 	public void download(final Video video) {
 		final VideoPage videoPage = openVideoPage(video);
 		final StreamMapEntry bestEntry = streamMapEntryScorer.findBestEntry(videoPage.getStreamMapEntries());
@@ -73,7 +75,7 @@ public class Ripper {
 			return 0;
 		}
 		else {
-			return (lastExecuted + DELAY) - System.currentTimeMillis();
+			return (lastExecuted + getDelay()) - System.currentTimeMillis();
 		}
 	}
 
@@ -122,7 +124,7 @@ public class Ripper {
 			return true;
 		}
 		else {
-			return System.currentTimeMillis() - lastExecuted >= Ripper.DELAY;
+			return System.currentTimeMillis() - lastExecuted >= getDelay();
 		}
 	}
 
@@ -142,6 +144,11 @@ public class Ripper {
 			onDownloadFailed(video, t, entry);
 		});
 
+	}
+
+	private long getDelay() {
+		final int delayMinutes = settings.getSetting("delay", Integer.class);
+		return TimeUnit.MINUTES.toMillis(delayMinutes);
 	}
 
 	private boolean isExcluded(final ContentGridEntry contentEntry, final Channel channel) {

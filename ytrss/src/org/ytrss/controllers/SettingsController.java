@@ -42,12 +42,14 @@ public class SettingsController {
 
 		private Bitrate	bitrate;
 
+		private Integer	delay;
+
 		public SettingsForm() {
 			// Empty default constructor
 		}
 
 		public SettingsForm(final String password, final String password2, final Integer port, final String files, final Integer downloaderThreads,
-				final Integer transcoderThreads, final Bitrate bitrate) {
+				final Integer transcoderThreads, final Bitrate bitrate, final Integer delay) {
 			this.password = password;
 			this.password2 = password2;
 			this.port = port;
@@ -55,10 +57,15 @@ public class SettingsController {
 			this.downloaderThreads = downloaderThreads;
 			this.transcoderThreads = transcoderThreads;
 			this.bitrate = bitrate;
+			this.delay = delay;
 		}
 
 		public Bitrate getBitrate() {
 			return bitrate;
+		}
+
+		public Integer getDelay() {
+			return delay;
 		}
 
 		public Integer getDownloaderThreads() {
@@ -87,6 +94,10 @@ public class SettingsController {
 
 		public void setBitrate(final Bitrate bitrate) {
 			this.bitrate = bitrate;
+		}
+
+		public void setDelay(final Integer delay) {
+			this.delay = delay;
 		}
 
 		public void setDownloaderThreads(final Integer downloaderThreads) {
@@ -130,8 +141,9 @@ public class SettingsController {
 		final Integer downloaderThreads = settingsService.getSetting("downloaderThreads", Integer.class);
 		final Integer transcoderThreads = settingsService.getSetting("transcoderThreads", Integer.class);
 		final Bitrate bitrate = settingsService.getSetting("bitrate", Bitrate.class);
+		final Integer delay = settingsService.getSetting("delay", Integer.class);
 
-		model.addAttribute("settingsForm", new SettingsForm("", "", port, files, downloaderThreads, transcoderThreads, bitrate));
+		model.addAttribute("settingsForm", new SettingsForm("", "", port, files, downloaderThreads, transcoderThreads, bitrate, delay));
 		model.addAttribute("channels", channelDAO.findAll());
 
 		return "settings";
@@ -145,14 +157,10 @@ public class SettingsController {
 		validateFiles(settingsForm.getFiles(), bindingResult);
 		validateDownloaderThreads(settingsForm.getDownloaderThreads(), bindingResult);
 		validateTranscoderThreads(settingsForm.getTranscoderThreads(), bindingResult);
+		validateDelay(settingsForm.getDelay(), bindingResult);
 
 		if (bindingResult.hasErrors()) {
 			return "settings";
-		}
-
-		if (hasPasswordChanged(settingsForm)) {
-			updatePassword(settingsForm.getPassword());
-			request.logout();
 		}
 
 		settingsService.setSetting("files", settingsForm.getFiles());
@@ -160,6 +168,12 @@ public class SettingsController {
 		settingsService.setSetting("downloaderThreads", settingsForm.getDownloaderThreads());
 		settingsService.setSetting("transcoderThreads", settingsForm.getTranscoderThreads());
 		settingsService.setSetting("bitrate", settingsForm.getBitrate());
+		settingsService.setSetting("delay", settingsForm.getDelay());
+
+		if (hasPasswordChanged(settingsForm)) {
+			updatePassword(settingsForm.getPassword());
+			request.logout();
+		}
 
 		return "redirect:/";
 	}
@@ -171,6 +185,15 @@ public class SettingsController {
 	private void updatePassword(final String password) {
 		final String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
 		settingsService.setSetting("password", hashedPassword);
+	}
+
+	private void validateDelay(final Integer delay, final BindingResult bindingResult) {
+		if (delay == null) {
+			bindingResult.addError(new FieldError("settingsForm", "delay", "must not be empty"));
+		}
+		else if (delay < 1) {
+			bindingResult.addError(new FieldError("settingsForm", "delay", "must at least be 1"));
+		}
 	}
 
 	private void validateDownloaderThreads(final Integer downloaderThreads, final BindingResult bindingResult) {

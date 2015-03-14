@@ -33,7 +33,7 @@ public class VideoPage {
 
 	private static final Pattern	TITLE_PATTERN		= Pattern.compile("og:title\"\\s*content=\"(.+)\">");
 
-	private static final Pattern	DESCRIPTION_PATTERN	= Pattern.compile("id=\"eow-description\"\\s*>\\s*(.+)<\\/p>[\\s|\\n]*<\\/div>", Pattern.MULTILINE);
+	private static final Pattern	DESCRIPTION_PATTERN	= Pattern.compile("id=\"eow-description\"\\s*>\\s*(.*)<\\/p>[\\s|\\n]*<\\/div>", Pattern.MULTILINE);
 
 	private static final Pattern	VIDEO_ID_PATTERN	= Pattern.compile("videoId\"\\s*content=\"(.+)\">");
 

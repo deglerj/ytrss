@@ -90,6 +90,7 @@ public class SettingsService {
 		initDefaultValue("downloaderThreads", 2);
 		initDefaultValue("transcoderThreads", 2);
 		initDefaultValue("bitrate", Bitrate.CBR_96);
+		initDefaultValue("delay", 30);
 	}
 
 	private boolean isSettingAvailable(final String name) {

@@ -1,8 +1,13 @@
 package org.ytrss.config;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,10 +23,32 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.ytrss.Ripper;
 import org.ytrss.db.SettingsService;
 
+import com.google.common.base.Throwables;
+
 @Configuration
 @EnableScheduling
 @EnableAsync
 public class AsyncConfiguration implements AsyncConfigurer {
+
+	private static class LoggingThreadPoolExecutor extends ThreadPoolExecutor {
+		public LoggingThreadPoolExecutor(final int threads) {
+			super(threads, threads, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
+		}
+
+		@Override
+		public <T> Future<T> submit(final Callable<T> task) {
+			final Callable<T> wrappedTask = () -> {
+				try {
+					return task.call();
+				}
+				catch (final Throwable t) {
+					log.error("Uncaught exception in thread pool", t);
+					throw Throwables.propagate(t);
+				}
+			};
+			return super.submit(wrappedTask);
+		}
+	}
 
 	private static Logger	log	= LoggerFactory.getLogger(Ripper.class);
 
@@ -46,13 +73,13 @@ public class AsyncConfiguration implements AsyncConfigurer {
 	@Bean
 	@Qualifier("downloader")
 	public Executor getStreamDownloaderExecutor() {
-		return Executors.newFixedThreadPool(settingsService.getSetting("downloaderThreads", Integer.class));
+		return new LoggingThreadPoolExecutor(settingsService.getSetting("downloaderThreads", Integer.class));
 	}
 
 	@Bean
 	@Qualifier("transcoder")
 	public Executor getTranscoderExecutor() {
-		return Executors.newFixedThreadPool(settingsService.getSetting("transcoderThreads", Integer.class));
+		return new LoggingThreadPoolExecutor(settingsService.getSetting("transcoderThreads", Integer.class));
 	}
 
 }
