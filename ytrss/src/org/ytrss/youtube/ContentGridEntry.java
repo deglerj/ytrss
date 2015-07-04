@@ -8,25 +8,20 @@ public class ContentGridEntry {
 
 	private final String			title;
 
-	private final String			href;
+	private final String			videoId;
 
-	private static final Pattern	VIDEO_ID_PATTERN	= Pattern.compile("v=([^&]+)");
-
-	public ContentGridEntry(final String title, final String href) {
+	public ContentGridEntry(final String title, final String videoId) {
 		this.title = title;
-		this.href = href;
+		this.videoId = videoId;
 	}
 
-	public String getHref() {
-		return href;
-	}
 
 	public String getTitle() {
 		return title;
 	}
 
 	public String getVideoID() {
-		return Patterns.getMatchGroup(VIDEO_ID_PATTERN, 1, href);
+		return videoId;
 	}
 
 }

@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.ytrss.Patterns;
@@ -23,45 +25,7 @@ import com.google.common.base.Throwables;
 
 public class ChannelPage {
 
-	private static class ContentGrid {
-
-		private final JsonRootNode	json;
-
-		public ContentGrid(final JsonRootNode json) {
-			this.json = json;
-		}
-
-		public List<ContentGridEntry> getEntries() {
-			final JsonNode contentNode = json.getNode("content_html");
-
-			final List<ContentGridEntry> entries = new ArrayList<>();
-
-			final Matcher entriesMatcher = GRID_ENTRY_PATTERN.matcher(contentNode.getText());
-			while (entriesMatcher.find()) {
-				final String title = entriesMatcher.group(2);
-				final String href = entriesMatcher.group(1).replace("&amp;", "&");
-				entries.add(new ContentGridEntry(title, href));
-			}
-
-			return entries;
-		}
-
-		public boolean hasMore() {
-			if (json.isNode("load_more_widget_html")) {
-				final String loadMore = json.getNode("load_more_widget_html").getText();
-				return !Strings.isNullOrEmpty(loadMore);
-			}
-			else {
-				return false;
-			}
-		}
-	}
-
 	private final String			source;
-
-	// Value of title attribute is matched in group 2, href in group 1
-	private static final Pattern	GRID_ENTRY_PATTERN		= Pattern.compile("<a[^>]*yt-uix-tile-link[^>]*href=\"([^\"]+)\"[^>]*>\\s*([^<]+)",
-			Pattern.MULTILINE);
 
 	private static final Pattern	PROFILE_IMAGE_PATTERN	= Pattern.compile("channel-header-profile-image\"\\s*src=\"([^\"]+)\"", Pattern.MULTILINE);
 
@@ -80,45 +44,57 @@ public class ChannelPage {
 	}
 
 	public List<ContentGridEntry> getContentGridEntries(final int maxEntries) {
-		int page = 1;
-		final List<ContentGridEntry> entries = new ArrayList<>();
+		Preconditions.checkArgument(maxEntries <= 50 && maxEntries > 0, "maxEntries must be between 1 and 50 (inclusive)");
+
+		final StringBuilder url = buildApiRequestUrl(maxEntries);
+
+		String json = URLs.getSource(url.toString(), true);
 
 		try {
-			ContentGrid grid;
-			do {
-				grid = loadGrid(page);
-				entries.addAll(grid.getEntries());
+			JsonRootNode root = new JdomParser().parse(json);
+			List<JsonNode> items = root.getArrayNode("items");
 
-				page++;
-			}
-			while (entries.size() < maxEntries && grid.hasMore());
+			List<ContentGridEntry> entries = Lists.newArrayList();
 
-			if (entries.size() > maxEntries) {
-				return entries.subList(0, maxEntries);
+			for(JsonNode item : items) {
+				JsonNode id = item.getNode("id");
+				String kind = id.getStringValue("kind");
+
+				// Skip playlists, etc.
+				if(!"youtube#video".equalsIgnoreCase(kind)) {
+					continue;
+				}
+
+				String videoId = id.getStringValue("videoId");
+
+				JsonNode snippet = item.getNode("snippet");
+				String title = snippet.getStringValue("title");
+
+				entries.add(new ContentGridEntry(title, videoId));
 			}
-			else {
-				return entries;
-			}
-		}
-		catch (final IOException | InvalidSyntaxException e) {
-			log.error("Error parsing conten grid entries", e);
+
+			return entries;
+
+		} catch (InvalidSyntaxException e) {
+			log.error("Error listing channel videos", e);
 			throw Throwables.propagate(e);
 		}
+
+
+	}
+
+	private StringBuilder buildApiRequestUrl(int maxEntries) {
+		//FIXME JDE key aus Settings auslesen
+		final StringBuilder url = new StringBuilder();
+		url.append("https://www.googleapis.com/youtube/v3/search?key=<API-KEY>&channelId=");
+		url.append(getChannelId());
+		url.append("&part=snippet,id&fields=items(id,snippet(title))&order=date&maxResults=");
+		url.append(maxEntries);
+		return url;
 	}
 
 	public String getProfileImage() {
 		return Patterns.getMatchGroup(PROFILE_IMAGE_PATTERN, 1, source);
-	}
-
-	private ContentGrid loadGrid(final int page) throws IOException, InvalidSyntaxException {
-		final String url = "https://www.youtube.com/c4_browse_ajax?action_load_more_videos=1&view=0&paging=" + page + "&channel_id=" + getChannelId()
-				+ "&sort=dd&flow=grid&fluid=True";
-
-		final String gridSource = URLs.getSource(url, true);
-
-		final JsonRootNode json = new JdomParser().parse(gridSource);
-		return new ContentGrid(json);
-
 	}
 
 }

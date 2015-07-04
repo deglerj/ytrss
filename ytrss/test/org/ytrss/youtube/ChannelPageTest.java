@@ -43,13 +43,13 @@ public class ChannelPageTest {
 	}
 
 	private void testEntry(final ContentGridEntry entry) {
-		final String url = "http://youtube.com" + entry.getHref() + "&gl=gb&hl=en"; // Force locale to make date parsing easier
+		final String url = "http://youtube.com/watch?v=" + entry.getVideoID() + "&gl=gb&hl=en";
 		final VideoPage videoPage = new VideoPage(URLs.getSource(url, false));
 		assertNotNull(videoPage.getTitle());
 	}
 
 	private void testPage(final ChannelPage page, final int minExpectedEntries) {
-		final List<ContentGridEntry> entries = page.getContentGridEntries(minExpectedEntries + 31);
+		final List<ContentGridEntry> entries = page.getContentGridEntries(minExpectedEntries);
 
 		assertTrue(entries.size() >= minExpectedEntries);
 

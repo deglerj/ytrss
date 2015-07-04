@@ -218,8 +218,8 @@ public class Ripper {
 		return new ChannelPage(URLs.getSource(url, false));
 	}
 
-	private VideoPage openVideoPage(final ContentGridEntry contentEntry) {
-		final String url = "http://youtube.com" + contentEntry.getHref() + "&gl=gb&hl=en"; // Force locale to make date parsing easier
+	private VideoPage openVideoPage(final ContentGridEntry entry) {
+		final String url = "http://youtube.com/watch?v=" + entry.getVideoID() + "&gl=gb&hl=en";// Force locale to make date parsing easier
 		return new VideoPage(URLs.getSource(url, false));
 	}
 
