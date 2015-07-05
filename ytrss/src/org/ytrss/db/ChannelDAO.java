@@ -119,17 +119,17 @@ public class ChannelDAO {
 	private EventBus					eventBus;
 
 	private final RowMapper<Channel>	rowMapper	= (rs, rowNum) -> {
-		final Channel channel = new Channel();
-		channel.setId(rs.getLong("id"));
-		channel.setName(rs.getString("name"));
-		channel.setUrl(rs.getString("url"));
-		channel.setExcludeRegex(rs.getString("exclude_regex"));
-		channel.setIncludeRegex(rs.getString("include_regex"));
-		channel.setSecurityToken(rs.getString("security_token"));
-		channel.setMaxVideos(rs.getInt("max_videos"));
-		channel.setHidden(rs.getBoolean("hidden"));
-		return channel;
-	};
+														final Channel channel = new Channel();
+														channel.setId(rs.getLong("id"));
+														channel.setName(rs.getString("name"));
+														channel.setUrl(rs.getString("url"));
+														channel.setExcludeRegex(rs.getString("exclude_regex"));
+														channel.setIncludeRegex(rs.getString("include_regex"));
+														channel.setSecurityToken(rs.getString("security_token"));
+														channel.setMaxVideos(rs.getInt("max_videos"));
+														channel.setHidden(rs.getBoolean("hidden"));
+														return channel;
+													};
 
 	@Autowired
 	private VideoDAO					videoDAO;

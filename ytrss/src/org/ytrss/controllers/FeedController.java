@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.ytrss.URLs;
 import org.ytrss.db.Channel;
 import org.ytrss.db.ChannelDAO;
+import org.ytrss.db.SettingsService;
 import org.ytrss.db.Video;
 import org.ytrss.db.VideoDAO;
 import org.ytrss.db.VideoState;
@@ -59,6 +60,9 @@ public class FeedController {
 	@Autowired
 	private VideoDAO		videoDAO;
 
+	@Autowired
+	private SettingsService	settingsService;
+
 	@RequestMapping(value = "/channel/{id}/feed", method = RequestMethod.GET)
 	public void getFeed(@PathVariable("id") final long id, @RequestParam("token") final String token, @RequestParam("type") final String type,
 			final HttpServletResponse response, final HttpServletRequest request) {
@@ -88,7 +92,8 @@ public class FeedController {
 	private void addChannelPageThumbnail(final Channel channel, final SyndFeed feed) {
 		try {
 			final String url = URLs.cleanUpURL(channel.getUrl()) + "/videos";
-			final ChannelPage page = new ChannelPage(URLs.getSource(url, false));
+			final String apiKey = settingsService.getSetting("apiKey", String.class);
+			final ChannelPage page = new ChannelPage(URLs.getSource(url, false), apiKey);
 			final String profileImage = page.getProfileImage();
 
 			final Thumbnail thumbnail = new Thumbnail(new URI(profileImage));

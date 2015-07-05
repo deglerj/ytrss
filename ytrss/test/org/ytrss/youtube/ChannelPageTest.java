@@ -2,9 +2,14 @@ package org.ytrss.youtube;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
+import org.apache.commons.io.IOUtils;
+import org.junit.Before;
 import org.junit.Test;
 import org.ytrss.URLs;
 
@@ -12,33 +17,48 @@ import com.google.common.collect.Iterables;
 
 public class ChannelPageTest {
 
+	private String	apiKey;
+
+	@Before
+	public void readApiKey() throws IOException {
+		try (final InputStream is = this.getClass().getResourceAsStream("api.key")) {
+
+			if (is == null) {
+				fail("Please create a file \"api.key\" and insert your YouTube Data API Key. Make sure to keep the file excluded from Git.");
+				return;
+			}
+
+			apiKey = IOUtils.toString(is);
+		}
+	}
+
 	@Test
 	public void testExtraSlashURLPage() {
 		final ChannelPage page = openPage("http://www.youtube.com/user/brentalfloss/");
-		testPage(page, 31);
+		testPage(page);
 	}
 
 	@Test
 	public void testNormalPage() {
 		final ChannelPage page = openPage("http://www.youtube.com/user/ROCKETBEANSTV");
-		testPage(page, 30);
+		testPage(page);
 	}
 
 	@Test
 	public void testOneEntryPage() {
 		final ChannelPage page = openPage("http://www.youtube.com/user/freekthecat");
-		testPage(page, 1);
+		testPage(page);
 	}
 
 	@Test
 	public void testWeirdURLPage() {
 		final ChannelPage page = openPage("http://www.youtube.com/channel/UCn0TDqRR4NjwWiAQR9FAd5w");
-		testPage(page, 31);
+		testPage(page);
 	}
 
 	private ChannelPage openPage(final String url) {
 		final String cleanURL = URLs.cleanUpURL(url);
-		return new ChannelPage(URLs.getSource(cleanURL, false));
+		return new ChannelPage(URLs.getSource(cleanURL, false), apiKey);
 
 	}
 
@@ -48,10 +68,10 @@ public class ChannelPageTest {
 		assertNotNull(videoPage.getTitle());
 	}
 
-	private void testPage(final ChannelPage page, final int minExpectedEntries) {
-		final List<ContentGridEntry> entries = page.getContentGridEntries(minExpectedEntries);
+	private void testPage(final ChannelPage page) {
+		final List<ContentGridEntry> entries = page.getContentGridEntries(50);
 
-		assertTrue(entries.size() >= minExpectedEntries);
+		assertTrue(entries.size() > 0);
 
 		assertNotNull(page.getProfileImage());
 

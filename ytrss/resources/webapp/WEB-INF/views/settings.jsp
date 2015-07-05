@@ -12,6 +12,17 @@
 <div class="container">
 	<form:form method="post" commandName="settingsForm" cssClass="form-horizontal">
 		<div class="form-group">
+			<label for="inputApiKey" class="col-lg-2 control-label">YouTube Data API Key</label>
+			<div class="col-lg-4">
+				<form:input path="apiKey" cssClass="form-control" id="inputApiKey" placeholder="" type="text"/>
+				<span class="help-block">See <a href="https://developers.google.com/youtube/v3/getting-started">YouTube Data API</a> for details</span>
+			</div>
+			<div class="col-xs-2">
+				<form:errors path="apiKey" cssClass="form-error"/>
+			</div>
+		</div>
+	
+		<div class="form-group">
 			<label for="inputPassword" class="col-lg-2 control-label">Password</label>
 			<div class="col-lg-4">
 				<form:input path="password" autocomplete="off" cssClass="form-control" id="inputPassword" placeholder="****" type="password"/>

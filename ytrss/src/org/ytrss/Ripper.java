@@ -215,7 +215,8 @@ public class Ripper {
 
 	private ChannelPage openChannelPage(final Channel channel) {
 		final String url = URLs.cleanUpURL(channel.getUrl()) + "/videos";
-		return new ChannelPage(URLs.getSource(url, false));
+		final String apiKey = settings.getSetting("apiKey", String.class);
+		return new ChannelPage(URLs.getSource(url, false), apiKey);
 	}
 
 	private VideoPage openVideoPage(final ContentGridEntry entry) {

@@ -1,6 +1,5 @@
 package org.ytrss.db;
 
-
 public class Videos {
 
 	public static String getFileName(final Video video) {

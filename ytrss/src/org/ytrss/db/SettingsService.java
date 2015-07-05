@@ -91,6 +91,7 @@ public class SettingsService {
 		initDefaultValue("transcoderThreads", 2);
 		initDefaultValue("bitrate", Bitrate.CBR_96);
 		initDefaultValue("delay", 30);
+		initDefaultValue("apiKey", "");
 	}
 
 	private boolean isSettingAvailable(final String name) {
