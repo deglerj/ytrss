@@ -69,7 +69,7 @@ public class ChannelPageTest {
 	}
 
 	private void testPage(final ChannelPage page) {
-		final List<ContentGridEntry> entries = page.getContentGridEntries(50);
+		final List<ContentGridEntry> entries = page.getContentGridEntries(101);
 
 		assertTrue(entries.size() > 0);
 

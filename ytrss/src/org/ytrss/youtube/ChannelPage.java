@@ -15,7 +15,6 @@ import argo.jdom.JsonNode;
 import argo.jdom.JsonRootNode;
 import argo.saj.InvalidSyntaxException;
 
-import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Lists;
@@ -39,22 +38,15 @@ public class ChannelPage {
 		this.source = source;
 	}
 
-	public String getChannelId() {
-		return Patterns.getMatchGroup(CHANNEL_ID_PATTERN, 1, source);
-	}
-
-	public List<ContentGridEntry> getContentGridEntries(final int maxEntries) {
-		Preconditions.checkArgument(maxEntries <= 50 && maxEntries > 0, "maxEntries must be between 1 and 50 (inclusive)");
-
-		final StringBuilder url = buildApiRequestUrl(maxEntries);
+	public String fetchNextPage(final String pageToken, final List<ContentGridEntry> entries) {
+		final StringBuilder url = buildApiRequestUrl(50, pageToken);
 
 		final String json = URLs.getSource(url.toString(), true);
 
 		try {
 			final JsonRootNode root = new JdomParser().parse(json);
+			final String nextPageToken = root.isStringValue("nextPageToken") ? root.getStringValue("nextPageToken") : null;
 			final List<JsonNode> items = root.getArrayNode("items");
-
-			final List<ContentGridEntry> entries = Lists.newArrayList();
 
 			for (final JsonNode item : items) {
 				final JsonNode id = item.getNode("id");
@@ -73,28 +65,52 @@ public class ChannelPage {
 				entries.add(new ContentGridEntry(title, videoId));
 			}
 
-			return entries;
+			return nextPageToken;
 
 		}
 		catch (final InvalidSyntaxException e) {
 			log.error("Error listing channel videos", e);
 			throw Throwables.propagate(e);
 		}
+	}
 
+	public String getChannelId() {
+		return Patterns.getMatchGroup(CHANNEL_ID_PATTERN, 1, source);
+	}
+
+	public List<ContentGridEntry> getContentGridEntries(final int maxEntries) {
+		final List<ContentGridEntry> entries = Lists.newArrayList();
+
+		String nextPageToken = null;
+		do {
+			nextPageToken = fetchNextPage(nextPageToken, entries);
+		}
+		while (nextPageToken != null && entries.size() < maxEntries);
+
+		if (entries.size() > maxEntries) {
+			return entries.subList(0, maxEntries);
+		}
+		else {
+			return entries;
+		}
 	}
 
 	public String getProfileImage() {
 		return Patterns.getMatchGroup(PROFILE_IMAGE_PATTERN, 1, source);
 	}
 
-	private StringBuilder buildApiRequestUrl(final int maxEntries) {
+	private StringBuilder buildApiRequestUrl(final int maxEntries, final String pageToken) {
 		final StringBuilder url = new StringBuilder();
 		url.append("https://www.googleapis.com/youtube/v3/search?key=");
 		url.append(apiKey);
 		url.append("&channelId=");
 		url.append(getChannelId());
-		url.append("&part=snippet,id&fields=items(id,snippet(title))&order=date&maxResults=");
+		url.append("&part=snippet,id&fields=nextPageToken,items(id,snippet(title))&order=date&maxResults=");
 		url.append(maxEntries);
+		if (pageToken != null) {
+			url.append("&pageToken=");
+			url.append(pageToken);
+		}
 		return url;
 	}
 
