@@ -69,7 +69,7 @@ public class SinglesController {
 
 	private Channel					singlesChannel;
 
-	private static final Pattern	YOUTUBE_ID_PATTERN	= Pattern.compile("v=([\\w\\d]+)");
+	private static final Pattern	YOUTUBE_ID_PATTERN	= Pattern.compile("v=([\\w\\d\\-]+)");
 
 	@RequestMapping(value = "/singles", method = RequestMethod.GET)
 	public String getSingles(final Model model) throws Exception {
