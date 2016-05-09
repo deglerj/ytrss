@@ -27,21 +27,21 @@ import com.google.common.collect.Lists;
 
 public class VideoPage {
 
-	private final String			source;
+	private static final Pattern STREAM_MAP_PATTERN = Pattern.compile("\"url_encoded_fmt_stream_map\"\\s*:\\s*\"([^\"]+)");
 
-	private static final Pattern	STREAM_MAP_PATTERN	= Pattern.compile("\"url_encoded_fmt_stream_map\"\\s*:\\s*\"([^\"]+)");
+	private static final Pattern TITLE_PATTERN = Pattern.compile("og:title\"\\s*content=\"(.+)\">");
 
-	private static final Pattern	TITLE_PATTERN		= Pattern.compile("og:title\"\\s*content=\"(.+)\">");
+	private static final Pattern DESCRIPTION_PATTERN = Pattern.compile("id=\"eow-description\"[^>]*>\\s*(.*)<\\/p>[\\s|\\n]*<\\/div>", Pattern.MULTILINE);
 
-	private static final Pattern	DESCRIPTION_PATTERN	= Pattern.compile("id=\"eow-description\"\\s*>\\s*(.*)<\\/p>[\\s|\\n]*<\\/div>", Pattern.MULTILINE);
+	private static final Pattern VIDEO_ID_PATTERN = Pattern.compile("videoId\"\\s*content=\"(.+)\">");
 
-	private static final Pattern	VIDEO_ID_PATTERN	= Pattern.compile("videoId\"\\s*content=\"(.+)\">");
+	private static final Pattern KEY_VALUE_PATTERN = Pattern.compile("^([^=]+)=(.+)$");
 
-	private static final Pattern	KEY_VALUE_PATTERN	= Pattern.compile("^([^=]+)=(.+)$");
+	private static final Pattern UPLOADED_PATTERN = Pattern.compile("<strong[^>]*watch-time-text[^>]*>.+on\\s+([^<]+)<\\/strong>");
 
-	private static final Pattern	UPLOADED_PATTERN	= Pattern.compile("<strong[^>]*watch-time-text[^>]*>.+on\\s+([^<]+)<\\/strong>");
+	private static Logger log = LoggerFactory.getLogger(ChannelController.class);
 
-	private static Logger			log					= LoggerFactory.getLogger(ChannelController.class);
+	private final String source;
 
 	public VideoPage(final String source) {
 		checkArgument(!Strings.isNullOrEmpty(source), "Source must not be emtpy");
