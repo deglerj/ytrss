@@ -33,7 +33,7 @@ public class SinglesController {
 
 		@NotBlank
 		@URL
-		private String	url;
+		private String url;
 
 		public SinglesForm() {
 			// Empty default constructor
@@ -53,23 +53,23 @@ public class SinglesController {
 
 	}
 
-	@Autowired
-	private ChannelDAO				channelDAO;
+	private static Logger log = LoggerFactory.getLogger(SinglesController.class);
+
+	private static final Pattern YOUTUBE_ID_PATTERN = Pattern.compile("v=([\\w\\d\\-]+)");
 
 	@Autowired
-	private Ripper					ripper;
+	private ChannelDAO channelDAO;
 
 	@Autowired
-	private JsonVideosSerializer	videosSerializer;
+	private Ripper ripper;
 
 	@Autowired
-	private VideoDAO				videoDAO;
+	private JsonVideosSerializer videosSerializer;
 
-	private static Logger			log					= LoggerFactory.getLogger(SinglesController.class);
+	@Autowired
+	private VideoDAO videoDAO;
 
-	private Channel					singlesChannel;
-
-	private static final Pattern	YOUTUBE_ID_PATTERN	= Pattern.compile("v=([\\w\\d\\-]+)");
+	private Channel singlesChannel;
 
 	@RequestMapping(value = "/singles", method = RequestMethod.GET)
 	public String getSingles(final Model model) throws Exception {
@@ -101,6 +101,7 @@ public class SinglesController {
 			final String internalURL = processUserURL(url);
 
 			final VideoPage page = new VideoPage(URLs.getSource(internalURL, false));
+
 			final Video video = videoDAO.create(singlesChannel, page);
 			ripper.download(video);
 			return true;

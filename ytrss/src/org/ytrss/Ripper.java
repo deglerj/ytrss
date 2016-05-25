@@ -31,38 +31,38 @@ import com.google.common.eventbus.EventBus;
 @Component
 public class Ripper {
 
-	private static Logger				log	= LoggerFactory.getLogger(Ripper.class);
+	private static Logger log = LoggerFactory.getLogger(Ripper.class);
 
-	private Long						lastExecuted;
+	private Long lastExecuted;
 
-	private volatile boolean			active;
-
-	@Autowired
-	private ChannelDAO					channelDAO;
+	private volatile boolean active;
 
 	@Autowired
-	private VideoDAO					videoDAO;
+	private ChannelDAO channelDAO;
 
 	@Autowired
-	private Transcoder					transcoder;
+	private VideoDAO videoDAO;
 
 	@Autowired
-	private StreamDownloader			downloader;
+	private Transcoder transcoder;
 
 	@Autowired
-	private ScheduledExecutorService	scheduledExecutor;
+	private StreamDownloader downloader;
 
 	@Autowired
-	private StreamMapEntryScorer		streamMapEntryScorer;
+	private ScheduledExecutorService scheduledExecutor;
 
 	@Autowired
-	private ID3Tagger					id3Tagger;
+	private StreamMapEntryScorer streamMapEntryScorer;
 
 	@Autowired
-	private EventBus					eventBus;
+	private ID3Tagger id3Tagger;
 
 	@Autowired
-	private SettingsService				settings;
+	private EventBus eventBus;
+
+	@Autowired
+	private SettingsService settings;
 
 	public void download(final Video video) {
 		final VideoPage videoPage = openVideoPage(video);
@@ -110,10 +110,10 @@ public class Ripper {
 		transcoder.transcode(videoFile, video, nil -> {
 			log.info("Started transcoding of " + video.getName());
 			updateVideoState(video, VideoState.TRANSCODING);
-		}, mp3File -> {
+		} , mp3File -> {
 			log.info("Completed transcoding " + video.getName());
 			onTranscodeComplete(mp3File, video);
-		}, t -> {
+		} , t -> {
 			log.warn("Transcoding failed for " + video.getName(), t);
 			onTranscodeFailed(videoFile, video, t);
 		});
@@ -136,10 +136,10 @@ public class Ripper {
 		downloader.download(video, entry, nil -> {
 			log.info("Started download of " + video.getName());
 			updateVideoState(video, VideoState.DOWNLOADING);
-		}, videoFile -> {
+		} , videoFile -> {
 			log.info("Completed download of " + video.getName());
 			onDownloadComplete(video, videoFile);
-		}, t -> {
+		} , t -> {
 			log.error("Download failed for " + video.getName(), t);
 			onDownloadFailed(video, t, entry);
 		});
@@ -169,6 +169,10 @@ public class Ripper {
 
 	private void markAsSkipped(final Channel channel, final ContentGridEntry entry, final VideoState state) {
 		final VideoPage videoPage = openVideoPage(entry);
+		if (videoPage.isScheduledStream()) {
+			return;
+		}
+
 		final Video video = videoDAO.create(channel, videoPage);
 		video.setState(state);
 		videoDAO.persist(video);
@@ -187,7 +191,7 @@ public class Ripper {
 		// Retry in 5 minutes
 		scheduledExecutor.schedule(() -> {
 			download(video, entry);
-		}, 5, TimeUnit.MINUTES);
+		} , 5, TimeUnit.MINUTES);
 	}
 
 	private void onTranscodeComplete(final File mp3File, final Video video) {
@@ -210,7 +214,7 @@ public class Ripper {
 		// Retry in 5 minutes
 		scheduledExecutor.schedule(() -> {
 			transcode(videoFile, video);
-		}, 5, TimeUnit.MINUTES);
+		} , 5, TimeUnit.MINUTES);
 	}
 
 	private ChannelPage openChannelPage(final Channel channel) {
@@ -287,6 +291,10 @@ public class Ripper {
 		log.info("Starting ripping of new YouTube entry \"{}\"", entry.getTitle());
 
 		final VideoPage videoPage = openVideoPage(entry);
+		if (videoPage.isScheduledStream()) {
+			return;
+		}
+
 		final Video video = videoDAO.create(channel, videoPage);
 
 		ripExisting(entry, video);

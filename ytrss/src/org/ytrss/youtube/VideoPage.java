@@ -39,6 +39,8 @@ public class VideoPage {
 
 	private static final Pattern UPLOADED_PATTERN = Pattern.compile("<strong[^>]*watch-time-text[^>]*>.+on\\s+([^<]+)<\\/strong>");
 
+	private static final Pattern SCHEDULED_STREAM_PATTERN = Pattern.compile("<strong[^>]*watch-time-text[^>]*>\\s*Scheduled for[^<]+[^<]+<\\/strong>");
+
 	private static Logger log = LoggerFactory.getLogger(ChannelController.class);
 
 	private final String source;
@@ -124,6 +126,12 @@ public class VideoPage {
 
 	public String getVideoID() {
 		return getFromPattern(VideoPage.VIDEO_ID_PATTERN);
+	}
+
+	public boolean isScheduledStream() {
+		final Matcher foo = SCHEDULED_STREAM_PATTERN.matcher(source);
+		final boolean bar = foo.find();
+		return bar;
 	}
 
 	private String decode(final String encoded) throws IOException {
