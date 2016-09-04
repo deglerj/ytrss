@@ -6,13 +6,13 @@ import java.util.function.Consumer;
 
 import org.apache.commons.exec.CommandLine;
 import org.apache.commons.exec.DefaultExecutor;
-import org.apache.commons.exec.LogOutputStream;
 import org.apache.commons.exec.PumpStreamHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.scheduling.annotation.Async;
+import org.ytrss.StringOutputStream;
 import org.ytrss.db.SettingsService;
 import org.ytrss.db.Video;
 import org.ytrss.db.VideoDAO;
@@ -21,23 +21,7 @@ import org.ytrss.db.Videos;
 
 public class FFMPEGCommandTranscoder implements Transcoder {
 
-	private static class StringOutputStream extends LogOutputStream {
-
-		private final StringBuffer	lines	= new StringBuffer();
-
-		@Override
-		public String toString() {
-			return lines.toString();
-		}
-
-		@Override
-		protected void processLine(final String line, final int level) {
-			if (lines.length() != 0) {
-				lines.append("\n");
-			}
-			lines.append(line);
-		}
-	}
+	private static Logger log = LoggerFactory.getLogger(FFMPEGCommandTranscoder.class);
 
 	public static boolean isFfmpegAvailable() {
 		try {
@@ -63,11 +47,10 @@ public class FFMPEGCommandTranscoder implements Transcoder {
 	@Autowired
 	private SettingsService	settingsService;
 
-	private static Logger	log	= LoggerFactory.getLogger(FFMPEGCommandTranscoder.class);
-
 	@Override
 	@Async("transcoder")
-	public void transcode(final File videoFile, Video video, final Consumer<Void> started, final Consumer<File> transcoded, final Consumer<Throwable> failed) {
+	public void transcode(final File videoFile, Video video, final Consumer<Void> started, final Consumer<File> transcoded,
+			final Consumer<Throwable> failed) {
 		try {
 
 			try {
@@ -90,13 +73,14 @@ public class FFMPEGCommandTranscoder implements Transcoder {
 
 			log.info("Transcoding " + videoFile.getName());
 
-			final String fileName = settingsService.getSetting("files", String.class) + File.separator + "mp3s" + File.separator + Videos.getFileName(video)
-					+ ".mp3";
+			final String fileName = settingsService.getSetting("files", String.class) + File.separator + "mp3s" + File.separator
+					+ Videos.getFileName(video) + ".mp3";
 
 			final File mp3File = new File(fileName);
 
 			final String bitrate = getBitrateArgument();
-			final String command = "ffmpeg -y -i \"" + videoFile.getAbsolutePath() + "\" -vn " + bitrate + " \"" + mp3File.getAbsolutePath() + "\"";
+			final String command = "ffmpeg -y -i \"" + videoFile.getAbsolutePath() + "\" -vn " + bitrate + " \"" + mp3File.getAbsolutePath()
+					+ "\"";
 			final CommandLine cmdLine = CommandLine.parse(command);
 			final DefaultExecutor executor = new DefaultExecutor();
 			executor.setWorkingDirectory(new File(settingsService.getSetting("files", String.class)));

@@ -21,8 +21,6 @@ import org.ytrss.db.VideoState;
 import org.ytrss.transcoders.Transcoder;
 import org.ytrss.youtube.ChannelPage;
 import org.ytrss.youtube.ContentGridEntry;
-import org.ytrss.youtube.StreamMapEntry;
-import org.ytrss.youtube.StreamMapEntryScorer;
 import org.ytrss.youtube.VideoPage;
 
 import com.google.common.base.Strings;
@@ -31,43 +29,52 @@ import com.google.common.eventbus.EventBus;
 @Component
 public class Ripper {
 
-	private static Logger log = LoggerFactory.getLogger(Ripper.class);
+	private static Logger				log	= LoggerFactory.getLogger(Ripper.class);
 
-	private Long lastExecuted;
+	private Long						lastExecuted;
 
-	private volatile boolean active;
-
-	@Autowired
-	private ChannelDAO channelDAO;
+	private volatile boolean			active;
 
 	@Autowired
-	private VideoDAO videoDAO;
+	private ChannelDAO					channelDAO;
 
 	@Autowired
-	private Transcoder transcoder;
+	private VideoDAO					videoDAO;
 
 	@Autowired
-	private StreamDownloader downloader;
+	private Transcoder					transcoder;
 
 	@Autowired
-	private ScheduledExecutorService scheduledExecutor;
+	private StreamDownloader			downloader;
 
 	@Autowired
-	private StreamMapEntryScorer streamMapEntryScorer;
+	private ScheduledExecutorService	scheduledExecutor;
 
 	@Autowired
-	private ID3Tagger id3Tagger;
+	private ID3Tagger					id3Tagger;
 
 	@Autowired
-	private EventBus eventBus;
+	private EventBus					eventBus;
 
 	@Autowired
-	private SettingsService settings;
+	private SettingsService				settings;
 
 	public void download(final Video video) {
-		final VideoPage videoPage = openVideoPage(video);
-		final StreamMapEntry bestEntry = streamMapEntryScorer.findBestEntry(videoPage.getStreamMapEntries());
-		download(video, bestEntry);
+		log.info("Requesting download for " + video.getName());
+
+		updateVideoState(video, VideoState.DOWNLOADING_ENQUEUED);
+
+		downloader.download(video, nil -> {
+			log.info("Started download of " + video.getName());
+			updateVideoState(video, VideoState.DOWNLOADING);
+		}, videoFile -> {
+			log.info("Completed download of " + video.getName());
+			onDownloadComplete(video, videoFile);
+		}, t -> {
+			log.error("Download failed for " + video.getName(), t);
+			onDownloadFailed(video, t);
+		});
+
 	}
 
 	public long getCountdown() {
@@ -110,10 +117,10 @@ public class Ripper {
 		transcoder.transcode(videoFile, video, nil -> {
 			log.info("Started transcoding of " + video.getName());
 			updateVideoState(video, VideoState.TRANSCODING);
-		} , mp3File -> {
+		}, mp3File -> {
 			log.info("Completed transcoding " + video.getName());
 			onTranscodeComplete(mp3File, video);
-		} , t -> {
+		}, t -> {
 			log.warn("Transcoding failed for " + video.getName(), t);
 			onTranscodeFailed(videoFile, video, t);
 		});
@@ -126,24 +133,6 @@ public class Ripper {
 		else {
 			return System.currentTimeMillis() - lastExecuted >= getDelay();
 		}
-	}
-
-	private void download(final Video video, final StreamMapEntry entry) {
-		log.info("Requesting download for " + video.getName());
-
-		updateVideoState(video, VideoState.DOWNLOADING_ENQUEUED);
-
-		downloader.download(video, entry, nil -> {
-			log.info("Started download of " + video.getName());
-			updateVideoState(video, VideoState.DOWNLOADING);
-		} , videoFile -> {
-			log.info("Completed download of " + video.getName());
-			onDownloadComplete(video, videoFile);
-		} , t -> {
-			log.error("Download failed for " + video.getName(), t);
-			onDownloadFailed(video, t, entry);
-		});
-
 	}
 
 	private long getDelay() {
@@ -184,14 +173,14 @@ public class Ripper {
 		transcode(videoFile, video);
 	}
 
-	private void onDownloadFailed(final Video video, final Throwable error, final StreamMapEntry entry) {
+	private void onDownloadFailed(final Video video, final Throwable error) {
 		// Mark as failed
 		updateVideoState(video, VideoState.DOWNLOADING_FAILED, error);
 
 		// Retry in 5 minutes
 		scheduledExecutor.schedule(() -> {
-			download(video, entry);
-		} , 5, TimeUnit.MINUTES);
+			download(video);
+		}, 5, TimeUnit.MINUTES);
 	}
 
 	private void onTranscodeComplete(final File mp3File, final Video video) {
@@ -214,7 +203,7 @@ public class Ripper {
 		// Retry in 5 minutes
 		scheduledExecutor.schedule(() -> {
 			transcode(videoFile, video);
-		} , 5, TimeUnit.MINUTES);
+		}, 5, TimeUnit.MINUTES);
 	}
 
 	private ChannelPage openChannelPage(final Channel channel) {
@@ -225,11 +214,6 @@ public class Ripper {
 
 	private VideoPage openVideoPage(final ContentGridEntry entry) {
 		final String url = "http://youtube.com/watch?v=" + entry.getVideoID() + "&gl=gb&hl=en";// Force locale to make date parsing easier
-		return new VideoPage(URLs.getSource(url, false));
-	}
-
-	private VideoPage openVideoPage(final Video video) {
-		final String url = "http://youtube.com/watch?v=" + video.getYoutubeID() + "&gl=gb&hl=en"; // Force locale to make date parsing easier
 		return new VideoPage(URLs.getSource(url, false));
 	}
 
@@ -255,24 +239,20 @@ public class Ripper {
 				case TRANSCODING_ENQUEUED:
 				case EXCLUDED:
 				case NOT_INCLUDED:
-					log.debug("Skipping YouTube entry \"{}\" with video state {} (no action necessary)", entry.getTitle(), video.getState());
+					log.debug("Skipping YouTube entry \"{}\" with video state {} (no action necessary)", entry.getTitle(),
+							video.getState());
 					// Nothing to do
 					break;
 
 				case NEW:
 				case DOWNLOADING_FAILED:
 				case TRANSCODING_FAILED:
-					log.info("Starting ripping of previously processed YouTube entry \"{}\" with video state {}", entry.getTitle(), video.getState());
-					ripExisting(entry, video);
+					log.info("Starting ripping of previously processed YouTube entry \"{}\" with video state {}", entry.getTitle(),
+							video.getState());
+					download(video);
 					break;
 			}
 		}
-	}
-
-	private void ripExisting(final ContentGridEntry entry, final Video video) {
-		final VideoPage videoPage = openVideoPage(entry);
-		final StreamMapEntry bestEntry = streamMapEntryScorer.findBestEntry(videoPage.getStreamMapEntries());
-		download(video, bestEntry);
 	}
 
 	private void ripNew(final Channel channel, final ContentGridEntry entry) {
@@ -296,8 +276,7 @@ public class Ripper {
 		}
 
 		final Video video = videoDAO.create(channel, videoPage);
-
-		ripExisting(entry, video);
+		download(video);
 	}
 
 	@Scheduled(fixedDelay = 1000)

@@ -12,7 +12,7 @@ import com.googlecode.flyway.core.api.MigrationInfo;
 @Component
 public class DatabaseInitializer {
 
-	private static Log	log	= LogFactory.getLog(DatabaseInitializer.class);
+	private static Log log = LogFactory.getLog(DatabaseInitializer.class);
 
 	public void initialize(final DataSource dataSource) {
 		DatabaseInitializer.log.info("Preparing DB initialization");

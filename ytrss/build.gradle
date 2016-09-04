@@ -4,7 +4,7 @@ defaultTasks 'build'
 
 sourceCompatibility = 1.8 
 
-version = '0.2.2'
+version = '0.3.0.alpha1'
 
 repositories {
 	mavenCentral()
@@ -26,7 +26,7 @@ dependencies {
 	compile 'javax.servlet:jstl:+'
 	compile 'taglibs:standard:+'
     compile 'com.google.guava:guava:+'
-    compile 'org.hsqldb:hsqldb:2.+'
+    compile 'org.hsqldb:hsqldb:2.3.3'
 	compile 'commons-io:commons-io:+'
 	compile 'org.apache.commons:commons-lang3:+'
 	compile 'org.apache.commons:commons-exec:+'
